@@ -568,13 +568,13 @@ function updateOrderStatus(index, newStatus) {
     var order = allOrders[index];
     if (!order) return;
 
-    authFetch('https://api.nabztech.com/api/orders/' + order.id + '/status', {
+    authFetch('https://api.nabztech.com/api/orders/' + order.id + '/status', {   // ❌ wrong
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
     })
     .then(function(res) { return res.json(); })
-    .then(function(data) {
+    .then(function() {
         showNotification('✅ Order #' + order.id + ' → ' + newStatus);
         loadOrders();
     })
