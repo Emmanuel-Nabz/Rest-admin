@@ -292,16 +292,11 @@
     <!-- ============================================================== -->
      <script>
         // ============================================================
-        // 1. LOGIN
         // ============================================================
-        function authFetch(url, options) {
-    options = options || {};
-    options.headers = options.headers || {};
-    var token = localStorage.getItem('adminToken');
-    if (token) options.headers['Authorization'] = 'Bearer ' + token;
-    return authFetch(url, options);
-}
-        var loggedIn = false;
+// 1. LOGIN
+// ============================================================
+
+// Helper: attaches admin token to requests
 function authFetch(url, options) {
     options = options || {};
     options.headers = options.headers || {};
@@ -309,7 +304,10 @@ function authFetch(url, options) {
     if (token) options.headers['Authorization'] = 'Bearer ' + token;
     return fetch(url, options);
 }
-       function login() {
+
+var loggedIn = false;
+
+function login() {
     var username = document.getElementById('loginUsername').value.trim();
     var password = document.getElementById('loginPassword').value.trim();
     var errorEl = document.getElementById('loginError');
@@ -319,7 +317,8 @@ function authFetch(url, options) {
         return;
     }
 
-    authFetch(API + '/admin/login', {
+    // Plain fetch here — we don't have a token yet
+    fetch(API + '/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, password: password })
@@ -343,9 +342,10 @@ function authFetch(url, options) {
         errorEl.textContent = '❌ Network error. Try again.';
     });
 }
+
 // On page load — restore session if logged in
 function checkSession() {
-    if (localStorage.getItem('adminLoggedIn') === 'true') {
+    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
         loggedIn = true;
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('dashboardPage').style.display = 'block';
@@ -356,9 +356,9 @@ function checkSession() {
     }
 }
 
-// Run when the page loads
 window.addEventListener('DOMContentLoaded', checkSession);
-       function logout() {
+
+function logout() {
     if (!confirm('Logout?')) return;
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
@@ -367,7 +367,6 @@ window.addEventListener('DOMContentLoaded', checkSession);
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('loginPassword').value = '';
 }
-
        function switchTab(tab) {
     document.querySelectorAll('.tab-content').forEach(function(el) {
         el.classList.remove('active');
