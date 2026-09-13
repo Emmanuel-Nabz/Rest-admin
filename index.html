@@ -299,7 +299,7 @@
     options.headers = options.headers || {};
     var token = localStorage.getItem('adminToken');
     if (token) options.headers['Authorization'] = 'Bearer ' + token;
-    return fetch(url, options);
+    return authFetch(url, options);
 }
         var loggedIn = false;
 
@@ -313,7 +313,7 @@
         return;
     }
 
-    fetch(API + '/admin/login', {
+    authFetch(API + '/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, password: password })
@@ -405,7 +405,7 @@ function playBeep() {
 }
 
       function loadOrders() {
-    fetch('https://api.nabztech.com/api/orders')
+    authFetch('https://api.nabztech.com/api/orders')
         .then(function(response) { return response.json(); })
         .then(function(data) {
             console.log('✅ Orders loaded from API:', data.length);
@@ -561,7 +561,7 @@ function updateOrderStatus(index, newStatus) {
     var order = allOrders[index];
     if (!order) return;
 
-    fetch('https://api.nabztech.com/api/orders/' + order.id + '/status', {
+    authFetch('https://api.nabztech.com/api/orders/' + order.id + '/status', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -581,7 +581,7 @@ function deleteOrder(index) {
     if (!order) return;
 
     if (confirm('Delete this order?')) {
-        fetch('https://api.nabztech.com/api/orders/' + order.id, {
+        authFetch('https://api.nabztech.com/api/orders/' + order.id, {
             method: 'DELETE'
         })
         .then(function(res) { return res.json(); })
@@ -635,7 +635,7 @@ function deleteOrder(index) {
         }
 
        function loadMenu() {
-    fetch('https://api.nabztech.com/api/menu')
+    authFetch('https://api.nabztech.com/api/menu')
         .then(function(response) { return response.json(); })
         .then(function(data) {
             console.log('✅ Menu loaded from API:', data);
@@ -747,7 +747,7 @@ function deleteOrder(index) {
     
     var method = editId ? 'PUT' : 'POST';
 
-    fetch(url, {
+    authFetch(url, {
         method: method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(itemData)
@@ -808,7 +808,7 @@ function deleteOrder(index) {
        function deleteMenuItem(index) {
     var item = allMenuItems[index];
     if (confirm('Delete "' + item.name + '"?')) {
-        fetch('https://api.nabztech.com/api/menu/' + item.id, {
+        authFetch('https://api.nabztech.com/api/menu/' + item.id, {
             method: 'DELETE'
         })
         .then(function(response) { return response.json(); })
@@ -826,7 +826,7 @@ function deleteOrder(index) {
 // 4. CUSTOMERS MANAGEMENT
 // ============================================================
 function loadCustomers() {
-    fetch('https://api.nabztech.com/api/customers')
+    authFetch('https://api.nabztech.com/api/customers')
         .then(function(response) { return response.json(); })
         .then(function(customers) {
             var container = document.getElementById('customersContainer');
