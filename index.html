@@ -302,8 +302,14 @@
     return authFetch(url, options);
 }
         var loggedIn = false;
-
-        function login() {
+function authFetch(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    var token = localStorage.getItem('adminToken');
+    if (token) options.headers['Authorization'] = 'Bearer ' + token;
+    return fetch(url, options);
+}
+       function login() {
     var username = document.getElementById('loginUsername').value.trim();
     var password = document.getElementById('loginPassword').value.trim();
     var errorEl = document.getElementById('loginError');
@@ -318,7 +324,9 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: username, password: password })
     })
-    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(res) {
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+    })
     .then(function(result) {
         if (!result.ok) {
             errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
@@ -350,15 +358,15 @@ function checkSession() {
 
 // Run when the page loads
 window.addEventListener('DOMContentLoaded', checkSession);
-        function logout() {
-            if (confirm('Are you sure you want to logout?')) {
-                loggedIn = false;
-                localStorage.removeItem('adminLoggedIn');
-                document.getElementById('dashboardPage').style.display = 'none';
-                document.getElementById('loginPage').style.display = 'block';
-                document.getElementById('loginPassword').value = '';
-            }
-        }
+       function logout() {
+    if (!confirm('Logout?')) return;
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    localStorage.removeItem('adminLoggedIn');
+    document.getElementById('dashboardPage').style.display = 'none';
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginPassword').value = '';
+}
 
        function switchTab(tab) {
     document.querySelectorAll('.tab-content').forEach(function(el) {
