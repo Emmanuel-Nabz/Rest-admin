@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f0f2f5; padding: 20px; max-width: 1000px; margin: 0 auto; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        
+        body {
+    background-image: linear-gradient(rgba(1, 2, 5, 0.2), rgba(2, 5, 11, 0.2)), url('admin-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 20px;
+    min-height: 100vh;
+    width: 100%;
+}
         .login-container { background: white; padding: 40px 35px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-width: 420px; width: 100%; text-align: center; }
         .login-container h1 { font-size: 2em; color: #2c3e50; margin-bottom: 5px; }
         .login-container h1 i { color: #e67e22; }
@@ -91,7 +98,7 @@
         .notification i { margin-right: 10px; }
 
         /* ===== MENU MANAGEMENT ===== */
-        .menu-form { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .menu-form { background: rgb(159, 157, 157); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
         .menu-form h3 { color: #2c3e50; margin-bottom: 15px; }
         .menu-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .menu-form .form-group { margin-bottom: 0; }
@@ -154,7 +161,7 @@
     <div id="dashboardPage" class="dashboard">
         <div class="header">
             <div class="top-bar">
-                <h1>🍕 Admin Dashboard</h1>
+                <h1>🍕 Nabz-Tech Eats Admin Dashboard</h1>
                 <div class="user-info">
                     <span id="currentUser">👤 admin</span>
                     <span class="badge">Admin</span>
@@ -179,12 +186,15 @@
                 <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="applyFilters()">
                 <input type="date" id="dateFrom" onchange="applyFilters()">
                 <input type="date" id="dateTo" onchange="applyFilters()">
-                <select id="statusFilter" onchange="applyFilters()">
-                    <option value="all">📋 All</option>
-                    <option value="Pending">⏳ Pending</option>
-                    <option value="Completed">✅ Completed</option>
-                    <option value="Rejected">❌ Rejected</option>
-                </select>
+               <select id="statusFilter" onchange="applyFilters()">
+    <option value="all">📋 All</option>
+    <option value="New">🆕 New</option>
+    <option value="Confirmed">✅ Confirmed</option>
+    <option value="Preparing">👨‍🍳 Preparing</option>
+    <option value="On the Way">🛵 On the Way</option>
+    <option value="Delivered">🎉 Delivered</option>
+    <option value="Cancelled">❌ Cancelled</option>
+</select>
             </div>
             <div class="orders-header">
                 <h2>📋 Orders (<span id="orderCount">0</span>)</h2>
@@ -269,9 +279,14 @@
     </div>
 </div>
 
-        <a href="https://emmanuel-nabz.github.io/restaurant-app/" class="back-link">🏠 Back to Customer App</a>
-    </div>
-
+       <a href="#" class="back-link" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
+    🏠 Home
+<a href="#top" 
+   onclick="document.documentElement.scrollTop = 0; document.body.scrollTop = 0; return false;"
+   style="position: fixed; bottom: 90px; right: 20px; width: 50px; height: 50px; background: #e67e22; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3em; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4); text-decoration: none; z-index: 999;">
+    🏠
+</a>
+<a name="top"></a>
     <!-- ============================================================== -->
     <!-- PART 1 ENDS HERE — NOW COPY PART 2 BELOW                     -->
     <!-- ============================================================== -->
@@ -279,28 +294,62 @@
         // ============================================================
         // 1. LOGIN
         // ============================================================
+        function authFetch(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    var token = localStorage.getItem('adminToken');
+    if (token) options.headers['Authorization'] = 'Bearer ' + token;
+    return fetch(url, options);
+}
         var loggedIn = false;
 
         function login() {
-            var username = document.getElementById('loginUsername').value.trim();
-            var password = document.getElementById('loginPassword').value.trim();
-            var errorEl = document.getElementById('loginError');
+    var username = document.getElementById('loginUsername').value.trim();
+    var password = document.getElementById('loginPassword').value.trim();
+    var errorEl = document.getElementById('loginError');
 
-            if (username === 'admin' && password === 'admin123') {
-                errorEl.textContent = '';
-                loggedIn = true;
-                localStorage.setItem('adminLoggedIn', 'true');
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('dashboardPage').style.display = 'block';
-                document.getElementById('currentUser').textContent = '👤 admin';
-                loadOrders();
-                loadMenu();
-                setInterval(loadOrders, 30000);
-            } else {
-                errorEl.textContent = '❌ Invalid username or password.';
-            }
+    if (!username || !password) {
+        errorEl.textContent = '❌ Please enter both fields.';
+        return;
+    }
+
+    fetch(API + '/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
+            return;
         }
+        localStorage.setItem('adminToken', result.data.token);
+        localStorage.setItem('adminUser', result.data.username);
+        localStorage.setItem('adminLoggedIn', 'true');
+        errorEl.textContent = '';
+        showDashboard();
+    })
+    .catch(function(err) {
+        console.error('Login error:', err);
+        errorEl.textContent = '❌ Network error. Try again.';
+    });
+}
+// On page load — restore session if logged in
+function checkSession() {
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+        loggedIn = true;
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboardPage').style.display = 'block';
+        document.getElementById('currentUser').textContent = '👤 admin';
+        loadOrders();
+        loadMenu();
+        setInterval(loadOrders, 30000);
+    }
+}
 
+// Run when the page loads
+window.addEventListener('DOMContentLoaded', checkSession);
         function logout() {
             if (confirm('Are you sure you want to logout?')) {
                 loggedIn = false;
@@ -328,11 +377,72 @@
         // 2. ORDERS
         // ============================================================
         var allOrders = [];
+        var lastOrderCount = 0;
 
-        function loadOrders() {
-            allOrders = JSON.parse(localStorage.getItem('nabzOrders')) || [];
-            applyFilters();
+// 🔊 Beep using Web Audio API — no external file needed
+var audioCtx = null;
+
+function playBeep() {
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 880;
+        gain.gain.value = 0.15;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+    } catch (err) {
+        console.warn('🔇 Beep failed:', err);
+    }
+}
+
+      function loadOrders() {
+    fetch('https://api.nabztech.com/api/orders')
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            console.log('✅ Orders loaded from API:', data.length);
+
+            allOrders = data.map(function(order) {
+                return {
+                    id: order.id,
+                    date: order.created_at,
+                    name: order.customer_name,
+                    phone: order.customer_phone,
+                    address: order.customer_address,
+                    payment: order.payment_method,
+                    total: parseFloat(order.total),
+                    status: order.status || 'New',
+                    items: []
+                };
+            });
+
+            // 🔔 Detect new order and beep
+            if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
+                playBeep();
+                document.title = '🔔 New Order! | Admin';
+                setTimeout(function() {
+                    document.title = '🍕 Admin Dashboard';
+                }, 5000);
+                showNotification('🔔 New order received!');
+            }
+            lastOrderCount = allOrders.length;
+
+            applyFilters();
+        })
+        .catch(function(error) {
+            console.error('❌ Orders API error:', error);
+            allOrders = [];
+            applyFilters();
+        });
+}
 
         function applyFilters() {
             var search = document.getElementById('searchInput').value.toLowerCase();
@@ -356,72 +466,135 @@
             updateStats(filtered);
         }
 
-        function renderOrders(orders) {
-            var container = document.getElementById('ordersContainer');
-            document.getElementById('orderCount').textContent = orders.length;
-            if (orders.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>No orders found</p></div>';
-                return;
-            }
-            var html = '';
-            orders.forEach(function(order) {
-                var originalIndex = allOrders.indexOf(order);
-                var statusClass = order.status === 'Completed' ? 'completed' : order.status === 'Rejected' ? 'rejected' : '';
-                var statusText = order.status === 'Completed' ? '✅ Completed' : order.status === 'Rejected' ? '❌ Rejected' : '⏳ Pending';
-                html += '<div class="order-card ' + statusClass + '">' +
-                    '<div class="order-header"><span class="order-id">#' + (originalIndex + 1) + '</span><span class="order-status ' + order.status.toLowerCase() + '">' + statusText + '</span></div>' +
-                    '<div class="order-details"><i class="fas fa-calendar"></i> ' + order.date + '</div>' +
-                    '<div class="order-details"><i class="fas fa-user"></i> ' + order.name + '</div>' +
-                    '<div class="order-details"><i class="fas fa-phone"></i> ' + order.phone + '</div>' +
-                    '<div class="order-details"><i class="fas fa-map-pin"></i> ' + order.address + '</div>' +
-                    '<div class="order-details"><i class="fas fa-credit-card"></i> ' + order.payment + '</div>' +
-                    '<div class="order-items">' + order.items.map(function(item) { return item.quantity + 'x ' + item.name; }).join(', ') + '</div>' +
-                    '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
-                    '<div class="order-actions">' +
-                    (order.status === 'Pending' ?
-                        '<button class="btn btn-accept" onclick="updateOrderStatus(' + originalIndex + ', \'Completed\')">✅ Accept</button>' +
-                        '<button class="btn btn-reject" onclick="updateOrderStatus(' + originalIndex + ', \'Rejected\')">❌ Reject</button>' :
-                        '<span style="color:' + (order.status === 'Completed' ? '#27ae60' : '#e74c3c') + ';font-weight:bold;">' + (order.status === 'Completed' ? '✅ Completed' : '❌ Rejected') + '</span>' +
-                        '<button class="btn btn-delete" onclick="deleteOrder(' + originalIndex + ')">🗑️ Delete</button>'
-                    ) +
-                    '</div></div>';
-            });
-            container.innerHTML = html;
+function renderOrders(orders) {
+    var container = document.getElementById('ordersContainer');
+    document.getElementById('orderCount').textContent = orders.length;
+
+    if (orders.length === 0) {
+        container.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>No orders found</p></div>';
+        return;
+    }
+
+    var html = '';
+    orders.forEach(function(order) {
+        var originalIndex = allOrders.indexOf(order);
+
+        // Status color + icon
+        var statusInfo = {
+            'New': { color: '#3498db', icon: '🆕', class: 'new' },
+            'Confirmed': { color: '#27ae60', icon: '✅', class: 'confirmed' },
+            'Preparing': { color: '#f39c12', icon: '👨‍🍳', class: 'preparing' },
+            'On the Way': { color: '#9b59b6', icon: '🛵', class: 'onway' },
+            'Delivered': { color: '#2ecc71', icon: '🎉', class: 'delivered' },
+            'Cancelled': { color: '#e74c3c', icon: '❌', class: 'cancelled' }
+        };
+        var st = statusInfo[order.status] || statusInfo['New'];
+
+        // Action buttons per status
+        var actionButtons = '';
+
+        if (order.status === 'New' || !order.status) {
+            actionButtons =
+                '<button class="btn btn-accept" onclick="updateOrderStatus(' + originalIndex + ', \'Confirmed\')">✅ Confirm</button>' +
+                '<button class="btn btn-reject" onclick="updateOrderStatus(' + originalIndex + ', \'Cancelled\')">❌ Cancel</button>';
+        } else if (order.status === 'Confirmed') {
+            actionButtons =
+                '<button class="btn" style="background:#f39c12;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')">👨‍🍳 Start Preparing</button>';
+        } else if (order.status === 'Preparing') {
+            actionButtons =
+                '<button class="btn" style="background:#9b59b6;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'On the Way\')">🛵 Send Out for Delivery</button>';
+        } else if (order.status === 'On the Way') {
+            actionButtons =
+                '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>';
+        } else if (order.status === 'Delivered') {
+            actionButtons =
+                '<span style="color:#2ecc71;font-weight:bold;">🎉 Completed</span>' +
+                '<button class="btn btn-delete" onclick="deleteOrder(' + originalIndex + ')">🗑️ Delete</button>';
+        } else if (order.status === 'Cancelled') {
+            actionButtons =
+                '<span style="color:#e74c3c;font-weight:bold;">❌ Cancelled</span>' +
+                '<button class="btn btn-delete" onclick="deleteOrder(' + originalIndex + ')">🗑️ Delete</button>';
         }
 
-        function updateStats(orders) {
-            var pending = orders.filter(function(o) { return o.status === 'Pending'; });
-            var completed = orders.filter(function(o) { return o.status === 'Completed'; });
-            document.getElementById('totalOrders').textContent = orders.length;
-            document.getElementById('pendingOrders').textContent = pending.length;
-            document.getElementById('completedOrders').textContent = completed.length;
-            var revenue = 0;
-            completed.forEach(function(o) { revenue += o.total; });
-            document.getElementById('totalRevenue').textContent = 'BD ' + revenue.toFixed(2);
-        }
+        html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
+            '<div class="order-header">' +
+                '<span class="order-id">#' + order.id + '</span>' +
+                '<span class="order-status" style="background:' + st.color + ';color:white;padding:4px 12px;border-radius:20px;font-size:0.8em;font-weight:600;">' + st.icon + ' ' + (order.status || 'New') + '</span>' +
+            '</div>' +
+            '<div class="order-details"><i class="fas fa-calendar"></i> ' + order.date + '</div>' +
+            '<div class="order-details"><i class="fas fa-user"></i> ' + order.name + '</div>' +
+            '<div class="order-details"><i class="fas fa-phone"></i> ' + order.phone + '</div>' +
+            '<div class="order-details"><i class="fas fa-map-pin"></i> ' + order.address + '</div>' +
+            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + order.payment + '</div>' +
+            '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
+            '<div class="order-actions">' + actionButtons + '</div>' +
+        '</div>';
+    });
 
-        function updateOrderStatus(index, status) {
-            var orders = JSON.parse(localStorage.getItem('nabzOrders')) || [];
-            if (index >= 0 && index < orders.length) {
-                orders[index].status = status;
-                localStorage.setItem('nabzOrders', JSON.stringify(orders));
-                loadOrders();
-                showNotification('✅ Order #' + (index + 1) + ' updated to ' + status);
-            }
-        }
+    container.innerHTML = html;
+}
+       function updateStats(orders) {
+    // Active = anything not delivered and not cancelled
+    var activeStatuses = ['New', 'Confirmed', 'Preparing', 'On the Way'];
+    var active = orders.filter(function(o) {
+        return activeStatuses.indexOf(o.status) !== -1;
+    });
 
-        function deleteOrder(index) {
-            if (confirm('Delete this order?')) {
-                var orders = JSON.parse(localStorage.getItem('nabzOrders')) || [];
-                if (index >= 0 && index < orders.length) {
-                    orders.splice(index, 1);
-                    localStorage.setItem('nabzOrders', JSON.stringify(orders));
-                    loadOrders();
-                    showNotification('🗑️ Order deleted');
-                }
-            }
-        }
+    // Revenue = delivered orders only
+    var delivered = orders.filter(function(o) {
+        return o.status === 'Delivered';
+    });
 
+    document.getElementById('totalOrders').textContent     = orders.length;
+    document.getElementById('pendingOrders').textContent   = active.length;
+    document.getElementById('completedOrders').textContent = delivered.length;
+
+    var revenue = 0;
+    delivered.forEach(function(o) {
+        var t = parseFloat(o.total);
+        if (!isNaN(t)) revenue += t;
+    });
+    document.getElementById('totalRevenue').textContent = 'BD ' + revenue.toFixed(2);
+}
+        
+function updateOrderStatus(index, newStatus) {
+    var order = allOrders[index];
+    if (!order) return;
+
+    fetch('https://api.nabztech.com/api/orders/' + order.id + '/status', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        showNotification('✅ Order #' + order.id + ' → ' + newStatus);
+        loadOrders();
+    })
+    .catch(function(error) {
+        console.error('❌ Update error:', error);
+        alert('Failed to update status');
+    });
+}
+function deleteOrder(index) {
+    var order = allOrders[index];
+    if (!order) return;
+
+    if (confirm('Delete this order?')) {
+        fetch('https://api.nabztech.com/api/orders/' + order.id, {
+            method: 'DELETE'
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+            showNotification('🗑️ Order deleted');
+            loadOrders();
+        })
+        .catch(function(error) {
+            console.error('❌ Delete error:', error);
+            alert('Failed to delete');
+        });
+    }
+}
         function clearAllOrders() {
             if (confirm('Delete ALL orders?')) {
                 localStorage.removeItem('nabzOrders');
@@ -461,10 +634,20 @@
             localStorage.setItem('nabzMenu', JSON.stringify(menu));
         }
 
-        function loadMenu() {
-            allMenuItems = getMenu();
+       function loadMenu() {
+    fetch('https://api.nabztech.com/api/menu')
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            console.log('✅ Menu loaded from API:', data);
+            allMenuItems = data;
             renderMenu();
-        }
+        })
+        .catch(function(error) {
+            console.error('❌ API error:', error);
+            allMenuItems = [];
+            renderMenu();
+        });
+}
 
       function previewImage(event) {
     var file = event.target.files[0];
@@ -508,60 +691,88 @@
     reader.readAsDataURL(file);
 }
         function renderMenu() {
-            var container = document.getElementById('menuList');
-            if (!container) return;
-            if (allMenuItems.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
-                return;
-            }
-            var catIcons = { 'Burgers': '🍔', 'Pizzas': '🍕', 'Wraps': '🌯', 'Sides': '🍟', 'Drinks': '🥤', 'Desserts': '🍦' };
-            var html = '';
-            allMenuItems.forEach(function(item, index) {
-                var icon = catIcons[item.category] || '🍽️';
-                var imageHtml = '';
-                if (item.image && item.image.startsWith('data:image')) {
-                    imageHtml = '<img src="' + item.image + '" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">';
-                } else {
-                    imageHtml = '<span class="item-icon">' + icon + '</span>';
-                }
-                html += '<div class="menu-item-row">' +
-                    '<div class="item-info">' + imageHtml +
-                    '<div class="item-details"><div class="item-name">' + item.name + '</div><div class="item-desc">' + item.category + ' · ' + item.desc + '</div></div>' +
-                    '</div>' +
-                    '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
-                    '<div class="item-actions">' +
-                    '<button class="btn-edit" onclick="editMenuItem(' + index + ')"><i class="fas fa-edit"></i></button>' +
-                    '<button class="btn-delete-item" onclick="deleteMenuItem(' + index + ')"><i class="fas fa-trash"></i></button>' +
-                    '</div></div>';
-            });
-            container.innerHTML = html;
+    var container = document.getElementById('menuList');
+    if (!container) return;
+    
+    if (allMenuItems.length === 0) {
+        container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
+        return;
+    }
+    
+    var catIcons = { 'Burgers': '🍔', 'Pizzas': '🍕', 'Wraps': '🌯', 'Sides': '🍟', 'Drinks': '🥤', 'Desserts': '🍦' };
+    var html = '';
+    allMenuItems.forEach(function(item, index) {
+        var icon = catIcons[item.category] || '🍽️';
+        var imageHtml = '';
+        if (item.image_url && item.image_url.startsWith('data:image')) {
+            imageHtml = '<img src="' + item.image_url + '" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">';
+        } else {
+            imageHtml = '<span class="item-icon">' + icon + '</span>';
         }
+        html += '<div class="menu-item-row">' +
+            '<div class="item-info">' + imageHtml +
+            '<div class="item-details"><div class="item-name">' + item.name + '</div><div class="item-desc">' + item.category + ' · ' + (item.description || item.desc) + '</div></div>' +
+            '</div>' +
+            '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
+            '<div class="item-actions">' +
+            '<button class="btn-edit" onclick="editMenuItem(' + index + ')"><i class="fas fa-edit"></i></button>' +
+            '<button class="btn-delete-item" onclick="deleteMenuItem(' + index + ')"><i class="fas fa-trash"></i></button>' +
+            '</div></div>';
+    });
+    container.innerHTML = html;
+}
+       function saveMenuItem() {
+    var category = document.getElementById('menuCategory').value;
+    var name = document.getElementById('menuName').value.trim();
+    var desc = document.getElementById('menuDesc').value.trim();
+    var price = parseFloat(document.getElementById('menuPrice').value);
+    var image = document.getElementById('menuImage').value || 'default.jpg';
+    var editId = document.getElementById('editItemId').value;
 
-        function saveMenuItem() {
-            var category = document.getElementById('menuCategory').value;
-            var name = document.getElementById('menuName').value.trim();
-            var desc = document.getElementById('menuDesc').value.trim();
-            var price = parseFloat(document.getElementById('menuPrice').value);
-            var image = document.getElementById('menuImage').value || 'default.jpg';
-            var editId = document.getElementById('editItemId').value;
+    if (!name) { alert('Please enter an item name.'); return; }
+    if (!desc) { alert('Please enter a description.'); return; }
+    if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
 
-            if (!name) { alert('Please enter an item name.'); return; }
-            if (!desc) { alert('Please enter a description.'); return; }
-            if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
+    var itemData = {
+        category: category,
+        name: name,
+        description: desc,
+        price: price,
+        image_url: image
+    };
 
-            var menu = getMenu();
-            if (editId) {
-                menu[parseInt(editId)] = { category: category, name: name, desc: desc, price: price, image: image };
-                showNotification('✅ Item updated!');
-            } else {
-                menu.push({ category: category, name: name, desc: desc, price: price, image: image });
-                showNotification('✅ Item added!');
+    var url = editId 
+        ? 'https://api.nabztech.com/api/menu/' + editId 
+        : 'https://api.nabztech.com/api/menu';
+    
+    var method = editId ? 'PUT' : 'POST';
+
+    fetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(itemData)
+    })
+    .then(function(response) {
+        return response.text().then(function(text) {
+            console.log('📥 Server response:', text);
+            try {
+                return JSON.parse(text);
+            } catch (e) {
+                console.error('❌ Not JSON:', text);
+                throw new Error('Server returned: ' + text.substring(0, 100));
             }
-            saveMenu(menu);
-            cancelEdit();
-            loadMenu();
-        }
-
+        });
+    })
+    .then(function(data) {
+        showNotification('✅ Item saved!');
+        cancelEdit();
+        loadMenu();
+    })
+    .catch(function(error) {
+        console.error('❌ Save error:', error);
+        alert('Failed: ' + error.message);
+    });
+}
         function editMenuItem(index) {
             var item = allMenuItems[index];
             document.getElementById('menuCategory').value = item.category;
@@ -594,30 +805,67 @@
             document.querySelector('.btn-save').textContent = 'Save Item';
         }
 
-        function deleteMenuItem(index) {
-            if (confirm('Delete "' + allMenuItems[index].name + '"?')) {
-                var menu = getMenu();
-                menu.splice(index, 1);
-                saveMenu(menu);
-                loadMenu();
-                showNotification('🗑️ Item deleted');
-            }
-        }
+       function deleteMenuItem(index) {
+    var item = allMenuItems[index];
+    if (confirm('Delete "' + item.name + '"?')) {
+        fetch('https://api.nabztech.com/api/menu/' + item.id, {
+            method: 'DELETE'
+        })
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            showNotification('🗑️ Item deleted');
+            loadMenu();
+        })
+        .catch(function(error) {
+            console.error('❌ Delete error:', error);
+            alert('Failed to delete item');
+        });
+    }
+}
 // ============================================================
 // 4. CUSTOMERS MANAGEMENT
 // ============================================================
 function loadCustomers() {
-    var customers = JSON.parse(localStorage.getItem('nabzCustomers')) || [];
-    var container = document.getElementById('customersContainer');
-    var countEl = document.getElementById('customerCount');
-    
-    if (countEl) countEl.textContent = customers.length;
-    if (!container) return;
+    fetch('https://api.nabztech.com/api/customers')
+        .then(function(response) { return response.json(); })
+        .then(function(customers) {
+            var container = document.getElementById('customersContainer');
+            var countEl = document.getElementById('customerCount');
 
-    if (customers.length === 0) {
-        container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No customers registered yet</p></div>';
-        return;
-    }
+            if (countEl) countEl.textContent = customers.length;
+            if (!container) return;
+
+            if (customers.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No customers registered yet</p></div>';
+                return;
+            }
+
+            var html = '<table style="width:100%; border-collapse:collapse;">' +
+                '<thead><tr style="text-align:left; border-bottom: 2px solid #ecf0f1;">' +
+                '<th style="padding:10px;">#</th>' +
+                '<th style="padding:10px;">Name</th>' +
+                '<th style="padding:10px;">Phone</th>' +
+                '<th style="padding:10px;">Address</th>' +
+                '<th style="padding:10px;">Registered</th>' +
+                '</tr></thead><tbody>';
+
+            customers.forEach(function(c, i) {
+                html += '<tr style="border-bottom: 1px solid #ecf0f1;">' +
+                    '<td style="padding:10px;">' + (i + 1) + '</td>' +
+                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + c.name + '</td>' +
+                    '<td style="padding:10px;"><a href="tel:' + c.phone + '" style="color:#3498db;">' + c.phone + '</a></td>' +
+                    '<td style="padding:10px; color:#555;">' + c.address + '</td>' +
+                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (c.created_at || '-') + '</td>' +
+                    '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        })
+        .catch(function(error) {
+            console.error('❌ Customers error:', error);
+        });
+}
 
     var html = '<table style="width:100%; border-collapse:collapse;">' +
         '<thead><tr style="text-align:left; border-bottom: 2px solid #ecf0f1;">' +
@@ -640,7 +888,7 @@ function loadCustomers() {
 
     html += '</tbody></table>';
     container.innerHTML = html;
-}
+
         // ============================================================
         // 4. NOTIFICATIONS
         // ============================================================
@@ -653,6 +901,37 @@ function loadCustomers() {
             document.body.appendChild(div);
             setTimeout(function() { div.remove(); }, 3000);
         }
+        // 🔊 Simple beep using Web Audio API — no external file needed
+var audioCtx = null;
+
+function playBeep() {
+    try {
+        // Create once, reuse after
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // Some browsers suspend the context until a user gesture
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.value = 880;          // A5 note — pleasant "ding"
+        gain.gain.value = 0.15;             // volume (0–1)
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);  // 250ms beep
+    } catch (err) {
+        console.warn('🔇 Beep failed:', err);
+    }
+}
 
         // ============================================================
         // 5. AUTO-LOGIN
