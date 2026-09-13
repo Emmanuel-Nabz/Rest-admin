@@ -7,16 +7,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
         body {
-    background-image: linear-gradient(rgba(1, 2, 5, 0.2), rgba(2, 5, 11, 0.2)), url('admin-bg.jpg');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    padding: 20px;
-    min-height: 100vh;
-    width: 100%;
-}
-        .login-container { background: white; padding: 40px 35px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.15); max-width: 420px; width: 100%; text-align: center; }
+            background-image: linear-gradient(rgba(1, 2, 5, 0.2), rgba(2, 5, 11, 0.2)), url('admin-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 20px;
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        /* ===== LOGIN ===== */
+        .login-container {
+            background: white;
+            padding: 40px 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            margin-top: 60px;
+        }
         .login-container h1 { font-size: 2em; color: #2c3e50; margin-bottom: 5px; }
         .login-container h1 i { color: #e67e22; }
         .login-container .subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 0.95em; }
@@ -24,43 +39,85 @@
         .login-container .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
         .login-container .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #ddd; border-radius: 10px; font-size: 1em; transition: border-color 0.3s; }
         .login-container .form-group input:focus { border-color: #3498db; outline: none; }
-        .login-btn { width: 100%; padding: 14px; background: #e67e22; color: white; border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold; cursor: pointer; transition: background 0.3s; margin-top: 5px; }
+        .login-btn {
+            width: 100%; padding: 14px; background: #e67e22; color: white;
+            border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold;
+            cursor: pointer; transition: background 0.3s; margin-top: 5px;
+        }
         .login-btn:hover { background: #d35400; }
         .login-btn i { margin-right: 8px; }
-        .login-container .error-msg { color: #e74c3c; font-size: 0.9em; min-height: 30px; margin-top: 10px; }
+        .login-container .error-msg { color: #e74c3c; font-size: 0.9em; min-height: 24px; margin-top: 10px; }
+        .login-container .switch-link { text-align: center; margin-top: 15px; }
+        .login-container .switch-link a { color: #3498db; font-size: 0.9em; text-decoration: none; }
+        .login-container .switch-link a:hover { text-decoration: underline; }
 
-        .dashboard { display: none; width: 100%; }
-        .header { text-align: center; padding: 20px 0; border-bottom: 4px solid #e67e22; margin-bottom: 30px; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        .header .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-wrap: wrap; gap: 10px; }
+        /* ===== DASHBOARD ===== */
+        .dashboard { display: none; width: 100%; max-width: 1400px; }
+        .header {
+            text-align: center; padding: 20px 0; border-bottom: 4px solid #e67e22;
+            margin-bottom: 30px; background: white; border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        .header .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 20px; flex-wrap: wrap; gap: 10px;
+        }
         .header h1 { font-size: 1.8em; color: #2c3e50; }
         .header .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
         .header .user-info span { color: #2c3e50; font-weight: 600; }
         .header .user-info .badge { background: #e67e22; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7em; }
-        .header .logout-btn { background: #e74c3c; color: white; border: none; padding: 8px 18px; border-radius: 20px; cursor: pointer; font-weight: 600; transition: background 0.3s; }
+        .header .logout-btn {
+            background: #e74c3c; color: white; border: none; padding: 8px 18px;
+            border-radius: 20px; cursor: pointer; font-weight: 600; transition: background 0.3s;
+        }
         .header .logout-btn:hover { background: #c0392b; }
         .header .tabs { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
-        .header .tab-btn { padding: 8px 20px; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; background: #ecf0f1; color: #7f8c8d; transition: all 0.3s; }
+        .header .tab-btn {
+            padding: 8px 20px; border: none; border-radius: 20px; cursor: pointer;
+            font-weight: 600; background: #ecf0f1; color: #7f8c8d; transition: all 0.3s;
+        }
         .header .tab-btn.active { background: #e67e22; color: white; }
         .header .tab-btn:hover { background: #e67e22; color: white; }
 
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* ===== STATS ===== */
         .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.3s; }
+        .stat-card {
+            background: white; padding: 20px; border-radius: 12px; text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.3s;
+        }
         .stat-card:hover { transform: translateY(-5px); }
         .stat-card .number { font-size: 2em; font-weight: bold; color: #e67e22; }
         .stat-card .label { color: #7f8c8d; font-size: 0.85em; margin-top: 5px; }
         .stat-card .number.green { color: #27ae60; }
 
-        .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); align-items: center; }
-        .filters input, .filters select { padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95em; flex: 1; min-width: 150px; transition: border-color 0.3s; background: white; }
+        /* ===== FILTERS ===== */
+        .filters {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+            background: white; padding: 15px; border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06); align-items: center;
+        }
+        .filters input, .filters select {
+            padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px;
+            font-size: 0.95em; flex: 1; min-width: 150px; transition: border-color 0.3s;
+            background: white;
+        }
         .filters input:focus, .filters select:focus { border-color: #3498db; outline: none; }
 
-        .orders-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; background: white; padding: 12px 18px; border-radius: 12px; }
+        /* ===== ORDERS HEADER / BUTTONS ===== */
+        .orders-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 15px; flex-wrap: wrap; gap: 10px;
+            background: white; padding: 12px 18px; border-radius: 12px;
+        }
         .orders-header h2 { color: #2c3e50; font-size: 1.1em; }
         .orders-header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .orders-header .btn { padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85em; transition: all 0.3s; }
+        .orders-header .btn {
+            padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer;
+            font-weight: 600; font-size: 0.85em; transition: all 0.3s;
+        }
         .btn-refresh { background: #3498db; color: white; }
         .btn-refresh:hover { background: #2980b9; }
         .btn-export { background: #27ae60; color: white; }
@@ -68,54 +125,79 @@
         .btn-clear { background: #e74c3c; color: white; }
         .btn-clear:hover { background: #c0392b; }
 
-        .order-card { background: white; border-radius: 12px; padding: 16px 18px; margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); border-left: 4px solid #f39c12; transition: transform 0.2s; }
+        /* ===== ORDER CARD ===== */
+        .order-card {
+            background: white; border-radius: 12px; padding: 16px 18px;
+            margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border-left: 4px solid #f39c12; transition: transform 0.2s;
+        }
         .order-card:hover { transform: translateX(5px); }
-        .order-card.completed { border-left-color: #27ae60; }
-        .order-card.rejected { border-left-color: #e74c3c; opacity: 0.6; }
         .order-card .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .order-card .order-id { font-weight: bold; color: #2c3e50; }
-        .order-card .order-status { font-size: 0.8em; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-        .order-card .order-status.pending { background: #f39c12; color: white; }
-        .order-card .order-status.completed { background: #27ae60; color: white; }
-        .order-card .order-status.rejected { background: #e74c3c; color: white; }
+        .order-card .order-status {
+            font-size: 0.8em; padding: 4px 12px; border-radius: 20px; font-weight: 600;
+        }
         .order-card .order-details { margin: 8px 0; color: #555; font-size: 0.95em; }
         .order-card .order-details i { width: 20px; color: #7f8c8d; }
-        .order-card .order-items { background: #f8f9fa; padding: 10px 12px; border-radius: 8px; margin: 8px 0; font-size: 0.9em; }
-        .order-card .order-total { font-weight: bold; color: #27ae60; font-size: 1.1em; }
+        .order-card .order-total { font-weight: bold; color: #27ae60; font-size: 1.1em; margin-top: 6px; }
         .order-card .order-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-        .order-card .btn { padding: 6px 18px; border: none; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 0.85em; }
+        .order-card .btn {
+            padding: 6px 18px; border: none; border-radius: 20px; cursor: pointer;
+            font-weight: 600; font-size: 0.85em;
+        }
         .btn-accept { background: #27ae60; color: white; }
         .btn-reject { background: #e74c3c; color: white; }
         .btn-delete { background: #95a5a6; color: white; }
 
         .empty { text-align: center; color: #95a5a6; padding: 60px 0; }
-        .empty i { font-size: 4em; margin-bottom: 15px; }
+        .empty i { font-size: 4em; margin-bottom: 15px; display: block; }
 
-        .back-link { display: inline-block; margin-top: 20px; color: #3498db; text-decoration: none; font-weight: 600; background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-        .back-link:hover { text-decoration: underline; }
-
-        .notification { position: fixed; top: 20px; right: 20px; background: #27ae60; color: white; padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold; }
+        .notification {
+            position: fixed; top: 20px; right: 20px; background: #27ae60; color: white;
+            padding: 15px 25px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold;
+        }
         .notification i { margin-right: 10px; }
 
         /* ===== MENU MANAGEMENT ===== */
-        .menu-form { background: rgb(159, 157, 157); padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+        .menu-form {
+            background: #f8f9fa; padding: 20px; border-radius: 12px;
+            margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
         .menu-form h3 { color: #2c3e50; margin-bottom: 15px; }
         .menu-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
         .menu-form .form-group { margin-bottom: 0; }
         .menu-form .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
-        .menu-form .form-group input, .menu-form .form-group select, .menu-form .form-group textarea { width: 100%; padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s; }
-        .menu-form .form-group input:focus, .menu-form .form-group select:focus, .menu-form .form-group textarea:focus { border-color: #3498db; outline: none; }
+        .menu-form .form-group input,
+        .menu-form .form-group select,
+        .menu-form .form-group textarea {
+            width: 100%; padding: 10px 14px; border: 2px solid #ddd;
+            border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s;
+            background: white;
+        }
+        .menu-form .form-group input:focus,
+        .menu-form .form-group select:focus,
+        .menu-form .form-group textarea:focus { border-color: #3498db; outline: none; }
         .menu-form .form-group textarea { resize: vertical; min-height: 60px; }
         .menu-form .form-row-full { grid-column: 1 / -1; }
-        .menu-form .btn-save { background: #27ae60; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 1em; }
+        .menu-form .btn-save {
+            background: #27ae60; color: white; border: none; padding: 12px 30px;
+            border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 1em;
+        }
         .menu-form .btn-save:hover { background: #1e8449; }
-        .menu-form .btn-cancel { background: #95a5a6; color: white; border: none; padding: 12px 30px; border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 1em; margin-left: 10px; }
+        .menu-form .btn-cancel {
+            background: #95a5a6; color: white; border: none; padding: 12px 30px;
+            border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 1em; margin-left: 10px;
+        }
         .menu-form .btn-cancel:hover { background: #7f8c8d; }
         #imagePreviewContainer { display: none; text-align: center; margin-top: 10px; }
         #imagePreview { max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
 
         .menu-list { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-        .menu-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #ecf0f1; flex-wrap: wrap; gap: 10px; }
+        .menu-item-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #ecf0f1; flex-wrap: wrap; gap: 10px;
+        }
         .menu-item-row:last-child { border-bottom: none; }
         .menu-item-row .item-info { display: flex; align-items: center; gap: 15px; flex: 1; }
         .menu-item-row .item-info .item-icon { font-size: 1.8em; }
@@ -123,7 +205,10 @@
         .menu-item-row .item-info .item-details .item-desc { font-size: 0.85em; color: #7f8c8d; }
         .menu-item-row .item-price { font-weight: bold; color: #27ae60; min-width: 70px; }
         .menu-item-row .item-actions { display: flex; gap: 8px; }
-        .menu-item-row .item-actions button { padding: 4px 12px; border: none; border-radius: 15px; cursor: pointer; font-weight: 600; font-size: 0.8em; }
+        .menu-item-row .item-actions button {
+            padding: 4px 12px; border: none; border-radius: 15px; cursor: pointer;
+            font-weight: 600; font-size: 0.8em;
+        }
         .menu-item-row .item-actions .btn-edit { background: #3498db; color: white; }
         .menu-item-row .item-actions .btn-delete-item { background: #e74c3c; color: white; }
 
@@ -139,12 +224,9 @@
 </head>
 <body>
 
-    <!-- ===== LOGIN PAGE ===== -->
-     <div style="text-align:center; margin-top:15px;">
-    <a href="#" onclick="showRegister(); return false;" 
-       style="color:#3498db; font-size:0.9em;">Create an account</a>
-</div>
-    <div id="loginPage" class="login-container">
+<!-- ===== LOGIN PAGE ===== -->
+<div id="loginPage" class="login-container">
+    <div id="loginView">
         <h1><i class="fas fa-utensils"></i> Nabz-Tech Eats</h1>
         <p class="subtitle">Restaurant Admin Login</p>
         <div class="form-group">
@@ -159,181 +241,213 @@
             <i class="fas fa-sign-in-alt"></i> Login
         </button>
         <div id="loginError" class="error-msg"></div>
-    </div>
-<div id="registerForm" style="display:none;">
-    <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="registerUsername" placeholder="Choose a username">
-    </div>
-    <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="registerPassword" placeholder="Min 6 characters">
-    </div>
-    <div class="form-group">
-        <label>Confirm Password</label>
-        <input type="password" id="registerPassword2" placeholder="Repeat password">
-    </div>
-    <button class="login-btn" onclick="register()">Create Account</button>
-    <div id="registerError" class="error-msg"></div>
-    <div style="text-align:center; margin-top:15px;">
-        <a href="#" onclick="showLogin(); return false;" 
-           style="color:#3498db; font-size:0.9em;">← Back to login</a>
-    </div>
-</div>
-    <!-- ===== DASHBOARD ===== -->
-    <div id="dashboardPage" class="dashboard">
-        <div class="header">
-            <div class="top-bar">
-                <h1>🍕 Nabz-Tech Eats Admin Dashboard</h1>
-                <div class="user-info">
-                    <span id="currentUser">👤 admin</span>
-                    <span class="badge">Admin</span>
-                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                </div>
-            </div>
-           <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('orders')" id="tabOrders">📋 Orders</button>
-    <button class="tab-btn" onclick="switchTab('menu')" id="tabMenu">🍽️ Menu</button>
-    <button class="tab-btn" onclick="switchTab('customers')" id="tabCustomers">👥 Customers</button>
-</div>
-
-        <!-- TAB 1: ORDERS -->
-        <div id="tabOrdersContent" class="tab-content active">
-            <div class="stats">
-                <div class="stat-card"><div class="number" id="totalOrders">0</div><div class="label">📊 Total Orders</div></div>
-                <div class="stat-card"><div class="number green" id="pendingOrders">0</div><div class="label">⏳ Pending</div></div>
-                <div class="stat-card"><div class="number" id="completedOrders">0</div><div class="label">✅ Completed</div></div>
-                <div class="stat-card"><div class="number green" id="totalRevenue">BD 0</div><div class="label">💰 Revenue</div></div>
-            </div>
-            <div class="filters">
-                <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="applyFilters()">
-                <input type="date" id="dateFrom" onchange="applyFilters()">
-                <input type="date" id="dateTo" onchange="applyFilters()">
-               <select id="statusFilter" onchange="applyFilters()">
-    <option value="all">📋 All</option>
-    <option value="New">🆕 New</option>
-    <option value="Confirmed">✅ Confirmed</option>
-    <option value="Preparing">👨‍🍳 Preparing</option>
-    <option value="On the Way">🛵 On the Way</option>
-    <option value="Delivered">🎉 Delivered</option>
-    <option value="Cancelled">❌ Cancelled</option>
-</select>
-            </div>
-            <div class="orders-header">
-                <h2>📋 Orders (<span id="orderCount">0</span>)</h2>
-                <div class="actions">
-                    <button class="btn btn-refresh" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
-                    <button class="btn btn-export" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button>
-                    <button class="btn btn-clear" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
-                </div>
-            </div>
-            <div id="ordersContainer"><div class="empty"><i class="fas fa-inbox"></i><p>No orders yet</p></div></div>
+        <div class="switch-link">
+            <a href="#" onclick="showRegister(); return false;">Create an account</a>
         </div>
+    </div>
 
-        <!-- TAB 2: MENU -->
-        <div id="tabMenuContent" class="tab-content">
-            <div class="orders-header">
-                <h2>🍽️ Menu Management</h2>
-                <button class="btn btn-refresh" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
-            </div>
+    <div id="registerView" style="display:none;">
+        <h1><i class="fas fa-user-plus"></i> Create Admin</h1>
+        <p class="subtitle">Set up your admin account</p>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="registerUsername" placeholder="Choose a username">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="registerPassword" placeholder="Min 6 characters">
+        </div>
+        <div class="form-group">
+            <label>Confirm Password</label>
+            <input type="password" id="registerPassword2" placeholder="Repeat password">
+        </div>
+        <button class="login-btn" onclick="register()">Create Account</button>
+        <div id="registerError" class="error-msg"></div>
+        <div class="switch-link">
+            <a href="#" onclick="showLogin(); return false;">← Back to login</a>
+        </div>
+    </div>
+</div>
 
-            <div class="menu-form" id="menuForm">
-                <h3 id="menuFormTitle">Add New Item</h3>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="menuCategory">
-                            <option value="Burgers">🍔 Burgers</option>
-                            <option value="Pizzas">🍕 Pizzas</option>
-                            <option value="Wraps">🌯 Wraps</option>
-                            <option value="Sides">🍟 Sides</option>
-                            <option value="Drinks">🥤 Drinks</option>
-                            <option value="Desserts">🍦 Desserts</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Item Name</label>
-                        <input type="text" id="menuName" placeholder="e.g. Classic Burger">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group form-row-full">
-                        <label>Description</label>
-                        <textarea id="menuDesc" placeholder="Describe the item..."></textarea>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Price (BD)</label>
-                        <input type="number" id="menuPrice" placeholder="2.50" step="0.01" min="0">
-                    </div>
-                    <div class="form-group">
-                        <label>Upload Image (Optional)</label>
-                        <input type="file" id="menuImageFile" accept="image/*" onchange="previewImage(event)" style="padding: 8px;">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group form-row-full">
-                        <div id="imagePreviewContainer">
-                            <img id="imagePreview" src="" alt="Preview">
-                        </div>
-                        <input type="hidden" id="menuImage" value="">
-                    </div>
-                </div>
-                <div>
-                    <button class="btn-save" onclick="saveMenuItem()"><i class="fas fa-save"></i> Save Item</button>
-                    <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i> Cancel</button>
-                    <input type="hidden" id="editItemId" value="">
-                </div>
-            </div>
-
-            <div class="menu-list" id="menuList">
-                <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading menu...</p>
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboardPage" class="dashboard">
+    <div class="header">
+        <div class="top-bar">
+            <h1>🍕 Nabz-Tech Eats Admin Dashboard</h1>
+            <div class="user-info">
+                <span id="currentUser">👤 admin</span>
+                <span class="badge">Admin</span>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
             </div>
         </div>
-        <!-- ===== TAB 3: CUSTOMERS ===== -->
-<div id="tabCustomersContent" class="tab-content">
-    <div class="orders-header">
-        <h2>👥 Registered Customers (<span id="customerCount">0</span>)</h2>
-        <button class="btn btn-refresh" onclick="loadCustomers()"><i class="fas fa-sync"></i> Refresh</button>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('orders')" id="tabOrders">📋 Orders</button>
+            <button class="tab-btn" onclick="switchTab('menu')" id="tabMenu">🍽️ Menu</button>
+            <button class="tab-btn" onclick="switchTab('customers')" id="tabCustomers">👥 Customers</button>
+        </div>
     </div>
-    <div id="customersContainer" class="menu-list">
-        <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading customers...</p>
+
+    <!-- ========== TAB 1: ORDERS ========== -->
+    <div id="tabOrdersContent" class="tab-content active">
+        <div class="stats">
+            <div class="stat-card"><div class="number" id="totalOrders">0</div><div class="label">📊 Total Orders</div></div>
+            <div class="stat-card"><div class="number green" id="pendingOrders">0</div><div class="label">⏳ Active</div></div>
+            <div class="stat-card"><div class="number" id="completedOrders">0</div><div class="label">✅ Delivered</div></div>
+            <div class="stat-card"><div class="number green" id="totalRevenue">BD 0</div><div class="label">💰 Revenue</div></div>
+        </div>
+        <div class="filters">
+            <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="applyFilters()">
+            <input type="date" id="dateFrom" onchange="applyFilters()">
+            <input type="date" id="dateTo" onchange="applyFilters()">
+            <select id="statusFilter" onchange="applyFilters()">
+                <option value="all">📋 All</option>
+                <option value="New">🆕 New</option>
+                <option value="Confirmed">✅ Confirmed</option>
+                <option value="Preparing">👨‍🍳 Preparing</option>
+                <option value="On the Way">🛵 On the Way</option>
+                <option value="Delivered">🎉 Delivered</option>
+                <option value="Cancelled">❌ Cancelled</option>
+            </select>
+        </div>
+        <div class="orders-header">
+            <h2>📋 Orders (<span id="orderCount">0</span>)</h2>
+            <div class="actions">
+                <button class="btn btn-refresh" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
+                <button class="btn btn-export" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button>
+                <button class="btn btn-clear" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
+            </div>
+        </div>
+        <div id="ordersContainer"><div class="empty"><i class="fas fa-inbox"></i><p>No orders yet</p></div></div>
+    </div>
+
+    <!-- ========== TAB 2: MENU ========== -->
+    <div id="tabMenuContent" class="tab-content">
+        <div class="orders-header">
+            <h2>🍽️ Menu Management</h2>
+            <button class="btn btn-refresh" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+
+        <div class="menu-form" id="menuForm">
+            <h3 id="menuFormTitle">Add New Item</h3>
+            <input type="hidden" id="editItemId" value="">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="menuCategory">
+                        <option value="Burgers">🍔 Burgers</option>
+                        <option value="Pizzas">🍕 Pizzas</option>
+                        <option value="Wraps">🌯 Wraps</option>
+                        <option value="Sides">🍟 Sides</option>
+                        <option value="Drinks">🥤 Drinks</option>
+                        <option value="Desserts">🍦 Desserts</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Item Name</label>
+                    <input type="text" id="menuName" placeholder="e.g. Classic Burger">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group form-row-full">
+                    <label>Description</label>
+                    <textarea id="menuDesc" placeholder="Describe the item..."></textarea>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Price (BD)</label>
+                    <input type="number" id="menuPrice" placeholder="2.50" step="0.01" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Upload Image (Optional)</label>
+                    <input type="file" id="menuImageFile" accept="image/*" onchange="previewImage(event)" style="padding: 8px;">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group form-row-full">
+                    <div id="imagePreviewContainer">
+                        <img id="imagePreview" src="" alt="Preview">
+                    </div>
+                    <input type="hidden" id="menuImage" value="">
+                </div>
+            </div>
+            <div>
+                <button class="btn-save" onclick="saveMenuItem()"><i class="fas fa-save"></i> Save Item</button>
+                <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i> Cancel</button>
+            </div>
+        </div>
+
+        <div class="menu-list" id="menuList">
+            <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading menu...</p>
+        </div>
+    </div>
+
+    <!-- ========== TAB 3: CUSTOMERS ========== -->
+    <div id="tabCustomersContent" class="tab-content">
+        <div class="orders-header">
+            <h2>👥 Registered Customers (<span id="customerCount">0</span>)</h2>
+            <button class="btn btn-refresh" onclick="loadCustomers()"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+        <div id="customersContainer" class="menu-list">
+            <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading customers...</p>
+        </div>
     </div>
 </div>
 
-       <a href="#" class="back-link" onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;">
-    🏠 Home
-<a href="#top" 
-   onclick="document.documentElement.scrollTop = 0; document.body.scrollTop = 0; return false;"
-   style="position: fixed; bottom: 90px; right: 20px; width: 50px; height: 50px; background: #e67e22; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3em; box-shadow: 0 4px 15px rgba(230, 126, 34, 0.4); text-decoration: none; z-index: 999;">
-    🏠
-</a>
-<a name="top"></a>
-    <!-- ============================================================== -->
-    <!-- PART 1 ENDS HERE — NOW COPY PART 2 BELOW                     -->
-    <!-- ============================================================== -->
-     <script>
-        // ============================================================
-        // ============================================================
-// 1. LOGIN
+<script>
 // ============================================================
-function showRegister() {
-    document.querySelector('.login-box > h1').textContent = '🍕 Create Admin';
-    document.querySelector('.login-box .subtitle').textContent = 'Set up your admin account';
-    document.querySelectorAll('.login-box .form-group, .login-box .login-btn, .login-box #loginError').forEach(function(el) {
-        el.style.display = 'none';
-    });
-    document.getElementById('registerForm').style.display = 'block';
+// CONFIG
+// ============================================================
+var API = 'https://api.nabztech.com/api';
+var loggedIn = false;
+var allOrders = [];
+var allMenuItems = [];
+var lastOrderCount = 0;
+var ordersInterval = null;
+
+// ============================================================
+// AUTH HELPERS
+// ============================================================
+function authFetch(url, options) {
+    options = options || {};
+    options.headers = options.headers || {};
+    var token = localStorage.getItem('adminToken');
+    if (token) options.headers['Authorization'] = 'Bearer ' + token;
+    return fetch(url, options);
 }
 
-function showLogin() {
-    document.querySelector('.login-box > h1').textContent = '🍕 Admin Login';
-    document.querySelector('.login-box .subtitle').textContent = 'Restaurant Admin Login';
-    document.querySelectorAll('.login-box .form-group, .login-box .login-btn, .login-box #loginError').forEach(function(el) {
-        el.style.display = '';
+function login() {
+    var username = document.getElementById('loginUsername').value.trim();
+    var password = document.getElementById('loginPassword').value.trim();
+    var errorEl = document.getElementById('loginError');
+
+    if (!username || !password) {
+        errorEl.textContent = '❌ Please enter both fields.';
+        return;
+    }
+
+    // Plain fetch — we don't have a token yet
+    fetch(API + '/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
+            return;
+        }
+        localStorage.setItem('adminToken', result.data.token);
+        localStorage.setItem('adminUser', result.data.username);
+        localStorage.setItem('adminLoggedIn', 'true');
+        errorEl.textContent = '';
+        showDashboard();
+    })
+    .catch(function(err) {
+        console.error('Login error:', err);
+        errorEl.textContent = '❌ Network error. Try again.';
     });
-    document.getElementById('registerForm').style.display = 'none';
 }
 
 function register() {
@@ -367,7 +481,7 @@ function register() {
             return;
         }
         errorEl.style.color = '#27ae60';
-        errorEl.textContent = '✅ Account created! Redirecting to login...';
+        errorEl.textContent = '✅ Account created! Redirecting...';
         setTimeout(showLogin, 1500);
     })
     .catch(function(err) {
@@ -376,107 +490,83 @@ function register() {
     });
 }
 
-// Helper: attaches admin token to requests
-function authFetch(url, options) {
-    options = options || {};
-    options.headers = options.headers || {};
-    var token = localStorage.getItem('adminToken');
-    if (token) options.headers['Authorization'] = 'Bearer ' + token;
-    return fetch(url, options);
+function showRegister() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('registerView').style.display = 'block';
 }
 
-var loggedIn = false;
-
-function login() {
-    var username = document.getElementById('loginUsername').value.trim();
-    var password = document.getElementById('loginPassword').value.trim();
-    var errorEl = document.getElementById('loginError');
-
-    if (!username || !password) {
-        errorEl.textContent = '❌ Please enter both fields.';
-        return;
-    }
-
-    // Plain fetch here — we don't have a token yet
-    fetch(API + '/admin/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, password: password })
-    })
-    .then(function(res) {
-        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
-    })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
-            return;
-        }
-        localStorage.setItem('adminToken', result.data.token);
-        localStorage.setItem('adminUser', result.data.username);
-        localStorage.setItem('adminLoggedIn', 'true');
-        errorEl.textContent = '';
-        showDashboard();
-    })
-    .catch(function(err) {
-        console.error('Login error:', err);
-        errorEl.textContent = '❌ Network error. Try again.';
-    });
+function showLogin() {
+    document.getElementById('registerView').style.display = 'none';
+    document.getElementById('loginView').style.display = 'block';
+    document.getElementById('registerError').style.color = '#e74c3c';
+    document.getElementById('registerError').textContent = '';
 }
-
-// On page load — restore session if logged in
-function checkSession() {
-    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
-        loggedIn = true;
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('dashboardPage').style.display = 'block';
-        document.getElementById('currentUser').textContent = '👤 admin';
-        loadOrders();
-        loadMenu();
-        setInterval(loadOrders, 30000);
-    }
-}
-
-window.addEventListener('DOMContentLoaded', checkSession);
 
 function logout() {
     if (!confirm('Logout?')) return;
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
     localStorage.removeItem('adminLoggedIn');
+    if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
     document.getElementById('dashboardPage').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('loginPage').style.display = 'block';
     document.getElementById('loginPassword').value = '';
 }
-       function switchTab(tab) {
-    document.querySelectorAll('.tab-content').forEach(function(el) {
-        el.classList.remove('active');
-    });
-    document.querySelectorAll('.tab-btn').forEach(function(el) {
-        el.classList.remove('active');
-    });
+
+function showDashboard() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+    document.getElementById('currentUser').textContent = '👤 ' + (localStorage.getItem('adminUser') || 'admin');
+
+    loadOrders();
+    loadMenu();
+    loadCustomers();
+
+    if (ordersInterval) clearInterval(ordersInterval);
+    ordersInterval = setInterval(loadOrders, 30000);
+}
+
+function checkSession() {
+    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
+        loggedIn = true;
+        showDashboard();
+    }
+}
+
+window.addEventListener('DOMContentLoaded', checkSession);
+
+// ============================================================
+// TABS
+// ============================================================
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+    document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
     document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1) + 'Content').classList.add('active');
     document.getElementById('tab' + tab.charAt(0).toUpperCase() + tab.slice(1)).classList.add('active');
     if (tab === 'menu') loadMenu();
     if (tab === 'customers') loadCustomers();
 }
 
-        // ============================================================
-        // 2. ORDERS
-        // ============================================================
-        var allOrders = [];
-        var lastOrderCount = 0;
+// ============================================================
+// NOTIFICATIONS + BEEP
+// ============================================================
+function showNotification(message) {
+    var existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    var div = document.createElement('div');
+    div.className = 'notification';
+    div.innerHTML = '<i class="fas fa-bell"></i> ' + message;
+    document.body.appendChild(div);
+    setTimeout(function() { div.remove(); }, 3000);
+}
 
-// 🔊 Beep using Web Audio API — no external file needed
 var audioCtx = null;
-
 function playBeep() {
     try {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
+        if (audioCtx.state === 'suspended') audioCtx.resume();
         var osc = audioCtx.createOscillator();
         var gain = audioCtx.createGain();
         osc.type = 'sine';
@@ -491,11 +581,14 @@ function playBeep() {
     }
 }
 
-      function loadOrders() {
-    authFetch('https://api.nabztech.com/api/orders')
+// ============================================================
+// ORDERS
+// ============================================================
+function loadOrders() {
+    authFetch(API + '/orders')
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            console.log('✅ Orders loaded from API:', data.length);
+            console.log('✅ Orders loaded:', data.length);
 
             allOrders = data.map(function(order) {
                 return {
@@ -511,13 +604,10 @@ function playBeep() {
                 };
             });
 
-            // 🔔 Detect new order and beep
             if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
                 playBeep();
                 document.title = '🔔 New Order! | Admin';
-                setTimeout(function() {
-                    document.title = '🍕 Admin Dashboard';
-                }, 5000);
+                setTimeout(function() { document.title = '🍕 Admin Dashboard'; }, 5000);
                 showNotification('🔔 New order received!');
             }
             lastOrderCount = allOrders.length;
@@ -531,27 +621,29 @@ function playBeep() {
         });
 }
 
-        function applyFilters() {
-            var search = document.getElementById('searchInput').value.toLowerCase();
-            var statusFilter = document.getElementById('statusFilter').value;
-            var dateFrom = document.getElementById('dateFrom').value;
-            var dateTo = document.getElementById('dateTo').value;
+function applyFilters() {
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var statusFilter = document.getElementById('statusFilter').value;
+    var dateFrom = document.getElementById('dateFrom').value;
+    var dateTo = document.getElementById('dateTo').value;
 
-            var filtered = allOrders.filter(function(order) {
-                var matchSearch = !search || order.name.toLowerCase().includes(search) || String(order.id).includes(search);
-                var matchStatus = statusFilter === 'all' || order.status === statusFilter;
-                var matchDate = true;
-                if (dateFrom || dateTo) {
-                    var orderDate = new Date(order.date).toISOString().split('T')[0];
-                    if (dateFrom && orderDate < dateFrom) matchDate = false;
-                    if (dateTo && orderDate > dateTo) matchDate = false;
-                }
-                return matchSearch && matchStatus && matchDate;
-            });
-
-            renderOrders(filtered);
-            updateStats(filtered);
+    var filtered = allOrders.filter(function(order) {
+        var matchSearch = !search ||
+            (order.name && order.name.toLowerCase().includes(search)) ||
+            String(order.id).includes(search);
+        var matchStatus = statusFilter === 'all' || order.status === statusFilter;
+        var matchDate = true;
+        if (dateFrom || dateTo) {
+            var orderDate = new Date(order.date).toISOString().split('T')[0];
+            if (dateFrom && orderDate < dateFrom) matchDate = false;
+            if (dateTo && orderDate > dateTo) matchDate = false;
         }
+        return matchSearch && matchStatus && matchDate;
+    });
+
+    renderOrders(filtered);
+    updateStats(filtered);
+}
 
 function renderOrders(orders) {
     var container = document.getElementById('ordersContainer');
@@ -562,24 +654,21 @@ function renderOrders(orders) {
         return;
     }
 
+    var statusInfo = {
+        'New':       { color: '#3498db', icon: '🆕' },
+        'Confirmed': { color: '#27ae60', icon: '✅' },
+        'Preparing': { color: '#f39c12', icon: '👨‍🍳' },
+        'On the Way':{ color: '#9b59b6', icon: '🛵' },
+        'Delivered': { color: '#2ecc71', icon: '🎉' },
+        'Cancelled': { color: '#e74c3c', icon: '❌' }
+    };
+
     var html = '';
     orders.forEach(function(order) {
         var originalIndex = allOrders.indexOf(order);
-
-        // Status color + icon
-        var statusInfo = {
-            'New': { color: '#3498db', icon: '🆕', class: 'new' },
-            'Confirmed': { color: '#27ae60', icon: '✅', class: 'confirmed' },
-            'Preparing': { color: '#f39c12', icon: '👨‍🍳', class: 'preparing' },
-            'On the Way': { color: '#9b59b6', icon: '🛵', class: 'onway' },
-            'Delivered': { color: '#2ecc71', icon: '🎉', class: 'delivered' },
-            'Cancelled': { color: '#e74c3c', icon: '❌', class: 'cancelled' }
-        };
         var st = statusInfo[order.status] || statusInfo['New'];
 
-        // Action buttons per status
         var actionButtons = '';
-
         if (order.status === 'New' || !order.status) {
             actionButtons =
                 '<button class="btn btn-accept" onclick="updateOrderStatus(' + originalIndex + ', \'Confirmed\')">✅ Confirm</button>' +
@@ -606,31 +695,24 @@ function renderOrders(orders) {
         html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
             '<div class="order-header">' +
                 '<span class="order-id">#' + order.id + '</span>' +
-                '<span class="order-status" style="background:' + st.color + ';color:white;padding:4px 12px;border-radius:20px;font-size:0.8em;font-weight:600;">' + st.icon + ' ' + (order.status || 'New') + '</span>' +
+                '<span class="order-status" style="background:' + st.color + ';color:white;">' + st.icon + ' ' + (order.status || 'New') + '</span>' +
             '</div>' +
-            '<div class="order-details"><i class="fas fa-calendar"></i> ' + order.date + '</div>' +
-            '<div class="order-details"><i class="fas fa-user"></i> ' + order.name + '</div>' +
-            '<div class="order-details"><i class="fas fa-phone"></i> ' + order.phone + '</div>' +
-            '<div class="order-details"><i class="fas fa-map-pin"></i> ' + order.address + '</div>' +
-            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + order.payment + '</div>' +
+            '<div class="order-details"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-user"></i> ' + (order.name || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-phone"></i> ' + (order.phone || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-map-pin"></i> ' + (order.address || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + (order.payment || '-') + '</div>' +
             '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
     });
-
     container.innerHTML = html;
 }
-       function updateStats(orders) {
-    // Active = anything not delivered and not cancelled
-    var activeStatuses = ['New', 'Confirmed', 'Preparing', 'On the Way'];
-    var active = orders.filter(function(o) {
-        return activeStatuses.indexOf(o.status) !== -1;
-    });
 
-    // Revenue = delivered orders only
-    var delivered = orders.filter(function(o) {
-        return o.status === 'Delivered';
-    });
+function updateStats(orders) {
+    var activeStatuses = ['New', 'Confirmed', 'Preparing', 'On the Way'];
+    var active = orders.filter(function(o) { return activeStatuses.indexOf(o.status) !== -1; });
+    var delivered = orders.filter(function(o) { return o.status === 'Delivered'; });
 
     document.getElementById('totalOrders').textContent     = orders.length;
     document.getElementById('pendingOrders').textContent   = active.length;
@@ -643,12 +725,12 @@ function renderOrders(orders) {
     });
     document.getElementById('totalRevenue').textContent = 'BD ' + revenue.toFixed(2);
 }
-        
+
 function updateOrderStatus(index, newStatus) {
     var order = allOrders[index];
     if (!order) return;
 
-    authFetch('https://api.nabztech.com/api/orders/' + order.id + '/status', {   // ❌ wrong
+    authFetch(API + '/orders/' + order.id + '/status', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -663,16 +745,15 @@ function updateOrderStatus(index, newStatus) {
         alert('Failed to update status');
     });
 }
+
 function deleteOrder(index) {
     var order = allOrders[index];
     if (!order) return;
+    if (!confirm('Delete this order?')) return;
 
-    if (confirm('Delete this order?')) {
-        authFetch('https://api.nabztech.com/api/orders/' + order.id, {
-            method: 'DELETE'
-        })
+    authFetch(API + '/orders/' + order.id, { method: 'DELETE' })
         .then(function(res) { return res.json(); })
-        .then(function(data) {
+        .then(function() {
             showNotification('🗑️ Order deleted');
             loadOrders();
         })
@@ -680,63 +761,63 @@ function deleteOrder(index) {
             console.error('❌ Delete error:', error);
             alert('Failed to delete');
         });
-    }
 }
-        function clearAllOrders() {
-            if (confirm('Delete ALL orders?')) {
-                localStorage.removeItem('nabzOrders');
-                loadOrders();
-                showNotification('🗑️ All orders cleared');
-            }
-        }
 
-        function exportCSV() {
-            var orders = JSON.parse(localStorage.getItem('nabzOrders')) || [];
-            if (orders.length === 0) { alert('No orders to export.'); return; }
-            var csv = 'Order #,Date,Name,Phone,Address,Payment,Items,Total,Status\n';
-            orders.forEach(function(order, index) {
-                var items = order.items.map(function(item) { return item.quantity + 'x ' + item.name; }).join('; ');
-                csv += (index + 1) + ',' + order.date + ',' + order.name + ',' + order.phone + ',' + order.address + ',' + order.payment + ',' + items + ',' + order.total.toFixed(2) + ',' + order.status + '\n';
-            });
-            var blob = new Blob([csv], { type: 'text/csv' });
-            var url = URL.createObjectURL(blob);
-            var a = document.createElement('a');
-            a.href = url;
-            a.download = 'orders-' + new Date().toISOString().split('T')[0] + '.csv';
-            a.click();
-            URL.revokeObjectURL(url);
-            showNotification('📊 Exported');
-        }
+function clearAllOrders() {
+    if (!confirm('Delete ALL orders? This clears them from the server too.')) return;
+    if (allOrders.length === 0) { showNotification('ℹ️ No orders to clear'); return; }
 
-        // ============================================================
-        // 3. MENU MANAGEMENT WITH IMAGE UPLOAD
-        // ============================================================
-        var allMenuItems = [];
+    var promises = allOrders.map(function(o) {
+        return authFetch(API + '/orders/' + o.id, { method: 'DELETE' }).catch(function(){});
+    });
+    Promise.all(promises).then(function() {
+        showNotification('🗑️ All orders cleared');
+        loadOrders();
+    });
+}
 
-        function getMenu() {
-            return JSON.parse(localStorage.getItem('nabzMenu')) || [];
-        }
+function exportCSV() {
+    if (allOrders.length === 0) { alert('No orders to export.'); return; }
+    var csv = 'Order #,Date,Name,Phone,Address,Payment,Total,Status\n';
+    allOrders.forEach(function(order) {
+        csv += order.id + ',' +
+               '"' + (order.date || '') + '",' +
+               '"' + (order.name || '') + '",' +
+               '"' + (order.phone || '') + '",' +
+               '"' + (order.address || '') + '",' +
+               '"' + (order.payment || '') + '",' +
+               order.total.toFixed(2) + ',' +
+               (order.status || '') + '\n';
+    });
+    var blob = new Blob([csv], { type: 'text/csv' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'orders-' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification('📊 Exported');
+}
 
-        function saveMenu(menu) {
-            localStorage.setItem('nabzMenu', JSON.stringify(menu));
-        }
-
-       function loadMenu() {
-    authFetch('https://api.nabztech.com/api/menu')
+// ============================================================
+// MENU
+// ============================================================
+function loadMenu() {
+    authFetch(API + '/menu')
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            console.log('✅ Menu loaded from API:', data);
-            allMenuItems = data;
+            console.log('✅ Menu loaded:', data.length);
+            allMenuItems = Array.isArray(data) ? data : [];
             renderMenu();
         })
         .catch(function(error) {
-            console.error('❌ API error:', error);
+            console.error('❌ Menu error:', error);
             allMenuItems = [];
             renderMenu();
         });
 }
 
-      function previewImage(event) {
+function previewImage(event) {
     var file = event.target.files[0];
     if (!file) return;
 
@@ -746,69 +827,64 @@ function deleteOrder(index) {
         img.onload = function() {
             var canvas = document.createElement('canvas');
             var ctx = canvas.getContext('2d');
-            
             var maxSize = 600;
-            var width = img.width;
-            var height = img.height;
-            
+            var width = img.width, height = img.height;
+
             if (width > height) {
-                if (width > maxSize) {
-                    height = height * (maxSize / width);
-                    width = maxSize;
-                }
+                if (width > maxSize) { height *= maxSize / width; width = maxSize; }
             } else {
-                if (height > maxSize) {
-                    width = width * (maxSize / height);
-                    height = maxSize;
-                }
+                if (height > maxSize) { width *= maxSize / height; height = maxSize; }
             }
-            
+
             canvas.width = width;
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
-            
-            var compressedImage = canvas.toDataURL('image/jpeg', 0.7);
-            
-            document.getElementById('imagePreview').src = compressedImage;
+
+            var compressed = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('imagePreview').src = compressed;
             document.getElementById('imagePreviewContainer').style.display = 'block';
-            document.getElementById('menuImage').value = compressedImage;
+            document.getElementById('menuImage').value = compressed;
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
-        function renderMenu() {
+
+function renderMenu() {
     var container = document.getElementById('menuList');
     if (!container) return;
-    
+
     if (allMenuItems.length === 0) {
         container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
         return;
     }
-    
-    var catIcons = { 'Burgers': '🍔', 'Pizzas': '🍕', 'Wraps': '🌯', 'Sides': '🍟', 'Drinks': '🥤', 'Desserts': '🍦' };
+
+    var catIcons = { 'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦' };
     var html = '';
-    allMenuItems.forEach(function(item, index) {
+    allMenuItems.forEach(function(item) {
         var icon = catIcons[item.category] || '🍽️';
-        var imageHtml = '';
-        if (item.image_url && item.image_url.startsWith('data:image')) {
-            imageHtml = '<img src="' + item.image_url + '" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">';
-        } else {
-            imageHtml = '<span class="item-icon">' + icon + '</span>';
-        }
+        var imageHtml = (item.image_url && item.image_url.startsWith('data:image'))
+            ? '<img src="' + item.image_url + '" style="width:40px;height:40px;border-radius:8px;object-fit:cover;">'
+            : '<span class="item-icon">' + icon + '</span>';
+
         html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
-            '<div class="item-details"><div class="item-name">' + item.name + '</div><div class="item-desc">' + item.category + ' · ' + (item.description || item.desc) + '</div></div>' +
+                '<div class="item-details">' +
+                    '<div class="item-name">' + item.name + '</div>' +
+                    '<div class="item-desc">' + item.category + ' · ' + (item.description || '') + '</div>' +
+                '</div>' +
             '</div>' +
             '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
             '<div class="item-actions">' +
-            '<button class="btn-edit" onclick="editMenuItem(' + index + ')"><i class="fas fa-edit"></i></button>' +
-            '<button class="btn-delete-item" onclick="deleteMenuItem(' + index + ')"><i class="fas fa-trash"></i></button>' +
-            '</div></div>';
+                '<button class="btn-edit" onclick="editMenuItem(' + item.id + ')"><i class="fas fa-edit"></i></button>' +
+                '<button class="btn-delete-item" onclick="deleteMenuItem(' + item.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+        '</div>';
     });
     container.innerHTML = html;
 }
-       function saveMenuItem() {
+
+function saveMenuItem() {
     var category = document.getElementById('menuCategory').value;
     var name = document.getElementById('menuName').value.trim();
     var desc = document.getElementById('menuDesc').value.trim();
@@ -828,10 +904,7 @@ function deleteOrder(index) {
         image_url: image
     };
 
-    var url = editId 
-        ? 'https://api.nabztech.com/api/menu/' + editId 
-        : 'https://api.nabztech.com/api/menu';
-    
+    var url = editId ? (API + '/menu/' + editId) : (API + '/menu');
     var method = editId ? 'PUT' : 'POST';
 
     authFetch(url, {
@@ -842,15 +915,11 @@ function deleteOrder(index) {
     .then(function(response) {
         return response.text().then(function(text) {
             console.log('📥 Server response:', text);
-            try {
-                return JSON.parse(text);
-            } catch (e) {
-                console.error('❌ Not JSON:', text);
-                throw new Error('Server returned: ' + text.substring(0, 100));
-            }
+            try { return JSON.parse(text); }
+            catch (e) { throw new Error('Server returned: ' + text.substring(0, 100)); }
         });
     })
-    .then(function(data) {
+    .then(function() {
         showNotification('✅ Item saved!');
         cancelEdit();
         loadMenu();
@@ -860,46 +929,51 @@ function deleteOrder(index) {
         alert('Failed: ' + error.message);
     });
 }
-        function editMenuItem(index) {
-            var item = allMenuItems[index];
-            document.getElementById('menuCategory').value = item.category;
-            document.getElementById('menuName').value = item.name;
-            document.getElementById('menuDesc').value = item.desc;
-            document.getElementById('menuPrice').value = item.price;
-            document.getElementById('menuImage').value = item.image || '';
-            if (item.image && item.image.startsWith('data:image')) {
-                document.getElementById('imagePreview').src = item.image;
-                document.getElementById('imagePreviewContainer').style.display = 'block';
-            } else {
-                document.getElementById('imagePreviewContainer').style.display = 'none';
-            }
-            document.getElementById('editItemId').value = index;
-            document.getElementById('menuFormTitle').textContent = '✏️ Edit Item';
-            document.querySelector('.btn-save').textContent = 'Update Item';
-            document.getElementById('menuForm').scrollIntoView({ behavior: 'smooth' });
-        }
 
-        function cancelEdit() {
-            document.getElementById('menuCategory').value = 'Burgers';
-            document.getElementById('menuName').value = '';
-            document.getElementById('menuDesc').value = '';
-            document.getElementById('menuPrice').value = '';
-            document.getElementById('menuImage').value = '';
-            document.getElementById('menuImageFile').value = '';
-            document.getElementById('imagePreviewContainer').style.display = 'none';
-            document.getElementById('editItemId').value = '';
-            document.getElementById('menuFormTitle').textContent = 'Add New Item';
-            document.querySelector('.btn-save').textContent = 'Save Item';
-        }
+function editMenuItem(id) {
+    var item = allMenuItems.find(function(i) { return i.id === id; });
+    if (!item) return;
 
-       function deleteMenuItem(index) {
-    var item = allMenuItems[index];
-    if (confirm('Delete "' + item.name + '"?')) {
-        authFetch('https://api.nabztech.com/api/menu/' + item.id, {
-            method: 'DELETE'
-        })
+    document.getElementById('menuCategory').value = item.category;
+    document.getElementById('menuName').value = item.name;
+    document.getElementById('menuDesc').value = item.description || '';
+    document.getElementById('menuPrice').value = item.price;
+    document.getElementById('menuImage').value = item.image_url || '';
+
+    if (item.image_url && item.image_url.startsWith('data:image')) {
+        document.getElementById('imagePreview').src = item.image_url;
+        document.getElementById('imagePreviewContainer').style.display = 'block';
+    } else {
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+
+    document.getElementById('editItemId').value = item.id;
+    document.getElementById('menuFormTitle').textContent = '✏️ Edit Item';
+    document.querySelector('.btn-save').textContent = 'Update Item';
+    document.getElementById('menuForm').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEdit() {
+    document.getElementById('menuCategory').value = 'Burgers';
+    document.getElementById('menuName').value = '';
+    document.getElementById('menuDesc').value = '';
+    document.getElementById('menuPrice').value = '';
+    document.getElementById('menuImage').value = '';
+    document.getElementById('menuImageFile').value = '';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('editItemId').value = '';
+    document.getElementById('menuFormTitle').textContent = 'Add New Item';
+    document.querySelector('.btn-save').textContent = 'Save Item';
+}
+
+function deleteMenuItem(id) {
+    var item = allMenuItems.find(function(i) { return i.id === id; });
+    if (!item) return;
+    if (!confirm('Delete "' + item.name + '"?')) return;
+
+    authFetch(API + '/menu/' + id, { method: 'DELETE' })
         .then(function(response) { return response.json(); })
-        .then(function(data) {
+        .then(function() {
             showNotification('🗑️ Item deleted');
             loadMenu();
         })
@@ -907,15 +981,16 @@ function deleteOrder(index) {
             console.error('❌ Delete error:', error);
             alert('Failed to delete item');
         });
-    }
 }
+
 // ============================================================
-// 4. CUSTOMERS MANAGEMENT
+// CUSTOMERS
 // ============================================================
 function loadCustomers() {
-    authFetch('https://api.nabztech.com/api/customers')
+    authFetch(API + '/customers')
         .then(function(response) { return response.json(); })
         .then(function(customers) {
+            customers = Array.isArray(customers) ? customers : [];
             var container = document.getElementById('customersContainer');
             var countEl = document.getElementById('customerCount');
 
@@ -928,7 +1003,7 @@ function loadCustomers() {
             }
 
             var html = '<table style="width:100%; border-collapse:collapse;">' +
-                '<thead><tr style="text-align:left; border-bottom: 2px solid #ecf0f1;">' +
+                '<thead><tr style="text-align:left; border-bottom:2px solid #ecf0f1;">' +
                 '<th style="padding:10px;">#</th>' +
                 '<th style="padding:10px;">Name</th>' +
                 '<th style="padding:10px;">Phone</th>' +
@@ -937,13 +1012,13 @@ function loadCustomers() {
                 '</tr></thead><tbody>';
 
             customers.forEach(function(c, i) {
-                html += '<tr style="border-bottom: 1px solid #ecf0f1;">' +
+                html += '<tr style="border-bottom:1px solid #ecf0f1;">' +
                     '<td style="padding:10px;">' + (i + 1) + '</td>' +
-                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + c.name + '</td>' +
-                    '<td style="padding:10px;"><a href="tel:' + c.phone + '" style="color:#3498db;">' + c.phone + '</a></td>' +
-                    '<td style="padding:10px; color:#555;">' + c.address + '</td>' +
-                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (c.created_at || '-') + '</td>' +
-                    '</tr>';
+                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + (c.name || '-') + '</td>' +
+                    '<td style="padding:10px;"><a href="tel:' + (c.phone || '') + '" style="color:#3498db;">' + (c.phone || '-') + '</a></td>' +
+                    '<td style="padding:10px; color:#555;">' + (c.address || '-') + '</td>' +
+                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (c.created_at || c.created || '-') + '</td>' +
+                '</tr>';
             });
 
             html += '</tbody></table>';
@@ -953,91 +1028,6 @@ function loadCustomers() {
             console.error('❌ Customers error:', error);
         });
 }
-
-    var html = '<table style="width:100%; border-collapse:collapse;">' +
-        '<thead><tr style="text-align:left; border-bottom: 2px solid #ecf0f1;">' +
-        '<th style="padding:10px;">#</th>' +
-        '<th style="padding:10px;">Name</th>' +
-        '<th style="padding:10px;">Phone</th>' +
-        '<th style="padding:10px;">Address</th>' +
-        '<th style="padding:10px;">Registered</th>' +
-        '</tr></thead><tbody>';
-
-    customers.forEach(function(c, i) {
-        html += '<tr style="border-bottom: 1px solid #ecf0f1;">' +
-            '<td style="padding:10px;">' + (i + 1) + '</td>' +
-            '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + c.name + '</td>' +
-            '<td style="padding:10px;"><a href="tel:' + c.phone + '" style="color:#3498db;">' + c.phone + '</a></td>' +
-            '<td style="padding:10px; color:#555;">' + c.address + '</td>' +
-            '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (c.created || '-') + '</td>' +
-            '</tr>';
-    });
-
-    html += '</tbody></table>';
-    container.innerHTML = html;
-
-        // ============================================================
-        // 4. NOTIFICATIONS
-        // ============================================================
-        function showNotification(message) {
-            var existing = document.querySelector('.notification');
-            if (existing) existing.remove();
-            var div = document.createElement('div');
-            div.className = 'notification';
-            div.innerHTML = '<i class="fas fa-bell"></i> ' + message;
-            document.body.appendChild(div);
-            setTimeout(function() { div.remove(); }, 3000);
-        }
-        // 🔊 Simple beep using Web Audio API — no external file needed
-var audioCtx = null;
-
-function playBeep() {
-    try {
-        // Create once, reuse after
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        // Some browsers suspend the context until a user gesture
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-
-        var osc = audioCtx.createOscillator();
-        var gain = audioCtx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.value = 880;          // A5 note — pleasant "ding"
-        gain.gain.value = 0.15;             // volume (0–1)
-
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);  // 250ms beep
-    } catch (err) {
-        console.warn('🔇 Beep failed:', err);
-    }
-}
-
-        // ============================================================
-        // 5. AUTO-LOGIN
-        // ============================================================
-        function checkAutoLogin() {
-            if (localStorage.getItem('adminLoggedIn') === 'true') {
-                loggedIn = true;
-                document.getElementById('loginPage').style.display = 'none';
-                document.getElementById('dashboardPage').style.display = 'block';
-                document.getElementById('currentUser').textContent = '👤 admin';
-                loadOrders();
-                loadMenu();
-                loadCustomers();
-                setInterval(loadOrders, 30000);
-            }
-        }
-
-        checkAutoLogin();
-        console.log("🚀 Admin Dashboard loaded!");
-    </script>
+</script>
 </body>
 </html>
