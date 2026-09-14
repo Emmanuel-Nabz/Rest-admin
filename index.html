@@ -21,7 +21,6 @@
             justify-content: center;
         }
 
-        /* ===== SHARED FORM STYLES ===== */
         .form-group { margin-bottom: 18px; text-align: left; }
         .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
         .form-group input, .form-group select, .form-group textarea {
@@ -459,13 +458,16 @@
         <div id="pwdError" style="color:#e74c3c; font-size:0.9em; min-height:20px; margin-bottom:10px;"></div>
         <button onclick="submitChangePassword()" style="width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:24px; font-weight:bold; cursor:pointer;">Update Password</button>
     </div>
-    <div id="assignDriverModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:10000; padding:15px;">
+</div>
+
+<!-- ===== ASSIGN DRIVER MODAL ===== -->
+<div id="assignDriverModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:10000; padding:15px;">
     <div style="background:white; border-radius:16px; padding:30px 25px; max-width:380px; width:100%; position:relative;">
         <button onclick="closeAssignDriverModal()" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:1.5em; color:#95a5a6; cursor:pointer;">×</button>
         <h2 style="color:#2c3e50; margin-bottom:20px; text-align:center; font-size:1.2em;">🚗 Assign a Driver</h2>
-        <div style="margin-bottom:15px;">
-            <label style="display:block; font-weight:600; color:#2c3e50; margin-bottom:6px;">Choose Driver</label>
-            <select id="assignDriverSelect" style="width:100%; padding:12px; border:2px solid #ddd; border-radius:8px; font-size:1em;">
+        <div class="form-group">
+            <label>Choose Driver</label>
+            <select id="assignDriverSelect">
                 <option value="">Loading drivers...</option>
             </select>
         </div>
@@ -474,7 +476,6 @@
             🛵 Send Out with Driver
         </button>
     </div>
-</div>
 </div>
 
 <script>
@@ -487,6 +488,7 @@ var allOrders = [];
 var allMenuItems = [];
 var lastOrderCount = 0;
 var ordersInterval = null;
+var currentAssigningOrderId = null;
 
 // ============================================================
 // AUTH HELPERS
@@ -497,74 +499,6 @@ function authFetch(url, options) {
     var token = localStorage.getItem('adminToken');
     if (token) options.headers['Authorization'] = 'Bearer ' + token;
     return fetch(url, options);
-    var currentAssigningOrderId = null;
-
-function openAssignDriverModal(orderId) {
-    currentAssigningOrderId = orderId;
-    var modal = document.getElementById('assignDriverModal');
-    var select = document.getElementById('assignDriverSelect');
-    var errorEl = document.getElementById('assignDriverError');
-
-    errorEl.textContent = '';
-    select.innerHTML = '<option value="">Loading...</option>';
-    modal.style.display = 'flex';
-
-    authFetch(API + '/drivers')
-        .then(function(res) { return res.json(); })
-        .then(function(drivers) {
-            if (!drivers || drivers.length === 0) {
-                select.innerHTML = '<option value="">No drivers yet</option>';
-                errorEl.textContent = '💡 Create a driver in the Admins tab first';
-                return;
-            }
-            var html = '<option value="">— Select a driver —</option>';
-            drivers.forEach(function(d) {
-                html += '<option value="' + d.id + '">' + d.username + '</option>';
-            });
-            select.innerHTML = html;
-        })
-        .catch(function(err) {
-            console.error('Load drivers error:', err);
-            errorEl.textContent = '❌ Could not load drivers';
-        });
-}
-
-function closeAssignDriverModal() {
-    document.getElementById('assignDriverModal').style.display = 'none';
-    currentAssigningOrderId = null;
-}
-
-function submitAssignDriver() {
-    var driverId = document.getElementById('assignDriverSelect').value;
-    var errorEl = document.getElementById('assignDriverError');
-
-    if (!driverId) {
-        errorEl.textContent = '❌ Please select a driver';
-        return;
-    }
-
-    authFetch(API + '/orders/' + currentAssigningOrderId + '/assign', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ driver_id: parseInt(driverId) })
-    })
-    .then(function(res) {
-        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
-    })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
-            return;
-        }
-        showNotification('🚗 Driver assigned — order is On the Way');
-        closeAssignDriverModal();
-        loadOrders();
-    })
-    .catch(function(err) {
-        console.error('Assign error:', err);
-        errorEl.textContent = '❌ Network error';
-    });
-}
 }
 
 function currentUserRole() {
@@ -695,7 +629,11 @@ function showDashboard() {
     var user = localStorage.getItem('adminUser') || 'admin';
     var role = currentUserRole();
     document.getElementById('currentUser').textContent = '👤 ' + user;
-    document.getElementById('roleBadge').textContent = role === 'owner' ? '👑 Owner' : '👤 Staff';
+
+    var badgeText = '👤 Staff';
+    if (role === 'owner') badgeText = '👑 Owner';
+    else if (role === 'driver') badgeText = '🚗 Driver';
+    document.getElementById('roleBadge').textContent = badgeText;
 
     // Show Admins tab only for owners
     var adminsTabBtn = document.getElementById('tabAdmins');
@@ -769,6 +707,76 @@ function submitChangePassword() {
     })
     .catch(function(err) {
         console.error('Password change error:', err);
+        errorEl.textContent = '❌ Network error';
+    });
+}
+
+// ============================================================
+// DRIVER ASSIGNMENT
+// ============================================================
+function openAssignDriverModal(orderId) {
+    currentAssigningOrderId = orderId;
+    var modal = document.getElementById('assignDriverModal');
+    var select = document.getElementById('assignDriverSelect');
+    var errorEl = document.getElementById('assignDriverError');
+
+    errorEl.textContent = '';
+    select.innerHTML = '<option value="">Loading...</option>';
+    modal.style.display = 'flex';
+
+    authFetch(API + '/drivers')
+        .then(function(res) { return res.json(); })
+        .then(function(drivers) {
+            if (!drivers || drivers.length === 0) {
+                select.innerHTML = '<option value="">No drivers yet</option>';
+                errorEl.textContent = '💡 Create a driver in the Admins tab first';
+                return;
+            }
+            var html = '<option value="">— Select a driver —</option>';
+            drivers.forEach(function(d) {
+                html += '<option value="' + d.id + '">' + d.username + '</option>';
+            });
+            select.innerHTML = html;
+        })
+        .catch(function(err) {
+            console.error('Load drivers error:', err);
+            errorEl.textContent = '❌ Could not load drivers';
+        });
+}
+
+function closeAssignDriverModal() {
+    document.getElementById('assignDriverModal').style.display = 'none';
+    currentAssigningOrderId = null;
+}
+
+function submitAssignDriver() {
+    var driverId = document.getElementById('assignDriverSelect').value;
+    var errorEl = document.getElementById('assignDriverError');
+
+    if (!driverId) {
+        errorEl.textContent = '❌ Please select a driver';
+        return;
+    }
+
+    authFetch(API + '/orders/' + currentAssigningOrderId + '/assign', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ driver_id: parseInt(driverId) })
+    })
+    .then(function(res) {
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+    })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
+            return;
+        }
+        showNotification('🚗 Driver assigned — order is On the Way');
+        closeAssignDriverModal();
+        loadOrders();
+    })
+    .catch(function(err) {
+        console.error('Assign error:', err);
         errorEl.textContent = '❌ Network error';
     });
 }
@@ -921,9 +929,9 @@ function renderOrders(orders) {
         } else if (order.status === 'Confirmed') {
             actionButtons =
                 '<button class="btn" style="background:#f39c12;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')">👨‍🍳 Start Preparing</button>';
-       } else if (order.status === 'Preparing') {
-    actionButtons =
-        '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
+        } else if (order.status === 'Preparing') {
+            actionButtons =
+                '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
         } else if (order.status === 'On the Way') {
             actionButtons =
                 '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>';
@@ -1302,9 +1310,14 @@ function loadAdmins() {
                 '</tr></thead><tbody>';
 
             admins.forEach(function(a, i) {
-                var roleLabel = a.role === 'owner'
-                    ? '<span style="background:#f39c12;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">👑 Owner</span>'
-                    : '<span style="background:#95a5a6;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">👤 Staff</span>';
+                var roleLabel;
+                if (a.role === 'owner') {
+                    roleLabel = '<span style="background:#f39c12;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">👑 Owner</span>';
+                } else if (a.role === 'driver') {
+                    roleLabel = '<span style="background:#9b59b6;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">🚗 Driver</span>';
+                } else {
+                    roleLabel = '<span style="background:#95a5a6;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">👤 Staff</span>';
+                }
 
                 var isMe = a.id === myId;
                 var deleteBtn = isMe
