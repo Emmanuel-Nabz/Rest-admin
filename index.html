@@ -21,6 +21,16 @@
             justify-content: center;
         }
 
+        /* ===== SHARED FORM STYLES ===== */
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px 16px; border: 2px solid #ddd;
+            border-radius: 10px; font-size: 1em; transition: border-color 0.3s;
+            background: white;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3498db; outline: none; }
+
         /* ===== LOGIN ===== */
         .login-container {
             background: white;
@@ -35,10 +45,6 @@
         .login-container h1 { font-size: 2em; color: #2c3e50; margin-bottom: 5px; }
         .login-container h1 i { color: #e67e22; }
         .login-container .subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 0.95em; }
-        .login-container .form-group { margin-bottom: 18px; text-align: left; }
-        .login-container .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
-        .login-container .form-group input { width: 100%; padding: 12px 16px; border: 2px solid #ddd; border-radius: 10px; font-size: 1em; transition: border-color 0.3s; }
-        .login-container .form-group input:focus { border-color: #3498db; outline: none; }
         .login-btn {
             width: 100%; padding: 14px; background: #e67e22; color: white;
             border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold;
@@ -63,14 +69,18 @@
             padding: 0 20px; flex-wrap: wrap; gap: 10px;
         }
         .header h1 { font-size: 1.8em; color: #2c3e50; }
-        .header .user-info { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .header .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
         .header .user-info span { color: #2c3e50; font-weight: 600; }
         .header .user-info .badge { background: #e67e22; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7em; }
-        .header .logout-btn {
-            background: #e74c3c; color: white; border: none; padding: 8px 18px;
-            border-radius: 20px; cursor: pointer; font-weight: 600; transition: background 0.3s;
+        .header .header-btn {
+            color: white; border: none; padding: 8px 16px;
+            border-radius: 20px; cursor: pointer; font-weight: 600;
+            font-size: 0.9em; transition: background 0.3s;
         }
-        .header .logout-btn:hover { background: #c0392b; }
+        .header .btn-logout { background: #e74c3c; }
+        .header .btn-logout:hover { background: #c0392b; }
+        .header .btn-password { background: #3498db; }
+        .header .btn-password:hover { background: #2980b9; }
         .header .tabs { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
         .header .tab-btn {
             padding: 8px 20px; border: none; border-radius: 20px; cursor: pointer;
@@ -166,19 +176,6 @@
         }
         .menu-form h3 { color: #2c3e50; margin-bottom: 15px; }
         .menu-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .menu-form .form-group { margin-bottom: 0; }
-        .menu-form .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
-        .menu-form .form-group input,
-        .menu-form .form-group select,
-        .menu-form .form-group textarea {
-            width: 100%; padding: 10px 14px; border: 2px solid #ddd;
-            border-radius: 8px; font-size: 0.95em; transition: border-color 0.3s;
-            background: white;
-        }
-        .menu-form .form-group input:focus,
-        .menu-form .form-group select:focus,
-        .menu-form .form-group textarea:focus { border-color: #3498db; outline: none; }
-        .menu-form .form-group textarea { resize: vertical; min-height: 60px; }
         .menu-form .form-row-full { grid-column: 1 / -1; }
         .menu-form .btn-save {
             background: #27ae60; color: white; border: none; padding: 12px 30px;
@@ -276,16 +273,21 @@
             <h1>🍕 Nabz-Tech Eats Admin Dashboard</h1>
             <div class="user-info">
                 <span id="currentUser">👤 admin</span>
-                <span class="badge">Admin</span>
-                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                <span class="badge" id="roleBadge">Admin</span>
+                <button class="header-btn btn-password" onclick="openChangePassword()">
+                    <i class="fas fa-key"></i> Password
+                </button>
+                <button class="header-btn btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
             </div>
         </div>
-       <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('orders')" id="tabOrders">📋 Orders</button>
-    <button class="tab-btn" onclick="switchTab('menu')" id="tabMenu">🍽️ Menu</button>
-    <button class="tab-btn" onclick="switchTab('customers')" id="tabCustomers">👥 Customers</button>
-    <button class="tab-btn" onclick="switchTab('admins')" id="tabAdmins" style="display:none;">👤 Admins</button>
-</div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('orders')" id="tabOrders">📋 Orders</button>
+            <button class="tab-btn" onclick="switchTab('menu')" id="tabMenu">🍽️ Menu</button>
+            <button class="tab-btn" onclick="switchTab('customers')" id="tabCustomers">👥 Customers</button>
+            <button class="tab-btn" onclick="switchTab('admins')" id="tabAdmins" style="display:none;">👤 Admins</button>
+        </div>
     </div>
 
     <!-- ========== TAB 1: ORDERS ========== -->
@@ -320,49 +322,7 @@
         </div>
         <div id="ordersContainer"><div class="empty"><i class="fas fa-inbox"></i><p>No orders yet</p></div></div>
     </div>
-<!-- ========== TAB 4: ADMINS ========== -->
-<div id="tabAdminsContent" class="tab-content">
-    <div class="orders-header">
-        <h2>👤 Admin Accounts (<span id="adminCount">0</span>)</h2>
-        <button class="btn btn-refresh" onclick="loadAdmins()"><i class="fas fa-sync"></i> Refresh</button>
-    </div>
-    <button class="logout-btn" onclick="openChangePassword()" style="background:#3498db;">
-    <i class="fas fa-key"></i> Password
-</button>
 
-    <div class="menu-form">
-        <h3>➕ Add New Admin</h3>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="newAdminUsername" placeholder="e.g. ali">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group">
-                <label>Role</label>
-                <select id="newAdminRole">
-                    <option value="staff">👤 Staff (can manage orders/menu)</option>
-                    <option value="owner">👑 Owner (full access + manage admins)</option>
-                </select>
-            </div>
-            <div class="form-group" style="display:flex; align-items:flex-end;">
-                <button class="btn-save" onclick="createAdmin()">
-                    <i class="fas fa-user-plus"></i> Create Admin
-                </button>
-            </div>
-        </div>
-        <div id="adminFormError" style="color:#e74c3c; margin-top:10px; font-size:0.9em; min-height:20px;"></div>
-    </div>
-
-    <div class="menu-list" id="adminsList">
-        <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading admins...</p>
-    </div>
-</div>
     <!-- ========== TAB 2: MENU ========== -->
     <div id="tabMenuContent" class="tab-content">
         <div class="orders-header">
@@ -434,28 +394,69 @@
         <div id="customersContainer" class="menu-list">
             <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading customers...</p>
         </div>
-        <!-- ===== CHANGE PASSWORD MODAL ===== -->
+    </div>
+
+    <!-- ========== TAB 4: ADMINS ========== -->
+    <div id="tabAdminsContent" class="tab-content">
+        <div class="orders-header">
+            <h2>👤 Admin Accounts (<span id="adminCount">0</span>)</h2>
+            <button class="btn btn-refresh" onclick="loadAdmins()"><i class="fas fa-sync"></i> Refresh</button>
+        </div>
+
+        <div class="menu-form">
+            <h3>➕ Add New Admin</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="newAdminUsername" placeholder="e.g. ali">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="newAdminRole">
+                        <option value="staff">👤 Staff (can manage orders/menu)</option>
+                        <option value="owner">👑 Owner (full access + manage admins)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:flex; align-items:flex-end;">
+                    <button class="btn-save" onclick="createAdmin()">
+                        <i class="fas fa-user-plus"></i> Create Admin
+                    </button>
+                </div>
+            </div>
+            <div id="adminFormError" style="color:#e74c3c; margin-top:10px; font-size:0.9em; min-height:20px;"></div>
+        </div>
+
+        <div class="menu-list" id="adminsList">
+            <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading admins...</p>
+        </div>
+    </div>
+</div>
+
+<!-- ===== CHANGE PASSWORD MODAL ===== -->
 <div id="changePasswordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:10000; padding:15px;">
     <div style="background:white; border-radius:16px; padding:30px 25px; max-width:380px; width:100%; position:relative;">
         <button onclick="closeChangePassword()" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:1.5em; color:#95a5a6; cursor:pointer;">×</button>
         <h2 style="color:#2c3e50; margin-bottom:20px; text-align:center; font-size:1.2em;">🔑 Change Password</h2>
-
         <div class="form-group">
             <label>Current Password</label>
-            <input type="password" id="currentPwd" class="input-field" placeholder="Enter current password">
+            <input type="password" id="currentPwd" placeholder="Enter current password">
         </div>
         <div class="form-group">
             <label>New Password</label>
-            <input type="password" id="newPwd" class="input-field" placeholder="Min 6 characters">
+            <input type="password" id="newPwd" placeholder="Min 6 characters">
         </div>
         <div class="form-group">
             <label>Confirm New Password</label>
-            <input type="password" id="newPwd2" class="input-field" placeholder="Repeat new password">
+            <input type="password" id="newPwd2" placeholder="Repeat new password">
         </div>
         <div id="pwdError" style="color:#e74c3c; font-size:0.9em; min-height:20px; margin-bottom:10px;"></div>
         <button onclick="submitChangePassword()" style="width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:24px; font-weight:bold; cursor:pointer;">Update Password</button>
-    </div>
-</div>
     </div>
 </div>
 
@@ -481,6 +482,31 @@ function authFetch(url, options) {
     return fetch(url, options);
 }
 
+function currentUserRole() {
+    try {
+        var token = localStorage.getItem('adminToken');
+        if (!token) return null;
+        var payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.role || 'staff';
+    } catch (e) {
+        return null;
+    }
+}
+
+function currentUserId() {
+    try {
+        var token = localStorage.getItem('adminToken');
+        if (!token) return null;
+        var payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.id;
+    } catch (e) {
+        return null;
+    }
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
 function login() {
     var username = document.getElementById('loginUsername').value.trim();
     var password = document.getElementById('loginPassword').value.trim();
@@ -491,7 +517,6 @@ function login() {
         return;
     }
 
-    // Plain fetch — we don't have a token yet
     fetch(API + '/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -513,12 +538,6 @@ function login() {
         console.error('Login error:', err);
         errorEl.textContent = '❌ Network error. Try again.';
     });
-}
-// Show Admins tab only for owners
-var role = currentUserRole();
-var adminsTabBtn = document.getElementById('tabAdmins');
-if (adminsTabBtn) {
-    adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
 }
 
 function register() {
@@ -587,7 +606,17 @@ function logout() {
 function showDashboard() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('dashboardPage').style.display = 'block';
-    document.getElementById('currentUser').textContent = '👤 ' + (localStorage.getItem('adminUser') || 'admin');
+
+    var user = localStorage.getItem('adminUser') || 'admin';
+    var role = currentUserRole();
+    document.getElementById('currentUser').textContent = '👤 ' + user;
+    document.getElementById('roleBadge').textContent = role === 'owner' ? '👑 Owner' : '👤 Staff';
+
+    // Show Admins tab only for owners
+    var adminsTabBtn = document.getElementById('tabAdmins');
+    if (adminsTabBtn) {
+        adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
+    }
 
     loadOrders();
     loadMenu();
@@ -605,6 +634,10 @@ function checkSession() {
 }
 
 window.addEventListener('DOMContentLoaded', checkSession);
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
 function openChangePassword() {
     document.getElementById('changePasswordModal').style.display = 'flex';
     document.getElementById('currentPwd').value = '';
@@ -654,6 +687,7 @@ function submitChangePassword() {
         errorEl.textContent = '❌ Network error';
     });
 }
+
 // ============================================================
 // TABS
 // ============================================================
@@ -1154,31 +1188,10 @@ function loadCustomers() {
             console.error('❌ Customers error:', error);
         });
 }
+
 // ============================================================
 // ADMIN MANAGEMENT
 // ============================================================
-function currentUserRole() {
-    try {
-        var token = localStorage.getItem('adminToken');
-        if (!token) return null;
-        var payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.role || 'staff';
-    } catch (e) {
-        return null;
-    }
-}
-
-function currentUserId() {
-    try {
-        var token = localStorage.getItem('adminToken');
-        if (!token) return null;
-        var payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
-    } catch (e) {
-        return null;
-    }
-}
-
 function loadAdmins() {
     authFetch(API + '/admins')
         .then(function(res) { return res.json(); })
