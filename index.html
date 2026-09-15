@@ -778,9 +778,25 @@ function submitChangePassword() {
 // ============================================================
 function openAssignDriverModal(orderId) {
     currentAssigningOrderId = orderId;
+
+    // Find the order to see if a driver is already assigned
+    var order = allOrders.find(function(o) { return o.id === orderId; });
+    var currentDriverId = order && order.driver_id ? order.driver_id : null;
+
     var modal = document.getElementById('assignDriverModal');
     var select = document.getElementById('assignDriverSelect');
     var errorEl = document.getElementById('assignDriverError');
+    var titleEl = modal.querySelector('h2');
+    var submitBtn = modal.querySelector('button[onclick*="submitAssignDriver"]');
+
+    // Update title and button text based on context
+    if (currentDriverId) {
+        titleEl.textContent = '🔄 Reassign Driver';
+        if (submitBtn) submitBtn.textContent = '🚗 Reassign to New Driver';
+    } else {
+        titleEl.textContent = '🚗 Assign a Driver';
+        if (submitBtn) submitBtn.textContent = '🛵 Send Out with Driver';
+    }
 
     errorEl.textContent = '';
     select.innerHTML = '<option value="">Loading...</option>';
@@ -794,18 +810,27 @@ function openAssignDriverModal(orderId) {
                 errorEl.textContent = '💡 Create a driver in the Admins tab first';
                 return;
             }
+
             var html = '<option value="">— Select a driver —</option>';
             drivers.forEach(function(d) {
-                html += '<option value="' + d.id + '">' + d.username + '</option>';
+                var label = d.username;
+                if (currentDriverId === d.id) {
+                    label += ' (currently assigned)';
+                }
+                html += '<option value="' + d.id + '">' + label + '</option>';
             });
             select.innerHTML = html;
+
+            // Pre-select the current driver
+            if (currentDriverId) {
+                select.value = currentDriverId;
+            }
         })
         .catch(function(err) {
             console.error('Load drivers error:', err);
             errorEl.textContent = '❌ Could not load drivers';
         });
 }
-
 function closeAssignDriverModal() {
     document.getElementById('assignDriverModal').style.display = 'none';
     currentAssigningOrderId = null;
@@ -906,18 +931,20 @@ function loadOrders() {
             console.log('✅ Orders loaded:', data.length);
 
             allOrders = data.map(function(order) {
-                return {
-                    id: order.id,
-                    date: order.created_at,
-                    name: order.customer_name,
-                    phone: order.customer_phone,
-                    address: order.customer_address,
-                    payment: order.payment_method,
-                    total: parseFloat(order.total),
-                    status: order.status || 'New',
-                    items: []
-                };
-            });
+    return {
+        id: order.id,
+        date: order.created_at,
+        name: order.customer_name,
+        phone: order.customer_phone,
+        address: order.customer_address,
+        payment: order.payment_method,
+        total: parseFloat(order.total),
+        status: order.status || 'New',
+        driver_id: order.driver_id,
+        driver_name: order.driver_name,
+        items: []
+    };
+});
 
             if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
                 playBeep();
@@ -992,11 +1019,14 @@ function renderOrders(orders) {
             actionButtons =
                 '<button class="btn" style="background:#f39c12;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')">👨‍🍳 Start Preparing</button>';
         } else if (order.status === 'Preparing') {
-            actionButtons =
-                '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
+    actionButtons =
+        '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
         } else if (order.status === 'On the Way') {
-            actionButtons =
-                '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>';
+    actionButtons =
+        '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>' +
+        '<button class="btn" style="background:#3498db;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🔄 Reassign Driver</button>';
+
+
         } else if (order.status === 'Delivered') {
             actionButtons =
                 '<span style="color:#2ecc71;font-weight:bold;">🎉 Completed</span>' +
@@ -1017,6 +1047,9 @@ function renderOrders(orders) {
             '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-map-pin"></i> ' + escapeHtml(order.address || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
+            (order.driver_name ?
+    '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: ' + escapeHtml(order.driver_name) + '</div>'
+    : '') +
             '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
