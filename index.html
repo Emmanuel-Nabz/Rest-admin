@@ -231,6 +231,58 @@
         #floatingHomeBtn:hover { background: #d35400; transform: scale(1.08); }
         #floatingHomeBtn:active { transform: scale(0.95); }
 
+        /* ===== TRIAL BANNER ===== */
+        #trialBanner {
+            display: none;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.35);
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+            animation: slideDown 0.4s ease;
+        }
+        #trialBanner .trial-text {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        #trialBanner .trial-text i {
+            font-size: 1.4em;
+        }
+        #trialBanner .trial-text .sub {
+            font-weight: 400;
+            font-size: 0.85em;
+            opacity: 0.95;
+            display: block;
+            margin-top: 2px;
+        }
+        #trialBanner .upgrade-btn {
+            background: white;
+            color: #e67e22;
+            border: none;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: transform 0.2s;
+            white-space: nowrap;
+        }
+        #trialBanner .upgrade-btn:hover {
+            transform: scale(1.05);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 600px) {
             .stats { grid-template-columns: 1fr 1fr; }
             .filters { flex-direction: column; align-items: stretch; }
@@ -239,68 +291,9 @@
             .menu-form .form-row { grid-template-columns: 1fr; }
             .menu-item-row { flex-direction: column; align-items: stretch; }
             #floatingHomeBtn { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 1.3em; }
+            #trialBanner { flex-direction: column; text-align: center; }
+            #trialBanner .trial-text { flex-direction: column; text-align: center; }
         }
-        /* ===== TRIAL BANNER ===== */
-#trialBanner {
-    display: none;
-    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-    color: white;
-    padding: 14px 20px;
-    border-radius: 12px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 15px rgba(230, 126, 34, 0.35);
-    align-items: center;
-    justify-content: space-between;
-    gap: 15px;
-    flex-wrap: wrap;
-    animation: slideDown 0.4s ease;
-}
-#trialBanner .trial-text {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 600;
-    font-size: 0.95em;
-}
-#trialBanner .trial-text i {
-    font-size: 1.4em;
-}
-#trialBanner .trial-text .sub {
-    font-weight: 400;
-    font-size: 0.85em;
-    opacity: 0.95;
-    display: block;
-    margin-top: 2px;
-}
-#trialBanner .upgrade-btn {
-    background: white;
-    color: #e67e22;
-    border: none;
-    padding: 10px 22px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: transform 0.2s;
-    white-space: nowrap;
-}
-#trialBanner .upgrade-btn:hover {
-    transform: scale(1.05);
-}
-@keyframes slideDown {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-@media (max-width: 600px) {
-    #trialBanner {
-        flex-direction: column;
-        text-align: center;
-    }
-    #trialBanner .trial-text {
-        flex-direction: column;
-        text-align: center;
-    }
-}
     </style>
 </head>
 <body>
@@ -367,7 +360,6 @@
         </button>
     </div>
 
-    <div class="header">
     <div class="header">
         <div class="top-bar">
             <h1>🍕 Nabz-Tech Eats Admin Dashboard</h1>
@@ -649,7 +641,6 @@ function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Show the floating button after scrolling down
 window.addEventListener('scroll', function() {
     var btn = document.getElementById('floatingHomeBtn');
     if (!btn) return;
@@ -748,9 +739,6 @@ function showLogin() {
     document.getElementById('registerError').textContent = '';
 }
 
-// ============================================================
-// LOGOUT (renamed to doLogout to avoid browser native API collision)
-// ============================================================
 function doLogout() {
     if (!confirm('Logout?')) return;
     localStorage.removeItem('adminToken');
@@ -774,7 +762,8 @@ function showDashboard() {
     if (role === 'owner') badgeText = '👑 Owner';
     else if (role === 'driver') badgeText = '🚗 Driver';
     document.getElementById('roleBadge').textContent = badgeText;
-        // Show trial banner if this is a trial account
+
+    // Show trial banner if this is a trial account
     showTrialBanner();
 
     var adminsTabBtn = document.getElementById('tabAdmins');
@@ -789,6 +778,16 @@ function showDashboard() {
     if (ordersInterval) clearInterval(ordersInterval);
     ordersInterval = setInterval(loadOrders, 30000);
 }
+
+function checkSession() {
+    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
+        loggedIn = true;
+        showDashboard();
+    }
+}
+
+window.addEventListener('DOMContentLoaded', checkSession);
+
 // ============================================================
 // TRIAL BANNER
 // ============================================================
@@ -849,15 +848,6 @@ function closeTrialInfo() {
     if (el) el.remove();
 }
 
-function checkSession() {
-    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
-        loggedIn = true;
-        showDashboard();
-    }
-}
-
-window.addEventListener('DOMContentLoaded', checkSession);
-
 // ============================================================
 // CHANGE PASSWORD
 // ============================================================
@@ -917,7 +907,6 @@ function submitChangePassword() {
 function openAssignDriverModal(orderId) {
     currentAssigningOrderId = orderId;
 
-    // Find the order to see if a driver is already assigned
     var order = allOrders.find(function(o) { return o.id === orderId; });
     var currentDriverId = order && order.driver_id ? order.driver_id : null;
 
@@ -927,7 +916,6 @@ function openAssignDriverModal(orderId) {
     var titleEl = modal.querySelector('h2');
     var submitBtn = modal.querySelector('button[onclick*="submitAssignDriver"]');
 
-    // Update title and button text based on context
     if (currentDriverId) {
         titleEl.textContent = '🔄 Reassign Driver';
         if (submitBtn) submitBtn.textContent = '🚗 Reassign to New Driver';
@@ -959,7 +947,6 @@ function openAssignDriverModal(orderId) {
             });
             select.innerHTML = html;
 
-            // Pre-select the current driver
             if (currentDriverId) {
                 select.value = currentDriverId;
             }
@@ -969,6 +956,7 @@ function openAssignDriverModal(orderId) {
             errorEl.textContent = '❌ Could not load drivers';
         });
 }
+
 function closeAssignDriverModal() {
     document.getElementById('assignDriverModal').style.display = 'none';
     currentAssigningOrderId = null;
@@ -1069,20 +1057,20 @@ function loadOrders() {
             console.log('✅ Orders loaded:', data.length);
 
             allOrders = data.map(function(order) {
-    return {
-        id: order.id,
-        date: order.created_at,
-        name: order.customer_name,
-        phone: order.customer_phone,
-        address: order.customer_address,
-        payment: order.payment_method,
-        total: parseFloat(order.total),
-        status: order.status || 'New',
-        driver_id: order.driver_id,
-        driver_name: order.driver_name,
-        items: []
-    };
-});
+                return {
+                    id: order.id,
+                    date: order.created_at,
+                    name: order.customer_name,
+                    phone: order.customer_phone,
+                    address: order.customer_address,
+                    payment: order.payment_method,
+                    total: parseFloat(order.total),
+                    status: order.status || 'New',
+                    driver_id: order.driver_id,
+                    driver_name: order.driver_name,
+                    items: []
+                };
+            });
 
             if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
                 playBeep();
@@ -1157,14 +1145,12 @@ function renderOrders(orders) {
             actionButtons =
                 '<button class="btn" style="background:#f39c12;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')">👨‍🍳 Start Preparing</button>';
         } else if (order.status === 'Preparing') {
-    actionButtons =
-        '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
+            actionButtons =
+                '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
         } else if (order.status === 'On the Way') {
-    actionButtons =
-        '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>' +
-        '<button class="btn" style="background:#3498db;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🔄 Reassign Driver</button>';
-
-
+            actionButtons =
+                '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>' +
+                '<button class="btn" style="background:#3498db;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🔄 Reassign Driver</button>';
         } else if (order.status === 'Delivered') {
             actionButtons =
                 '<span style="color:#2ecc71;font-weight:bold;">🎉 Completed</span>' +
@@ -1186,8 +1172,8 @@ function renderOrders(orders) {
             '<div class="order-details"><i class="fas fa-map-pin"></i> ' + escapeHtml(order.address || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
             (order.driver_name ?
-    '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: ' + escapeHtml(order.driver_name) + '</div>'
-    : '') +
+                '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: ' + escapeHtml(order.driver_name) + '</div>'
+                : '') +
             '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
@@ -1357,7 +1343,8 @@ function renderMenu() {
             '<div class="item-info">' + imageHtml +
                 '<div class="item-details">' +
                    '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
-'<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
+                   '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
+                '</div>' +
             '</div>' +
             '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
             '<div class="item-actions">' +
@@ -1521,9 +1508,6 @@ function loadCustomers() {
         });
 }
 
-// ============================================================
-// CUSTOMER EDIT / DELETE
-// ============================================================
 function editCustomer(id) {
     var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
     if (!customer) return;
@@ -1605,13 +1589,9 @@ function saveCustomerEdit(id) {
     });
 }
 
-// ============================================================
-// DELETE CUSTOMER (renamed to doDeleteCustomer to avoid collisions)
-// ============================================================
 function doDeleteCustomer(id) {
     var customers = window.allCustomers;
     if (!customers || !customers.length) {
-        // Refetch if window.allCustomers is empty
         authFetch(API + '/customers')
             .then(function(res) { return res.json(); })
             .then(function(list) {
