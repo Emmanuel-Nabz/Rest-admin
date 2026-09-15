@@ -1340,6 +1340,7 @@ function closeCustomerEdit() {
     if (el) el.remove();
 }
 
+
 function saveCustomerEdit(id) {
     var name = document.getElementById('editCustName').value.trim();
     var phone = document.getElementById('editCustPhone').value.trim();
@@ -1384,27 +1385,6 @@ function saveCustomerEdit(id) {
     });
 }
 
-    authFetch(API + '/customers/' + id, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, phone: phone, address: address })
-    })
-    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
-            return;
-        }
-        closeCustomerEdit();
-        showNotification('✅ Customer updated');
-        loadCustomers();
-    })
-    .catch(function(err) {
-        console.error('Edit customer error:', err);
-        errorEl.textContent = '❌ Network error';
-    });
-}
-
 function deleteCustomer(id) {
     var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
     if (!customer) return;
@@ -1415,7 +1395,6 @@ function deleteCustomer(id) {
 
     authFetch(API + '/customers/' + id, { method: 'DELETE' })
         .then(function(res) {
-            // Read as text first — some responses might not be JSON
             return res.text().then(function(text) {
                 var data;
                 try {
