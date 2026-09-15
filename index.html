@@ -489,6 +489,18 @@ var allMenuItems = [];
 var lastOrderCount = 0;
 var ordersInterval = null;
 var currentAssigningOrderId = null;
+// ============================================================
+// XSS PROTECTION
+// ============================================================
+function escapeHtml(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
 
 // ============================================================
 // AUTH HELPERS
@@ -951,10 +963,10 @@ function renderOrders(orders) {
                 '<span class="order-status" style="background:' + st.color + ';color:white;">' + st.icon + ' ' + (order.status || 'New') + '</span>' +
             '</div>' +
             '<div class="order-details"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-user"></i> ' + (order.name || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-phone"></i> ' + (order.phone || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-map-pin"></i> ' + (order.address || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + (order.payment || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
+'<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
+'<div class="order-details"><i class="fas fa-map-pin"></i> ' + escapeHtml(order.address || '-') + '</div>' +
+'<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
             '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
@@ -1123,9 +1135,8 @@ function renderMenu() {
         html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
                 '<div class="item-details">' +
-                    '<div class="item-name">' + item.name + '</div>' +
-                    '<div class="item-desc">' + item.category + ' · ' + (item.description || '') + '</div>' +
-                '</div>' +
+                   '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
+'<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
             '</div>' +
             '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
             '<div class="item-actions">' +
@@ -1267,9 +1278,9 @@ function loadCustomers() {
             customers.forEach(function(c, i) {
                 html += '<tr style="border-bottom:1px solid #ecf0f1;">' +
                     '<td style="padding:10px;">' + (i + 1) + '</td>' +
-                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + (c.name || '-') + '</td>' +
-                    '<td style="padding:10px;"><a href="tel:' + (c.phone || '') + '" style="color:#3498db;">' + (c.phone || '-') + '</a></td>' +
-                    '<td style="padding:10px; color:#555;">' + (c.address || '-') + '</td>' +
+                   '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + escapeHtml(c.name || '-') + '</td>' +
+'<td style="padding:10px;"><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:#3498db;">' + escapeHtml(c.phone || '-') + '</a></td>' +
+'<td style="padding:10px; color:#555;">' + escapeHtml(c.address || '-') + '</td>' +
                     '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (c.created_at || c.created || '-') + '</td>' +
                 '</tr>';
             });
@@ -1326,7 +1337,7 @@ function loadAdmins() {
 
                 html += '<tr style="border-bottom:1px solid #ecf0f1;">' +
                     '<td style="padding:10px;">' + (i + 1) + '</td>' +
-                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + a.username + '</td>' +
+                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + escapeHtml(a.username) + '</td>' +
                     '<td style="padding:10px;">' + roleLabel + '</td>' +
                     '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (a.created_at || '-') + '</td>' +
                     '<td style="padding:10px;">' + deleteBtn + '</td>' +
