@@ -1266,6 +1266,9 @@ function loadCustomers() {
                 return;
             }
 
+            // Store customers for later lookup by edit/delete
+            window.allCustomers = customers;
+
             var html = '<table style="width:100%; border-collapse:collapse;">' +
                 '<thead><tr style="text-align:left; border-bottom:2px solid #ecf0f1;">' +
                 '<th style="padding:10px;">#</th>' +
@@ -1273,15 +1276,20 @@ function loadCustomers() {
                 '<th style="padding:10px;">Phone</th>' +
                 '<th style="padding:10px;">Address</th>' +
                 '<th style="padding:10px;">Registered</th>' +
+                '<th style="padding:10px;">Actions</th>' +
                 '</tr></thead><tbody>';
 
             customers.forEach(function(c, i) {
                 html += '<tr style="border-bottom:1px solid #ecf0f1;">' +
                     '<td style="padding:10px;">' + (i + 1) + '</td>' +
-                   '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + escapeHtml(c.name || '-') + '</td>' +
-'<td style="padding:10px;"><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:#3498db;">' + escapeHtml(c.phone || '-') + '</a></td>' +
-'<td style="padding:10px; color:#555;">' + escapeHtml(c.address || '-') + '</td>' +
-                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (c.created_at || c.created || '-') + '</td>' +
+                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + escapeHtml(c.name || '-') + '</td>' +
+                    '<td style="padding:10px;"><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:#3498db;">' + escapeHtml(c.phone || '-') + '</a></td>' +
+                    '<td style="padding:10px; color:#555;">' + escapeHtml(c.address || '-') + '</td>' +
+                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + escapeHtml(c.created_at || c.created || '-') + '</td>' +
+                    '<td style="padding:10px; white-space:nowrap;">' +
+                        '<button onclick="editCustomer(' + c.id + ')" style="background:#3498db;color:white;border:none;padding:6px 12px;border-radius:15px;cursor:pointer;font-size:0.8em;margin-right:6px;"><i class="fas fa-edit"></i></button>' +
+                        '<button onclick="deleteCustomer(' + c.id + ')" style="background:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:15px;cursor:pointer;font-size:0.8em;"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
                 '</tr>';
             });
 
@@ -1290,6 +1298,103 @@ function loadCustomers() {
         })
         .catch(function(error) {
             console.error('❌ Customers error:', error);
+        });
+}
+// ============================================================
+// CUSTOMER EDIT / DELETE
+// ============================================================
+function editCustomer(id) {
+    var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
+    if (!customer) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'confirm-overlay';
+    overlay.id = 'customerEditOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;padding:15px;';
+
+    overlay.innerHTML =
+        '<div style="background:white;border-radius:16px;padding:30px 25px;max-width:400px;width:100%;position:relative;">' +
+            '<button onclick="closeCustomerEdit()" style="position:absolute;top:10px;right:15px;background:none;border:none;font-size:1.5em;color:#95a5a6;cursor:pointer;">×</button>' +
+            '<h2 style="color:#2c3e50;margin-bottom:20px;text-align:center;font-size:1.2em;">✏️ Edit Customer</h2>' +
+            '<div class="form-group">' +
+                '<label>Name</label>' +
+                '<input type="text" id="editCustName" value="' + escapeHtml(customer.name || '').replace(/"/g, '&quot;') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>Phone</label>' +
+                '<input type="text" id="editCustPhone" value="' + escapeHtml(customer.phone || '').replace(/"/g, '&quot;') + '">' +
+            '</div>' +
+            '<div class="form-group">' +
+                '<label>Address</label>' +
+                '<input type="text" id="editCustAddress" value="' + escapeHtml(customer.address || '').replace(/"/g, '&quot;') + '">' +
+            '</div>' +
+            '<div id="editCustError" style="color:#e74c3c;font-size:0.9em;min-height:20px;margin-bottom:10px;"></div>' +
+            '<button onclick="saveCustomerEdit(' + id + ')" style="width:100%;padding:12px;background:#27ae60;color:white;border:none;border-radius:24px;font-weight:bold;cursor:pointer;">Save Changes</button>' +
+        '</div>';
+
+    document.body.appendChild(overlay);
+}
+
+function closeCustomerEdit() {
+    var el = document.getElementById('customerEditOverlay');
+    if (el) el.remove();
+}
+
+function saveCustomerEdit(id) {
+    var name = document.getElementById('editCustName').value.trim();
+    var phone = document.getElementById('editCustPhone').value.trim();
+    var address = document.getElementById('editCustAddress').value.trim();
+    var errorEl = document.getElementById('editCustError');
+
+    errorEl.textContent = '';
+
+    if (!name || !phone || !address) {
+        errorEl.textContent = '❌ All fields are required';
+        return;
+    }
+
+    authFetch(API + '/customers/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, phone: phone, address: address })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
+            return;
+        }
+        closeCustomerEdit();
+        showNotification('✅ Customer updated');
+        loadCustomers();
+    })
+    .catch(function(err) {
+        console.error('Edit customer error:', err);
+        errorEl.textContent = '❌ Network error';
+    });
+}
+
+function deleteCustomer(id) {
+    var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
+    if (!customer) return;
+
+    if (!confirm('Delete customer "' + customer.name + '"?\n\nThis cannot be undone. Their past orders will remain.')) {
+        return;
+    }
+
+    authFetch(API + '/customers/' + id, { method: 'DELETE' })
+        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+        .then(function(result) {
+            if (!result.ok) {
+                alert('❌ ' + (result.data.error || 'Failed to delete'));
+                return;
+            }
+            showNotification('🗑️ Customer deleted');
+            loadCustomers();
+        })
+        .catch(function(err) {
+            console.error('Delete customer error:', err);
+            alert('❌ Network error');
         });
 }
 
