@@ -1358,6 +1358,37 @@ function saveCustomerEdit(id) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name, phone: phone, address: address })
     })
+    .then(function(res) {
+        return res.text().then(function(text) {
+            var data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                data = { error: text || 'Empty response' };
+            }
+            return { ok: res.ok, status: res.status, data: data };
+        });
+    })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || ('Error ' + result.status));
+            return;
+        }
+        closeCustomerEdit();
+        showNotification('✅ Customer updated');
+        loadCustomers();
+    })
+    .catch(function(err) {
+        console.error('Edit customer error:', err);
+        errorEl.textContent = '❌ Network error: ' + err.message;
+    });
+}
+
+    authFetch(API + '/customers/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, phone: phone, address: address })
+    })
     .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
         if (!result.ok) {
@@ -1383,10 +1414,21 @@ function deleteCustomer(id) {
     }
 
     authFetch(API + '/customers/' + id, { method: 'DELETE' })
-        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+        .then(function(res) {
+            // Read as text first — some responses might not be JSON
+            return res.text().then(function(text) {
+                var data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    data = { error: text || 'Empty response' };
+                }
+                return { ok: res.ok, status: res.status, data: data };
+            });
+        })
         .then(function(result) {
             if (!result.ok) {
-                alert('❌ ' + (result.data.error || 'Failed to delete'));
+                alert('❌ ' + (result.data.error || ('Error ' + result.status)));
                 return;
             }
             showNotification('🗑️ Customer deleted');
@@ -1394,10 +1436,9 @@ function deleteCustomer(id) {
         })
         .catch(function(err) {
             console.error('Delete customer error:', err);
-            alert('❌ Network error');
+            alert('❌ Network error: ' + err.message);
         });
 }
-
 // ============================================================
 // ADMIN MANAGEMENT
 // ============================================================
