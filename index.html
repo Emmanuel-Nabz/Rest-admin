@@ -3,539 +3,1258 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🍕 Admin Dashboard</title>
+    <title>Admin Dashboard — Nabz-Tech Eats</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        :root {
+            --bg: #f5f6f8;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --accent: #e67e22;
+            --accent-hover: #d35400;
+            --accent-soft: #fef3e2;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --purple: #8b5cf6;
+            --radius-sm: 6px;
+            --radius: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background-image: linear-gradient(rgba(1, 2, 5, 0.2), rgba(2, 5, 11, 0.2)), url('admin-bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            padding: 20px;
-            min-height: 100vh;
-            width: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ================= LOGIN ================= */
+        #loginPage {
             display: flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
-
-        .form-group { margin-bottom: 18px; text-align: left; }
-        .form-group label { display: block; font-weight: 600; color: #2c3e50; margin-bottom: 5px; font-size: 0.9em; }
-        .form-group input, .form-group select, .form-group textarea {
-            width: 100%; padding: 12px 16px; border: 2px solid #ddd;
-            border-radius: 10px; font-size: 1em; transition: border-color 0.3s;
-            background: white;
-        }
-        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #3498db; outline: none; }
-
-        /* ===== LOGIN ===== */
-        .login-container {
-            background: white;
-            padding: 40px 35px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-            max-width: 420px;
-            width: 100%;
-            text-align: center;
-            margin-top: 60px;
-        }
-        .login-container h1 { font-size: 2em; color: #2c3e50; margin-bottom: 5px; }
-        .login-container h1 i { color: #e67e22; }
-        .login-container .subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 0.95em; }
-        .login-btn {
-            width: 100%; padding: 14px; background: #e67e22; color: white;
-            border: none; border-radius: 10px; font-size: 1.1em; font-weight: bold;
-            cursor: pointer; transition: background 0.3s; margin-top: 5px;
-        }
-        .login-btn:hover { background: #d35400; }
-        .login-btn i { margin-right: 8px; }
-        .login-container .error-msg { color: #e74c3c; font-size: 0.9em; min-height: 24px; margin-top: 10px; }
-        .login-container .switch-link { text-align: center; margin-top: 15px; }
-        .login-container .switch-link a { color: #3498db; font-size: 0.9em; text-decoration: none; }
-        .login-container .switch-link a:hover { text-decoration: underline; }
-
-        /* ===== DASHBOARD ===== */
-        .dashboard { display: none; width: 100%; max-width: 1400px; }
-        .header {
-            text-align: center; padding: 20px 0; border-bottom: 4px solid #e67e22;
-            margin-bottom: 30px; background: white; border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-        .header .top-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 0 20px; flex-wrap: wrap; gap: 10px;
-        }
-        .header h1 { font-size: 1.8em; color: #2c3e50; }
-        .header .user-info { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-        .header .user-info span { color: #2c3e50; font-weight: 600; }
-        .header .user-info .badge { background: #e67e22; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7em; }
-        .header .header-btn {
-            color: white; border: none; padding: 8px 16px;
-            border-radius: 20px; cursor: pointer; font-weight: 600;
-            font-size: 0.9em; transition: background 0.3s;
-        }
-        .header .btn-logout { background: #e74c3c; }
-        .header .btn-logout:hover { background: #c0392b; }
-        .header .btn-password { background: #3498db; }
-        .header .btn-password:hover { background: #2980b9; }
-        .header .tabs { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
-        .header .tab-btn {
-            padding: 8px 20px; border: none; border-radius: 20px; cursor: pointer;
-            font-weight: 600; background: #ecf0f1; color: #7f8c8d; transition: all 0.3s;
-        }
-        .header .tab-btn.active { background: #e67e22; color: white; }
-        .header .tab-btn:hover { background: #e67e22; color: white; }
-
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* ===== STATS ===== */
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card {
-            background: white; padding: 20px; border-radius: 12px; text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: transform 0.3s;
-        }
-        .stat-card:hover { transform: translateY(-5px); }
-        .stat-card .number { font-size: 2em; font-weight: bold; color: #e67e22; }
-        .stat-card .label { color: #7f8c8d; font-size: 0.85em; margin-top: 5px; }
-        .stat-card .number.green { color: #27ae60; }
-
-        /* ===== FILTERS ===== */
-        .filters {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
-            background: white; padding: 15px; border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06); align-items: center;
-        }
-        .filters input, .filters select {
-            padding: 10px 14px; border: 2px solid #ddd; border-radius: 8px;
-            font-size: 0.95em; flex: 1; min-width: 150px; transition: border-color 0.3s;
-            background: white;
-        }
-        .filters input:focus, .filters select:focus { border-color: #3498db; outline: none; }
-
-        /* ===== ORDERS HEADER / BUTTONS ===== */
-        .orders-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 15px; flex-wrap: wrap; gap: 10px;
-            background: white; padding: 12px 18px; border-radius: 12px;
-        }
-        .orders-header h2 { color: #2c3e50; font-size: 1.1em; }
-        .orders-header .actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .orders-header .btn {
-            padding: 8px 16px; border: none; border-radius: 20px; cursor: pointer;
-            font-weight: 600; font-size: 0.85em; transition: all 0.3s;
-        }
-        .btn-refresh { background: #3498db; color: white; }
-        .btn-refresh:hover { background: #2980b9; }
-        .btn-export { background: #27ae60; color: white; }
-        .btn-export:hover { background: #1e8449; }
-        .btn-clear { background: #e74c3c; color: white; }
-        .btn-clear:hover { background: #c0392b; }
-
-        /* ===== ORDER CARD ===== */
-        .order-card {
-            background: white; border-radius: 12px; padding: 16px 18px;
-            margin-bottom: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            border-left: 4px solid #f39c12; transition: transform 0.2s;
-        }
-        .order-card:hover { transform: translateX(5px); }
-        .order-card .order-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
-        .order-card .order-id { font-weight: bold; color: #2c3e50; }
-        .order-card .order-status {
-            font-size: 0.8em; padding: 4px 12px; border-radius: 20px; font-weight: 600;
-        }
-        .order-card .order-details { margin: 8px 0; color: #555; font-size: 0.95em; }
-        .order-card .order-details i { width: 20px; color: #7f8c8d; }
-        .order-card .order-total { font-weight: bold; color: #27ae60; font-size: 1.1em; margin-top: 6px; }
-        .order-card .order-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-        .order-card .btn {
-            padding: 6px 18px; border: none; border-radius: 20px; cursor: pointer;
-            font-weight: 600; font-size: 0.85em;
-        }
-        .btn-accept { background: #27ae60; color: white; }
-        .btn-reject { background: #e74c3c; color: white; }
-        .btn-delete { background: #95a5a6; color: white; }
-
-        .empty { text-align: center; color: #95a5a6; padding: 60px 0; }
-        .empty i { font-size: 4em; margin-bottom: 15px; display: block; }
-
-        .notification {
-            position: fixed; top: 20px; right: 20px; background: #27ae60; color: white;
-            padding: 15px 25px; border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); z-index: 9999; font-weight: bold;
-        }
-        .notification i { margin-right: 10px; }
-
-        /* ===== MENU MANAGEMENT ===== */
-        .menu-form {
-            background: #f8f9fa; padding: 20px; border-radius: 12px;
-            margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-        }
-        .menu-form h3 { color: #2c3e50; margin-bottom: 15px; }
-        .menu-form .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
-        .menu-form .form-row-full { grid-column: 1 / -1; }
-        .menu-form .btn-save {
-            background: #27ae60; color: white; border: none; padding: 12px 30px;
-            border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 1em;
-        }
-        .menu-form .btn-save:hover { background: #1e8449; }
-        .menu-form .btn-cancel {
-            background: #95a5a6; color: white; border: none; padding: 12px 30px;
-            border-radius: 30px; font-weight: 600; cursor: pointer; font-size: 1em; margin-left: 10px;
-        }
-        .menu-form .btn-cancel:hover { background: #7f8c8d; }
-        #imagePreviewContainer { display: none; text-align: center; margin-top: 10px; }
-        #imagePreview { max-width: 200px; max-height: 200px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-
-        .menu-list { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
-        .menu-item-row {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 0; border-bottom: 1px solid #ecf0f1; flex-wrap: wrap; gap: 10px;
-        }
-        .menu-item-row:last-child { border-bottom: none; }
-        .menu-item-row .item-info { display: flex; align-items: center; gap: 15px; flex: 1; }
-        .menu-item-row .item-info .item-icon { font-size: 1.8em; }
-        .menu-item-row .item-info .item-details .item-name { font-weight: 600; color: #2c3e50; }
-        .menu-item-row .item-info .item-details .item-desc { font-size: 0.85em; color: #7f8c8d; }
-        .menu-item-row .item-price { font-weight: bold; color: #27ae60; min-width: 70px; }
-        .menu-item-row .item-actions { display: flex; gap: 8px; }
-        .menu-item-row .item-actions button {
-            padding: 4px 12px; border: none; border-radius: 15px; cursor: pointer;
-            font-weight: 600; font-size: 0.8em;
-        }
-        .menu-item-row .item-actions .btn-edit { background: #3498db; color: white; }
-        .menu-item-row .item-actions .btn-delete-item { background: #e74c3c; color: white; }
-
-        /* ===== FLOATING HOME BUTTON ===== */
-        #floatingHomeBtn {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            background: #e67e22;
-            color: white;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(230, 126, 34, 0.45);
-            z-index: 9998;
-            display: none;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s, transform 0.15s;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
         }
-        #floatingHomeBtn:hover { background: #d35400; transform: scale(1.08); }
-        #floatingHomeBtn:active { transform: scale(0.95); }
 
-        /* ===== TRIAL BANNER ===== */
-        #trialBanner {
-            display: none;
-            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            color: white;
-            padding: 14px 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 15px rgba(230, 126, 34, 0.35);
+        .login-container {
+            background: var(--surface);
+            padding: 40px 32px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .login-container h1 {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+
+        .login-container h1 i { color: var(--accent); margin-right: 6px; }
+
+        .login-container .subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            font-size: 0.9em;
+        }
+
+        .form-group { margin-bottom: 16px; text-align: left; }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--text);
+            margin-bottom: 6px;
+            font-size: 0.85em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.95em;
+            background: var(--surface);
+            color: var(--text);
+            transition: border-color 0.15s, box-shadow 0.15s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.12);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 11px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s;
+            font-family: inherit;
+        }
+
+        .login-btn:hover { background: var(--accent-hover); }
+        .login-btn i { margin-right: 6px; }
+
+        .error-msg {
+            color: var(--danger);
+            font-size: 0.85em;
+            min-height: 20px;
+            margin-top: 10px;
+        }
+
+        .switch-link { text-align: center; margin-top: 16px; }
+
+        .switch-link a {
+            color: var(--accent);
+            font-size: 0.85em;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .switch-link a:hover { text-decoration: underline; }
+
+        /* ================= DASHBOARD LAYOUT ================= */
+        #dashboardPage { display: none; }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* ================= SIDEBAR ================= */
+        .sidebar {
+            width: 240px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-header h1 i {
+            color: var(--accent);
+            font-size: 1.2em;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 12px 10px;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-weight: 500;
+            font-size: 0.92em;
+            cursor: pointer;
+            transition: background 0.12s, color 0.12s;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 2px;
+            font-family: inherit;
+        }
+
+        .nav-item:hover { background: #f3f4f6; color: var(--text); }
+
+        .nav-item.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.05em;
+        }
+
+        .sidebar-footer {
+            padding: 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: var(--radius);
+            background: #f9fafb;
+            margin-bottom: 8px;
+        }
+
+        .user-chip .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9em;
+            flex-shrink: 0;
+        }
+
+        .user-chip .user-info-mini {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-chip .user-name {
+            font-weight: 600;
+            font-size: 0.85em;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-chip .user-role {
+            font-size: 0.72em;
+            color: var(--text-secondary);
+        }
+
+        .sidebar-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--surface);
+            color: var(--text);
+            font-size: 0.85em;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 6px;
+            transition: background 0.12s;
+            font-family: inherit;
+        }
+
+        .sidebar-btn:hover { background: #f9fafb; }
+
+        .sidebar-btn.logout { color: var(--danger); }
+
+        .sidebar-btn.logout:hover { background: #fef2f2; }
+
+        /* ================= MAIN ================= */
+        .main {
+            flex: 1;
+            margin-left: 240px;
+            min-width: 0;
+        }
+
+        .main-header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 18px 28px;
+            display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 15px;
-            flex-wrap: wrap;
-            animation: slideDown 0.4s ease;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
+
+        .main-header h2 {
+            font-size: 1.15em;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.01em;
+        }
+
+        .main-header .subtitle {
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .main-content { padding: 24px 28px 60px; }
+
+        /* ================= TRIAL BANNER ================= */
+        #trialBanner {
+            display: none;
+            background: linear-gradient(135deg, #fef3e2 0%, #fde8c8 100%);
+            border: 1px solid #fcd9a8;
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
         #trialBanner .trial-text {
             display: flex;
             align-items: center;
             gap: 12px;
+            font-size: 0.9em;
+        }
+
+        #trialBanner .trial-text > i {
+            color: var(--accent);
+            font-size: 1.3em;
+        }
+
+        #trialBanner .trial-text strong {
             font-weight: 600;
-            font-size: 0.95em;
+            display: block;
+            color: var(--text);
         }
-        #trialBanner .trial-text i {
-            font-size: 1.4em;
-        }
+
         #trialBanner .trial-text .sub {
             font-weight: 400;
             font-size: 0.85em;
-            opacity: 0.95;
+            color: var(--text-secondary);
             display: block;
-            margin-top: 2px;
-        }
-        #trialBanner .upgrade-btn {
-            background: white;
-            color: #e67e22;
-            border: none;
-            padding: 10px 22px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: transform 0.2s;
-            white-space: nowrap;
-        }
-        #trialBanner .upgrade-btn:hover {
-            transform: scale(1.05);
-        }
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            margin-top: 1px;
         }
 
-        @media (max-width: 600px) {
-            .stats { grid-template-columns: 1fr 1fr; }
-            .filters { flex-direction: column; align-items: stretch; }
-            .orders-header { flex-direction: column; align-items: stretch; }
-            .header .top-bar { flex-direction: column; text-align: center; }
+        #trialBanner .upgrade-btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.82em;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: inherit;
+        }
+
+        #trialBanner .upgrade-btn:hover { background: var(--accent-hover); }
+
+        /* ================= TABS CONTENT ================= */
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ================= STATS ================= */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 18px 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: box-shadow 0.15s;
+        }
+
+        .stat-card:hover { box-shadow: var(--shadow-md); }
+
+        .stat-card .label {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            font-weight: 500;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .stat-card .number {
+            font-size: 1.75em;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        .stat-card .number.accent { color: var(--accent); }
+        .stat-card .number.green { color: var(--success); }
+
+        /* ================= FILTERS ================= */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 18px;
+            align-items: center;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 0.9em;
+            flex: 1;
+            min-width: 150px;
+            background: var(--surface);
+            color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.12);
+        }
+
+        /* ================= ORDERS HEADER ================= */
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .orders-header h2 {
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .orders-header h2 i { color: var(--text-secondary); }
+
+        .orders-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+        .btn {
+            padding: 8px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85em;
+            background: var(--surface);
+            color: var(--text);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.12s, border-color 0.12s;
+            font-family: inherit;
+        }
+
+        .btn:hover { background: #f9fafb; }
+
+        .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+        .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+
+        .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
+        .btn-success:hover { background: #059669; }
+
+        .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+        .btn-danger:hover { background: #dc2626; }
+
+        /* ================= ORDER CARD ================= */
+        .order-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px 18px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--accent);
+            transition: box-shadow 0.15s;
+        }
+
+        .order-card:hover { box-shadow: var(--shadow-md); }
+
+        .order-card .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .order-card .order-id {
+            font-weight: 700;
+            color: var(--text);
+            font-size: 0.95em;
+        }
+
+        .order-card .order-status {
+            font-size: 0.75em;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+        }
+
+        .order-card .order-details {
+            margin: 5px 0;
+            color: var(--text-secondary);
+            font-size: 0.88em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-card .order-details i {
+            width: 16px;
+            color: var(--text-muted);
+            text-align: center;
+            font-size: 0.85em;
+        }
+
+        .order-card .order-total {
+            font-weight: 700;
+            color: var(--success);
+            font-size: 1em;
+            margin-top: 8px;
+        }
+
+        .order-card .order-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .order-card .btn {
+            padding: 6px 14px;
+            font-size: 0.82em;
+            border-radius: var(--radius-sm);
+        }
+
+        /* ================= EMPTY STATE ================= */
+        .empty {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 50px 20px;
+            background: var(--surface);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+        }
+
+        .empty i {
+            font-size: 2.5em;
+            margin-bottom: 12px;
+            display: block;
+            color: #d1d5db;
+        }
+
+        .empty p { font-size: 0.9em; }
+
+        /* ================= NOTIFICATION ================= */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--text);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 9999;
+            font-weight: 500;
+            font-size: 0.9em;
+            animation: slideIn 0.25s ease;
+        }
+
+        .notification i { margin-right: 8px; color: var(--success); }
+
+        @keyframes slideIn {
+            from { transform: translateX(20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ================= MENU MANAGEMENT ================= */
+        .menu-form {
+            background: var(--surface);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .menu-form h3 {
+            color: var(--text);
+            margin-bottom: 16px;
+            font-size: 0.95em;
+            font-weight: 600;
+        }
+
+        .menu-form .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .menu-form .form-row-full { grid-column: 1 / -1; }
+
+        .menu-form .btn-save {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 22px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: inherit;
+        }
+
+        .menu-form .btn-save:hover { background: var(--accent-hover); }
+
+        .menu-form .btn-cancel {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            padding: 10px 22px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 8px;
+            font-family: inherit;
+        }
+
+        .menu-form .btn-cancel:hover { background: #f9fafb; }
+
+        #imagePreviewContainer {
+            display: none;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #imagePreview {
+            max-width: 180px;
+            max-height: 180px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        /* ================= MENU LIST ================= */
+        .menu-list {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 6px 20px;
+            border: 1px solid var(--border);
+        }
+
+        .menu-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .menu-item-row:last-child { border-bottom: none; }
+
+        .menu-item-row .item-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .menu-item-row .item-info .item-icon { font-size: 1.5em; }
+
+        .menu-item-row .item-info .item-details .item-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 0.92em;
+        }
+
+        .menu-item-row .item-info .item-details .item-desc {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+
+        .menu-item-row .item-price {
+            font-weight: 700;
+            color: var(--success);
+            min-width: 70px;
+            font-size: 0.92em;
+        }
+
+        .menu-item-row .item-actions { display: flex; gap: 6px; }
+
+        .menu-item-row .item-actions button {
+            padding: 6px 10px;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.82em;
+            background: #f3f4f6;
+            color: var(--text-secondary);
+            transition: background 0.12s, color 0.12s;
+        }
+
+        .menu-item-row .item-actions .btn-edit:hover {
+            background: #dbeafe;
+            color: var(--info);
+        }
+
+        .menu-item-row .item-actions .btn-delete-item:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* ================= TABLES (customers, admins) ================= */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+        }
+
+        .data-table thead tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .data-table th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .data-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .role-badge {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .role-owner  { background: #fef3e2; color: #b45309; }
+        .role-driver { background: #ede9fe; color: #6d28d9; }
+        .role-staff  { background: #f3f4f6; color: #6b7280; }
+
+        /* ================= MODALS ================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(17, 24, 39, 0.5);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 26px 24px;
+            max-width: 400px;
+            width: 100%;
+            position: relative;
+            box-shadow: var(--shadow-lg);
+            animation: modalIn 0.2s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.96); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-box h2 {
+            color: var(--text);
+            margin-bottom: 20px;
+            font-size: 1.05em;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: -0.01em;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            font-size: 1.4em;
+            color: var(--text-muted);
+            cursor: pointer;
+            line-height: 1;
+            padding: 4px;
+        }
+
+        .modal-close:hover { color: var(--text); }
+
+        .modal-btn-primary {
+            width: 100%;
+            padding: 11px;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: inherit;
+        }
+
+        .modal-btn-primary:hover { background: var(--accent-hover); }
+
+        /* ================= FLOATING HOME BTN ================= */
+        #floatingHomeBtn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--text);
+            color: #fff;
+            border: none;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            z-index: 9998;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s, transform 0.15s;
+        }
+
+        #floatingHomeBtn:hover { background: #000; transform: scale(1.08); }
+
+        /* ================= MOBILE ================= */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.3em;
+            color: var(--text);
+            cursor: pointer;
+            padding: 4px 8px;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(17, 24, 39, 0.5);
+            z-index: 90;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.25s ease;
+            }
+
+            .sidebar.open { transform: translateX(0); }
+
+            .sidebar-backdrop.open { display: block; }
+
+            .main { margin-left: 0; }
+
+            .mobile-menu-btn { display: block; }
+
+            .main-header { padding: 14px 16px; }
+
+            .main-content { padding: 16px 16px 60px; }
+
+            .stats { grid-template-columns: 1fr 1fr; gap: 10px; }
+
+            .stat-card { padding: 14px; }
+
+            .stat-card .number { font-size: 1.4em; }
+
             .menu-form .form-row { grid-template-columns: 1fr; }
-            .menu-item-row { flex-direction: column; align-items: stretch; }
-            #floatingHomeBtn { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 1.3em; }
+
+            .filters { flex-direction: column; align-items: stretch; }
+
+            .orders-header { flex-direction: column; align-items: stretch; }
+
             #trialBanner { flex-direction: column; text-align: center; }
-            #trialBanner .trial-text { flex-direction: column; text-align: center; }
+
+            #floatingHomeBtn { bottom: 16px; right: 16px; }
+
+            .data-table th, .data-table td { padding: 8px 6px; font-size: 0.85em; }
         }
     </style>
 </head>
 <body>
 
 <!-- ===== LOGIN PAGE ===== -->
-<div id="loginPage" class="login-container">
-    <div id="loginView">
-        <h1><i class="fas fa-utensils"></i> Nabz-Tech Eats</h1>
-        <p class="subtitle">Restaurant Admin Login</p>
-        <div class="form-group">
-            <label><i class="fas fa-user"></i> Username</label>
-            <input type="text" id="loginUsername" placeholder="Enter username">
+<div id="loginPage">
+    <div class="login-container">
+        <div id="loginView">
+            <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
+            <p class="subtitle">Restaurant Admin Login</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="login-btn" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <div id="loginError" class="error-msg"></div>
+            <div class="switch-link">
+                <a href="#" onclick="showRegister(); return false;">Create an account</a>
+            </div>
         </div>
-        <div class="form-group">
-            <label><i class="fas fa-lock"></i> Password</label>
-            <input type="password" id="loginPassword" placeholder="Enter password">
-        </div>
-        <button class="login-btn" onclick="login()">
-            <i class="fas fa-sign-in-alt"></i> Login
-        </button>
-        <div id="loginError" class="error-msg"></div>
-        <div class="switch-link">
-            <a href="#" onclick="showRegister(); return false;">Create an account</a>
-        </div>
-    </div>
 
-    <div id="registerView" style="display:none;">
-        <h1><i class="fas fa-user-plus"></i> Create Admin</h1>
-        <p class="subtitle">Set up your admin account</p>
-        <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="registerUsername" placeholder="Choose a username">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="registerPassword" placeholder="Min 6 characters">
-        </div>
-        <div class="form-group">
-            <label>Confirm Password</label>
-            <input type="password" id="registerPassword2" placeholder="Repeat password">
-        </div>
-        <button class="login-btn" onclick="register()">Create Account</button>
-        <div id="registerError" class="error-msg"></div>
-        <div class="switch-link">
-            <a href="#" onclick="showLogin(); return false;">← Back to login</a>
+        <div id="registerView" style="display:none;">
+            <h1><i class="fas fa-user-plus"></i>Create Admin</h1>
+            <p class="subtitle">Set up your admin account</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="registerUsername" placeholder="Choose a username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="registerPassword" placeholder="Min 6 characters">
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <input type="password" id="registerPassword2" placeholder="Repeat password">
+            </div>
+            <button class="login-btn" onclick="register()">Create Account</button>
+            <div id="registerError" class="error-msg"></div>
+            <div class="switch-link">
+                <a href="#" onclick="showLogin(); return false;">← Back to login</a>
+            </div>
         </div>
     </div>
 </div>
 
 <!-- ===== DASHBOARD ===== -->
-<div id="dashboardPage" class="dashboard">
+<div id="dashboardPage">
+    <div class="layout">
 
-    <!-- ===== TRIAL BANNER ===== -->
-    <div id="trialBanner">
-        <div class="trial-text">
-            <i class="fas fa-hourglass-half"></i>
-            <div>
-                🧪 Trial Account
-                <span class="sub">Full features available. Contact support to upgrade to permanent ownership.</span>
+        <!-- ===== SIDEBAR ===== -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
             </div>
-        </div>
-        <button class="upgrade-btn" onclick="showTrialUpgradeInfo()">
-            ℹ️ Info
-        </button>
-    </div>
 
-    <div class="header">
-        <div class="top-bar">
-            <h1>🍕 Nabz-Tech Eats Admin Dashboard</h1>
-            <div class="user-info">
-                <span id="currentUser">👤 admin</span>
-                <span class="badge" id="roleBadge">Admin</span>
-                <button class="header-btn btn-password" onclick="openChangePassword()">
-                    <i class="fas fa-key"></i> Password
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
+                    <i class="fas fa-receipt"></i>
+                    <span>Orders</span>
                 </button>
-                <button class="header-btn btn-logout" onclick="doLogout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
+                    <i class="fas fa-book-open"></i>
+                    <span>Menu</span>
                 </button>
-            </div>
-        </div>
-        <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('orders')" id="tabOrders">📋 Orders</button>
-            <button class="tab-btn" onclick="switchTab('menu')" id="tabMenu">🍽️ Menu</button>
-            <button class="tab-btn" onclick="switchTab('customers')" id="tabCustomers">👥 Customers</button>
-            <button class="tab-btn" onclick="switchTab('admins')" id="tabAdmins" style="display:none;">👤 Admins</button>
-        </div>
-    </div>
+                <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
+                    <i class="fas fa-users"></i>
+                    <span>Customers</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('admins')" id="tabAdmins" style="display:none;">
+                    <i class="fas fa-user-shield"></i>
+                    <span>Admins</span>
+                </button>
+            </nav>
 
-    <!-- ========== TAB 1: ORDERS ========== -->
-    <div id="tabOrdersContent" class="tab-content active">
-        <div class="stats">
-            <div class="stat-card"><div class="number" id="totalOrders">0</div><div class="label">📊 Total Orders</div></div>
-            <div class="stat-card"><div class="number green" id="pendingOrders">0</div><div class="label">⏳ Active</div></div>
-            <div class="stat-card"><div class="number" id="completedOrders">0</div><div class="label">✅ Delivered</div></div>
-            <div class="stat-card"><div class="number green" id="totalRevenue">BD 0</div><div class="label">💰 Revenue</div></div>
-        </div>
-        <div class="filters">
-            <input type="text" id="searchInput" placeholder="🔍 Search..." oninput="applyFilters()">
-            <input type="date" id="dateFrom" onchange="applyFilters()">
-            <input type="date" id="dateTo" onchange="applyFilters()">
-            <select id="statusFilter" onchange="applyFilters()">
-                <option value="all">📋 All</option>
-                <option value="New">🆕 New</option>
-                <option value="Confirmed">✅ Confirmed</option>
-                <option value="Preparing">👨‍🍳 Preparing</option>
-                <option value="On the Way">🛵 On the Way</option>
-                <option value="Delivered">🎉 Delivered</option>
-                <option value="Cancelled">❌ Cancelled</option>
-            </select>
-        </div>
-        <div class="orders-header">
-            <h2>📋 Orders (<span id="orderCount">0</span>)</h2>
-            <div class="actions">
-                <button class="btn btn-refresh" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
-                <button class="btn btn-export" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button>
-                <button class="btn btn-clear" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
-            </div>
-        </div>
-        <div id="ordersContainer"><div class="empty"><i class="fas fa-inbox"></i><p>No orders yet</p></div></div>
-    </div>
-
-    <!-- ========== TAB 2: MENU ========== -->
-    <div id="tabMenuContent" class="tab-content">
-        <div class="orders-header">
-            <h2>🍽️ Menu Management</h2>
-            <button class="btn btn-refresh" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
-        </div>
-
-        <div class="menu-form" id="menuForm">
-            <h3 id="menuFormTitle">Add New Item</h3>
-            <input type="hidden" id="editItemId" value="">
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="menuCategory">
-                        <option value="Burgers">🍔 Burgers</option>
-                        <option value="Pizzas">🍕 Pizzas</option>
-                        <option value="Wraps">🌯 Wraps</option>
-                        <option value="Sides">🍟 Sides</option>
-                        <option value="Drinks">🥤 Drinks</option>
-                        <option value="Desserts">🍦 Desserts</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Item Name</label>
-                    <input type="text" id="menuName" placeholder="e.g. Classic Burger">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group form-row-full">
-                    <label>Description</label>
-                    <textarea id="menuDesc" placeholder="Describe the item..."></textarea>
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Price (BD)</label>
-                    <input type="number" id="menuPrice" placeholder="2.50" step="0.01" min="0">
-                </div>
-                <div class="form-group">
-                    <label>Upload Image (Optional)</label>
-                    <input type="file" id="menuImageFile" accept="image/*" onchange="previewImage(event)" style="padding: 8px;">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group form-row-full">
-                    <div id="imagePreviewContainer">
-                        <img id="imagePreview" src="" alt="Preview">
+            <div class="sidebar-footer">
+                <div class="user-chip">
+                    <div class="avatar" id="userAvatar">A</div>
+                    <div class="user-info-mini">
+                        <div class="user-name" id="currentUser">admin</div>
+                        <div class="user-role" id="roleBadge">Staff</div>
                     </div>
-                    <input type="hidden" id="menuImage" value="">
                 </div>
+                <button class="sidebar-btn" onclick="openChangePassword()">
+                    <i class="fas fa-key"></i>
+                    <span>Change Password</span>
+                </button>
+                <button class="sidebar-btn logout" onclick="doLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
             </div>
-            <div>
-                <button class="btn-save" onclick="saveMenuItem()"><i class="fas fa-save"></i> Save Item</button>
-                <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i> Cancel</button>
-            </div>
-        </div>
+        </aside>
 
-        <div class="menu-list" id="menuList">
-            <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading menu...</p>
-        </div>
-    </div>
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
 
-    <!-- ========== TAB 3: CUSTOMERS ========== -->
-    <div id="tabCustomersContent" class="tab-content">
-        <div class="orders-header">
-            <h2>👥 Registered Customers (<span id="customerCount">0</span>)</h2>
-            <button class="btn btn-refresh" onclick="loadCustomers()"><i class="fas fa-sync"></i> Refresh</button>
-        </div>
-        <div id="customersContainer" class="menu-list">
-            <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading customers...</p>
-        </div>
-    </div>
-
-    <!-- ========== TAB 4: ADMINS ========== -->
-    <div id="tabAdminsContent" class="tab-content">
-        <div class="orders-header">
-            <h2>👤 Admin Accounts (<span id="adminCount">0</span>)</h2>
-            <button class="btn btn-refresh" onclick="loadAdmins()"><i class="fas fa-sync"></i> Refresh</button>
-        </div>
-
-        <div class="menu-form">
-            <h3>➕ Add New Admin</h3>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="newAdminUsername" placeholder="e.g. ali">
+        <!-- ===== MAIN ===== -->
+        <main class="main">
+            <header class="main-header">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h2 id="pageTitle">Orders</h2>
+                        <div class="subtitle" id="pageSubtitle">Manage incoming orders and drivers</div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Role</label>
-                    <select id="newAdminRole">
-                        <option value="staff">👤 Staff (can manage orders/menu)</option>
-                        <option value="driver">🚗 Driver (delivery only)</option>
-                        <option value="owner">👑 Owner (full access + manage admins)</option>
-                    </select>
-                </div>
-                <div class="form-group" style="display:flex; align-items:flex-end;">
-                    <button class="btn-save" onclick="createAdmin()">
-                        <i class="fas fa-user-plus"></i> Create Admin
+            </header>
+
+            <div class="main-content">
+
+                <!-- TRIAL BANNER -->
+                <div id="trialBanner">
+                    <div class="trial-text">
+                        <i class="fas fa-hourglass-half"></i>
+                        <div>
+                            <strong>Trial Account</strong>
+                            <span class="sub">Full features available. Contact support to upgrade to permanent ownership.</span>
+                        </div>
+                    </div>
+                    <button class="upgrade-btn" onclick="showTrialUpgradeInfo()">
+                        <i class="fas fa-info-circle"></i> Info
                     </button>
                 </div>
-            </div>
-            <div id="adminFormError" style="color:#e74c3c; margin-top:10px; font-size:0.9em; min-height:20px;"></div>
-        </div>
 
-        <div class="menu-list" id="adminsList">
-            <p style="color: #95a5a6; text-align: center; padding: 20px;">Loading admins...</p>
-        </div>
+                <!-- ===== TAB 1: ORDERS ===== -->
+                <div id="tabOrdersContent" class="tab-content active">
+                    <div class="stats">
+                        <div class="stat-card">
+                            <div class="label">Total Orders</div>
+                            <div class="number" id="totalOrders">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Active</div>
+                            <div class="number accent" id="pendingOrders">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Delivered</div>
+                            <div class="number green" id="completedOrders">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Revenue</div>
+                            <div class="number green" id="totalRevenue">BD 0</div>
+                        </div>
+                    </div>
+
+                    <div class="filters">
+                        <input type="text" id="searchInput" placeholder="Search by name or order #..." oninput="applyFilters()">
+                        <input type="date" id="dateFrom" onchange="applyFilters()">
+                        <input type="date" id="dateTo" onchange="applyFilters()">
+                        <select id="statusFilter" onchange="applyFilters()">
+                            <option value="all">All statuses</option>
+                            <option value="New">New</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Preparing">Preparing</option>
+                            <option value="On the Way">On the Way</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <div class="orders-header">
+                        <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+                        <div class="actions">
+                            <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
+                            <button class="btn" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button>
+                            <button class="btn btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
+                        </div>
+                    </div>
+
+                    <div id="ordersContainer">
+                        <div class="empty"><i class="fas fa-inbox"></i><p>No orders yet</p></div>
+                    </div>
+                </div>
+
+                <!-- ===== TAB 2: MENU ===== -->
+                <div id="tabMenuContent" class="tab-content">
+                    <div class="orders-header">
+                        <h2><i class="fas fa-book-open"></i> Menu Management</h2>
+                        <button class="btn" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+
+                    <div class="menu-form" id="menuForm">
+                        <h3 id="menuFormTitle">Add New Item</h3>
+                        <input type="hidden" id="editItemId" value="">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Category</label>
+                                <select id="menuCategory">
+                                    <option value="Burgers">Burgers</option>
+                                    <option value="Pizzas">Pizzas</option>
+                                    <option value="Wraps">Wraps</option>
+                                    <option value="Sides">Sides</option>
+                                    <option value="Drinks">Drinks</option>
+                                    <option value="Desserts">Desserts</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Item Name</label>
+                                <input type="text" id="menuName" placeholder="e.g. Classic Burger">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group form-row-full">
+                                <label>Description</label>
+                                <textarea id="menuDesc" placeholder="Describe the item..."></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Price (BD)</label>
+                                <input type="number" id="menuPrice" placeholder="2.50" step="0.01" min="0">
+                            </div>
+                            <div class="form-group">
+                                <label>Image (Optional)</label>
+                                <input type="file" id="menuImageFile" accept="image/*" onchange="previewImage(event)" style="padding: 8px;">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group form-row-full">
+                                <div id="imagePreviewContainer">
+                                    <img id="imagePreview" src="" alt="Preview">
+                                </div>
+                                <input type="hidden" id="menuImage" value="">
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn-save" onclick="saveMenuItem()"><i class="fas fa-save"></i> Save Item</button>
+                            <button class="btn-cancel" onclick="cancelEdit()">Cancel</button>
+                        </div>
+                    </div>
+
+                    <div class="menu-list" id="menuList">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading menu...</p>
+                    </div>
+                </div>
+
+                <!-- ===== TAB 3: CUSTOMERS ===== -->
+                <div id="tabCustomersContent" class="tab-content">
+                    <div class="orders-header">
+                        <h2><i class="fas fa-users"></i> Customers <span id="customerCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+                        <button class="btn" onclick="loadCustomers()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div id="customersContainer" class="menu-list">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading customers...</p>
+                    </div>
+                </div>
+
+                <!-- ===== TAB 4: ADMINS ===== -->
+                <div id="tabAdminsContent" class="tab-content">
+                    <div class="orders-header">
+                        <h2><i class="fas fa-user-shield"></i> Admin Accounts <span id="adminCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+                        <button class="btn" onclick="loadAdmins()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+
+                    <div class="menu-form">
+                        <h3><i class="fas fa-user-plus"></i> Add New Admin</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" id="newAdminUsername" placeholder="e.g. ali">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Role</label>
+                                <select id="newAdminRole">
+                                    <option value="staff">Staff (manage orders)</option>
+                                    <option value="driver">Driver (delivery only)</option>
+                                    <option value="owner">Owner (full access)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="display:flex; align-items:flex-end;">
+                                <button class="btn-save" onclick="createAdmin()">
+                                    <i class="fas fa-user-plus"></i> Create Admin
+                                </button>
+                            </div>
+                        </div>
+                        <div id="adminFormError" style="color: var(--danger); margin-top:10px; font-size:0.85em; min-height:20px;"></div>
+                    </div>
+
+                    <div class="menu-list" id="adminsList">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading admins...</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
     </div>
 </div>
 
 <!-- ===== CHANGE PASSWORD MODAL ===== -->
-<div id="changePasswordModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:10000; padding:15px;">
-    <div style="background:white; border-radius:16px; padding:30px 25px; max-width:380px; width:100%; position:relative;">
-        <button onclick="closeChangePassword()" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:1.5em; color:#95a5a6; cursor:pointer;">×</button>
-        <h2 style="color:#2c3e50; margin-bottom:20px; text-align:center; font-size:1.2em;">🔑 Change Password</h2>
+<div id="changePasswordModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeChangePassword()">×</button>
+        <h2><i class="fas fa-key"></i> Change Password</h2>
         <div class="form-group">
             <label>Current Password</label>
             <input type="password" id="currentPwd" placeholder="Enter current password">
@@ -548,25 +1267,25 @@
             <label>Confirm New Password</label>
             <input type="password" id="newPwd2" placeholder="Repeat new password">
         </div>
-        <div id="pwdError" style="color:#e74c3c; font-size:0.9em; min-height:20px; margin-bottom:10px;"></div>
-        <button onclick="submitChangePassword()" style="width:100%; padding:12px; background:#27ae60; color:white; border:none; border-radius:24px; font-weight:bold; cursor:pointer;">Update Password</button>
+        <div id="pwdError" style="color: var(--danger); font-size:0.85em; min-height:20px; margin-bottom:10px;"></div>
+        <button class="modal-btn-primary" onclick="submitChangePassword()">Update Password</button>
     </div>
 </div>
 
 <!-- ===== ASSIGN DRIVER MODAL ===== -->
-<div id="assignDriverModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); align-items:center; justify-content:center; z-index:10000; padding:15px;">
-    <div style="background:white; border-radius:16px; padding:30px 25px; max-width:380px; width:100%; position:relative;">
-        <button onclick="closeAssignDriverModal()" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:1.5em; color:#95a5a6; cursor:pointer;">×</button>
-        <h2 style="color:#2c3e50; margin-bottom:20px; text-align:center; font-size:1.2em;">🚗 Assign a Driver</h2>
+<div id="assignDriverModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeAssignDriverModal()">×</button>
+        <h2><i class="fas fa-motorcycle"></i> Assign a Driver</h2>
         <div class="form-group">
             <label>Choose Driver</label>
             <select id="assignDriverSelect">
                 <option value="">Loading drivers...</option>
             </select>
         </div>
-        <div id="assignDriverError" style="color:#e74c3c; font-size:0.9em; min-height:20px; margin-bottom:10px;"></div>
-        <button onclick="submitAssignDriver()" style="width:100%; padding:12px; background:#9b59b6; color:white; border:none; border-radius:24px; font-weight:bold; cursor:pointer;">
-            🛵 Send Out with Driver
+        <div id="assignDriverError" style="color: var(--danger); font-size:0.85em; min-height:20px; margin-bottom:10px;"></div>
+        <button class="modal-btn-primary" onclick="submitAssignDriver()" style="background: var(--purple);">
+            <i class="fas fa-motorcycle"></i> Send Out with Driver
         </button>
     </div>
 </div>
@@ -652,6 +1371,14 @@ window.addEventListener('scroll', function() {
 });
 
 // ============================================================
+// SIDEBAR (mobile)
+// ============================================================
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarBackdrop').classList.toggle('open');
+}
+
+// ============================================================
 // LOGIN
 // ============================================================
 function login() {
@@ -660,7 +1387,7 @@ function login() {
     var errorEl = document.getElementById('loginError');
 
     if (!username || !password) {
-        errorEl.textContent = '❌ Please enter both fields.';
+        errorEl.textContent = 'Please enter both fields.';
         return;
     }
 
@@ -717,7 +1444,7 @@ function register() {
             errorEl.textContent = '❌ ' + (result.data.error || 'Registration failed');
             return;
         }
-        errorEl.style.color = '#27ae60';
+        errorEl.style.color = '#10b981';
         errorEl.textContent = '✅ Account created! Redirecting...';
         setTimeout(showLogin, 1500);
     })
@@ -735,7 +1462,7 @@ function showRegister() {
 function showLogin() {
     document.getElementById('registerView').style.display = 'none';
     document.getElementById('loginView').style.display = 'block';
-    document.getElementById('registerError').style.color = '#e74c3c';
+    document.getElementById('registerError').style.color = 'var(--danger)';
     document.getElementById('registerError').textContent = '';
 }
 
@@ -746,7 +1473,7 @@ function doLogout() {
     localStorage.removeItem('adminLoggedIn');
     if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
     document.getElementById('dashboardPage').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'block';
+    document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('loginPassword').value = '';
 }
 
@@ -756,14 +1483,15 @@ function showDashboard() {
 
     var user = localStorage.getItem('adminUser') || 'admin';
     var role = currentUserRole();
-    document.getElementById('currentUser').textContent = '👤 ' + user;
 
-    var badgeText = '👤 Staff';
-    if (role === 'owner') badgeText = '👑 Owner';
-    else if (role === 'driver') badgeText = '🚗 Driver';
+    document.getElementById('currentUser').textContent = user;
+    document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+
+    var badgeText = 'Staff';
+    if (role === 'owner') badgeText = 'Owner';
+    else if (role === 'driver') badgeText = 'Driver';
     document.getElementById('roleBadge').textContent = badgeText;
 
-    // Show trial banner if this is a trial account
     showTrialBanner();
 
     var adminsTabBtn = document.getElementById('tabAdmins');
@@ -798,7 +1526,7 @@ function showTrialBanner() {
     var isTrial = false;
     try {
         var payload = JSON.parse(atob(token.split('.')[1]));
-        isTrial = payload.is_trial === 1;
+        isTrial = payload.is_trial === 1 || payload.is_trial === '1';
     } catch (e) {
         return;
     }
@@ -815,29 +1543,29 @@ function showTrialBanner() {
 
 function showTrialUpgradeInfo() {
     var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
     overlay.id = 'trialInfoOverlay';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:10000;padding:15px;';
 
     overlay.innerHTML =
-        '<div style="background:white;border-radius:20px;padding:32px 26px;max-width:420px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.3);position:relative;">' +
-            '<button onclick="closeTrialInfo()" style="position:absolute;top:10px;right:15px;background:none;border:none;font-size:1.5em;color:#95a5a6;cursor:pointer;">×</button>' +
-            '<div style="font-size:3em;margin-bottom:12px;">🧪</div>' +
-            '<h2 style="color:#2c3e50;margin-bottom:12px;font-size:1.3em;">Trial Account</h2>' +
-            '<p style="color:#555;font-size:0.95em;line-height:1.5;margin-bottom:20px;">' +
+        '<div class="modal-box" style="text-align:center;">' +
+            '<button class="modal-close" onclick="closeTrialInfo()">×</button>' +
+            '<div style="font-size:2.6em;margin-bottom:10px;">🧪</div>' +
+            '<h2 style="margin-bottom:12px;">Trial Account</h2>' +
+            '<p style="color:var(--text-secondary);font-size:0.9em;line-height:1.5;margin-bottom:20px;">' +
                 'You are currently on a <strong>free trial</strong> of the Nabz-Tech Eats ordering system.' +
             '</p>' +
-            '<div style="background:#fff8e6;border-radius:10px;padding:16px;text-align:left;margin-bottom:20px;">' +
-                '<p style="color:#7f8c8d;font-size:0.85em;line-height:1.6;margin:0;">' +
+            '<div style="background:var(--accent-soft);border-radius:var(--radius);padding:16px;text-align:left;margin-bottom:20px;">' +
+                '<p style="color:var(--text-secondary);font-size:0.82em;line-height:1.7;margin:0;">' +
                     '✅ All features are available during your trial<br>' +
                     '✅ Orders, drivers, and customers work fully<br>' +
                     '✅ No commission on any orders<br><br>' +
                     'To keep using the system after your trial ends, contact us to upgrade to a permanent account.' +
                 '</p>' +
             '</div>' +
-            '<p style="color:#95a5a6;font-size:0.85em;margin-bottom:16px;">' +
-                'Contact: <strong>+973-3331-0359</strong>' +
+            '<p style="color:var(--text-muted);font-size:0.82em;margin-bottom:16px;">' +
+                'Contact: <strong style="color:var(--text);">+973-3331-0359</strong>' +
             '</p>' +
-            '<button onclick="closeTrialInfo()" style="width:100%;padding:12px;background:#e67e22;color:white;border:none;border-radius:24px;font-weight:bold;cursor:pointer;">Got it</button>' +
+            '<button class="modal-btn-primary" onclick="closeTrialInfo()">Got it</button>' +
         '</div>';
 
     document.body.appendChild(overlay);
@@ -869,13 +1597,13 @@ function submitChangePassword() {
     var newPwd2 = document.getElementById('newPwd2').value;
     var errorEl = document.getElementById('pwdError');
 
-    errorEl.style.color = '#e74c3c';
+    errorEl.style.color = 'var(--danger)';
     errorEl.textContent = '';
 
-    if (!current) { errorEl.textContent = '❌ Enter your current password'; return; }
-    if (!newPwd || newPwd.length < 6) { errorEl.textContent = '❌ New password must be at least 6 characters'; return; }
-    if (newPwd !== newPwd2) { errorEl.textContent = '❌ New passwords do not match'; return; }
-    if (newPwd === current) { errorEl.textContent = '❌ New password must be different'; return; }
+    if (!current) { errorEl.textContent = 'Enter your current password'; return; }
+    if (!newPwd || newPwd.length < 6) { errorEl.textContent = 'New password must be at least 6 characters'; return; }
+    if (newPwd !== newPwd2) { errorEl.textContent = 'New passwords do not match'; return; }
+    if (newPwd === current) { errorEl.textContent = 'New password must be different'; return; }
 
     authFetch(API + '/admin/password', {
         method: 'PUT',
@@ -888,11 +1616,11 @@ function submitChangePassword() {
             errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
             return;
         }
-        errorEl.style.color = '#27ae60';
+        errorEl.style.color = 'var(--success)';
         errorEl.textContent = '✅ Password updated!';
         setTimeout(function() {
             closeChangePassword();
-            showNotification('🔑 Password changed successfully');
+            showNotification('Password changed successfully');
         }, 1200);
     })
     .catch(function(err) {
@@ -917,11 +1645,11 @@ function openAssignDriverModal(orderId) {
     var submitBtn = modal.querySelector('button[onclick*="submitAssignDriver"]');
 
     if (currentDriverId) {
-        titleEl.textContent = '🔄 Reassign Driver';
-        if (submitBtn) submitBtn.textContent = '🚗 Reassign to New Driver';
+        titleEl.innerHTML = '<i class="fas fa-sync"></i> Reassign Driver';
+        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-motorcycle"></i> Reassign to New Driver';
     } else {
-        titleEl.textContent = '🚗 Assign a Driver';
-        if (submitBtn) submitBtn.textContent = '🛵 Send Out with Driver';
+        titleEl.innerHTML = '<i class="fas fa-motorcycle"></i> Assign a Driver';
+        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-motorcycle"></i> Send Out with Driver';
     }
 
     errorEl.textContent = '';
@@ -933,7 +1661,7 @@ function openAssignDriverModal(orderId) {
         .then(function(drivers) {
             if (!drivers || drivers.length === 0) {
                 select.innerHTML = '<option value="">No drivers yet</option>';
-                errorEl.textContent = '💡 Create a driver in the Admins tab first';
+                errorEl.textContent = 'Create a driver in the Admins tab first';
                 return;
             }
 
@@ -953,7 +1681,7 @@ function openAssignDriverModal(orderId) {
         })
         .catch(function(err) {
             console.error('Load drivers error:', err);
-            errorEl.textContent = '❌ Could not load drivers';
+            errorEl.textContent = 'Could not load drivers';
         });
 }
 
@@ -967,7 +1695,7 @@ function submitAssignDriver() {
     var errorEl = document.getElementById('assignDriverError');
 
     if (!driverId) {
-        errorEl.textContent = '❌ Please select a driver';
+        errorEl.textContent = 'Please select a driver';
         return;
     }
 
@@ -984,22 +1712,29 @@ function submitAssignDriver() {
             errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
             return;
         }
-        showNotification('🚗 Driver assigned — order is On the Way');
+        showNotification('Driver assigned — order is On the Way');
         closeAssignDriverModal();
         loadOrders();
     })
     .catch(function(err) {
         console.error('Assign error:', err);
-        errorEl.textContent = '❌ Network error';
+        errorEl.textContent = 'Network error';
     });
 }
 
 // ============================================================
 // TABS
 // ============================================================
+var TAB_LABELS = {
+    orders:    { title: 'Orders',    subtitle: 'Manage incoming orders and drivers' },
+    menu:      { title: 'Menu',      subtitle: 'Manage your restaurant menu items' },
+    customers: { title: 'Customers', subtitle: 'View registered customers' },
+    admins:    { title: 'Admins',    subtitle: 'Manage admin accounts and roles' }
+};
+
 function switchTab(tab) {
     document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
-    document.querySelectorAll('.tab-btn').forEach(function(el) { el.classList.remove('active'); });
+    document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
 
     var tabCapitalized = tab.charAt(0).toUpperCase() + tab.slice(1);
     var contentEl = document.getElementById('tab' + tabCapitalized + 'Content');
@@ -1007,6 +1742,16 @@ function switchTab(tab) {
 
     if (contentEl) contentEl.classList.add('active');
     if (btnEl) btnEl.classList.add('active');
+
+    var labels = TAB_LABELS[tab] || TAB_LABELS.orders;
+    document.getElementById('pageTitle').textContent = labels.title;
+    document.getElementById('pageSubtitle').textContent = labels.subtitle;
+
+    // Close sidebar on mobile after tapping
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarBackdrop').classList.remove('open');
+    }
 
     if (tab === 'menu') loadMenu();
     if (tab === 'customers') loadCustomers();
@@ -1021,7 +1766,7 @@ function showNotification(message) {
     if (existing) existing.remove();
     var div = document.createElement('div');
     div.className = 'notification';
-    div.innerHTML = '<i class="fas fa-bell"></i> ' + message;
+    div.innerHTML = '<i class="fas fa-check-circle"></i> ' + message;
     document.body.appendChild(div);
     setTimeout(function() { div.remove(); }, 3000);
 }
@@ -1043,7 +1788,7 @@ function playBeep() {
         osc.start();
         osc.stop(audioCtx.currentTime + 0.25);
     } catch (err) {
-        console.warn('🔇 Beep failed:', err);
+        console.warn('Beep failed:', err);
     }
 }
 
@@ -1074,9 +1819,9 @@ function loadOrders() {
 
             if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
                 playBeep();
-                document.title = '🔔 New Order! | Admin';
-                setTimeout(function() { document.title = '🍕 Admin Dashboard'; }, 5000);
-                showNotification('🔔 New order received!');
+                document.title = '🔔 New Order!';
+                setTimeout(function() { document.title = 'Admin Dashboard — Nabz-Tech Eats'; }, 5000);
+                showNotification('New order received!');
             }
             lastOrderCount = allOrders.length;
 
@@ -1115,7 +1860,7 @@ function applyFilters() {
 
 function renderOrders(orders) {
     var container = document.getElementById('ordersContainer');
-    document.getElementById('orderCount').textContent = orders.length;
+    document.getElementById('orderCount').textContent = '(' + orders.length + ')';
 
     if (orders.length === 0) {
         container.innerHTML = '<div class="empty"><i class="fas fa-inbox"></i><p>No orders found</p></div>';
@@ -1123,12 +1868,12 @@ function renderOrders(orders) {
     }
 
     var statusInfo = {
-        'New':       { color: '#3498db', icon: '🆕' },
-        'Confirmed': { color: '#27ae60', icon: '✅' },
-        'Preparing': { color: '#f39c12', icon: '👨‍🍳' },
-        'On the Way':{ color: '#9b59b6', icon: '🛵' },
-        'Delivered': { color: '#2ecc71', icon: '🎉' },
-        'Cancelled': { color: '#e74c3c', icon: '❌' }
+        'New':        { color: '#3b82f6', bg: '#dbeafe', icon: 'New' },
+        'Confirmed':  { color: '#10b981', bg: '#d1fae5', icon: 'Confirmed' },
+        'Preparing':  { color: '#f59e0b', bg: '#fef3c7', icon: 'Preparing' },
+        'On the Way': { color: '#8b5cf6', bg: '#ede9fe', icon: 'On the Way' },
+        'Delivered':  { color: '#059669', bg: '#d1fae5', icon: 'Delivered' },
+        'Cancelled':  { color: '#ef4444', bg: '#fee2e2', icon: 'Cancelled' }
     };
 
     var html = '';
@@ -1139,42 +1884,42 @@ function renderOrders(orders) {
         var actionButtons = '';
         if (order.status === 'New' || !order.status) {
             actionButtons =
-                '<button class="btn btn-accept" onclick="updateOrderStatus(' + originalIndex + ', \'Confirmed\')">✅ Confirm</button>' +
-                '<button class="btn btn-reject" onclick="updateOrderStatus(' + originalIndex + ', \'Cancelled\')">❌ Cancel</button>';
+                '<button class="btn btn-success" onclick="updateOrderStatus(' + originalIndex + ', \'Confirmed\')"><i class="fas fa-check"></i> Confirm</button>' +
+                '<button class="btn btn-danger" onclick="updateOrderStatus(' + originalIndex + ', \'Cancelled\')"><i class="fas fa-times"></i> Cancel</button>';
         } else if (order.status === 'Confirmed') {
             actionButtons =
-                '<button class="btn" style="background:#f39c12;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')">👨‍🍳 Start Preparing</button>';
+                '<button class="btn btn-primary" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')"><i class="fas fa-fire"></i> Start Preparing</button>';
         } else if (order.status === 'Preparing') {
             actionButtons =
-                '<button class="btn" style="background:#9b59b6;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🛵 Assign Driver</button>';
+                '<button class="btn" style="background:var(--purple);color:#fff;border-color:var(--purple);" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-motorcycle"></i> Assign Driver</button>';
         } else if (order.status === 'On the Way') {
             actionButtons =
-                '<button class="btn" style="background:#2ecc71;color:white;" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')">🎉 Mark Delivered</button>' +
-                '<button class="btn" style="background:#3498db;color:white;" onclick="openAssignDriverModal(' + order.id + ')">🔄 Reassign Driver</button>';
+                '<button class="btn btn-success" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')"><i class="fas fa-check"></i> Mark Delivered</button>' +
+                '<button class="btn btn-primary" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-sync"></i> Reassign Driver</button>';
         } else if (order.status === 'Delivered') {
             actionButtons =
-                '<span style="color:#2ecc71;font-weight:bold;">🎉 Completed</span>' +
-                '<button class="btn btn-delete" onclick="deleteOrder(' + originalIndex + ')">🗑️ Delete</button>';
+                '<span style="color: var(--success); font-weight: 600; font-size: 0.85em;"><i class="fas fa-check-circle"></i> Completed</span>' +
+                '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
         } else if (order.status === 'Cancelled') {
             actionButtons =
-                '<span style="color:#e74c3c;font-weight:bold;">❌ Cancelled</span>' +
-                '<button class="btn btn-delete" onclick="deleteOrder(' + originalIndex + ')">🗑️ Delete</button>';
+                '<span style="color: var(--danger); font-weight: 600; font-size: 0.85em;"><i class="fas fa-times-circle"></i> Cancelled</span>' +
+                '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
         }
 
         html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
             '<div class="order-header">' +
-                '<span class="order-id">#' + order.id + '</span>' +
-                '<span class="order-status" style="background:' + st.color + ';color:white;">' + st.icon + ' ' + (order.status || 'New') + '</span>' +
+                '<span class="order-id">Order #' + order.id + '</span>' +
+                '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
             '</div>' +
             '<div class="order-details"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-map-pin"></i> ' + escapeHtml(order.address || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
             (order.driver_name ?
-                '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: ' + escapeHtml(order.driver_name) + '</div>'
+                '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
                 : '') +
-            '<div class="order-total">💰 Total: BD ' + order.total.toFixed(2) + '</div>' +
+            '<div class="order-total">BD ' + order.total.toFixed(2) + '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
     });
@@ -1209,7 +1954,7 @@ function updateOrderStatus(index, newStatus) {
     })
     .then(function(res) { return res.json(); })
     .then(function() {
-        showNotification('✅ Order #' + order.id + ' → ' + newStatus);
+        showNotification('Order #' + order.id + ' → ' + newStatus);
         loadOrders();
     })
     .catch(function(error) {
@@ -1226,7 +1971,7 @@ function deleteOrder(index) {
     authFetch(API + '/orders/' + order.id, { method: 'DELETE' })
         .then(function(res) { return res.json(); })
         .then(function() {
-            showNotification('🗑️ Order deleted');
+            showNotification('Order deleted');
             loadOrders();
         })
         .catch(function(error) {
@@ -1237,13 +1982,13 @@ function deleteOrder(index) {
 
 function clearAllOrders() {
     if (!confirm('Delete ALL orders? This clears them from the server too.')) return;
-    if (allOrders.length === 0) { showNotification('ℹ️ No orders to clear'); return; }
+    if (allOrders.length === 0) { showNotification('No orders to clear'); return; }
 
     var promises = allOrders.map(function(o) {
         return authFetch(API + '/orders/' + o.id, { method: 'DELETE' }).catch(function(){});
     });
     Promise.all(promises).then(function() {
-        showNotification('🗑️ All orders cleared');
+        showNotification('All orders cleared');
         loadOrders();
     });
 }
@@ -1268,7 +2013,7 @@ function exportCSV() {
     a.download = 'orders-' + new Date().toISOString().split('T')[0] + '.csv';
     a.click();
     URL.revokeObjectURL(url);
-    showNotification('📊 Exported');
+    showNotification('Exported');
 }
 
 // ============================================================
@@ -1342,8 +2087,8 @@ function renderMenu() {
         html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
                 '<div class="item-details">' +
-                   '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
-                   '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
+                    '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
+                    '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
                 '</div>' +
             '</div>' +
             '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
@@ -1392,7 +2137,7 @@ function saveMenuItem() {
         });
     })
     .then(function() {
-        showNotification('✅ Item saved!');
+        showNotification('Item saved!');
         cancelEdit();
         loadMenu();
     })
@@ -1446,7 +2191,7 @@ function deleteMenuItem(id) {
     authFetch(API + '/menu/' + id, { method: 'DELETE' })
         .then(function(response) { return response.json(); })
         .then(function() {
-            showNotification('🗑️ Item deleted');
+            showNotification('Item deleted');
             loadMenu();
         })
         .catch(function(error) {
@@ -1466,7 +2211,7 @@ function loadCustomers() {
             var container = document.getElementById('customersContainer');
             var countEl = document.getElementById('customerCount');
 
-            if (countEl) countEl.textContent = customers.length;
+            if (countEl) countEl.textContent = '(' + customers.length + ')';
             if (!container) return;
 
             if (customers.length === 0) {
@@ -1476,26 +2221,26 @@ function loadCustomers() {
 
             window.allCustomers = customers;
 
-            var html = '<table style="width:100%; border-collapse:collapse;">' +
-                '<thead><tr style="text-align:left; border-bottom:2px solid #ecf0f1;">' +
-                '<th style="padding:10px;">#</th>' +
-                '<th style="padding:10px;">Name</th>' +
-                '<th style="padding:10px;">Phone</th>' +
-                '<th style="padding:10px;">Address</th>' +
-                '<th style="padding:10px;">Registered</th>' +
-                '<th style="padding:10px;">Actions</th>' +
+            var html = '<table class="data-table">' +
+                '<thead><tr>' +
+                '<th>#</th>' +
+                '<th>Name</th>' +
+                '<th>Phone</th>' +
+                '<th>Address</th>' +
+                '<th>Registered</th>' +
+                '<th>Actions</th>' +
                 '</tr></thead><tbody>';
 
             customers.forEach(function(c, i) {
-                html += '<tr style="border-bottom:1px solid #ecf0f1;">' +
-                    '<td style="padding:10px;">' + (i + 1) + '</td>' +
-                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + escapeHtml(c.name || '-') + '</td>' +
-                    '<td style="padding:10px;"><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:#3498db;">' + escapeHtml(c.phone || '-') + '</a></td>' +
-                    '<td style="padding:10px; color:#555;">' + escapeHtml(c.address || '-') + '</td>' +
-                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + escapeHtml(c.created_at || c.created || '-') + '</td>' +
-                    '<td style="padding:10px; white-space:nowrap;">' +
-                        '<button onclick="editCustomer(' + c.id + ')" style="background:#3498db;color:white;border:none;padding:6px 12px;border-radius:15px;cursor:pointer;font-size:0.8em;margin-right:6px;"><i class="fas fa-edit"></i></button>' +
-                        '<button onclick="doDeleteCustomer(' + c.id + ')" style="background:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:15px;cursor:pointer;font-size:0.8em;"><i class="fas fa-trash"></i></button>' +
+                html += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td style="font-weight:600;">' + escapeHtml(c.name || '-') + '</td>' +
+                    '<td><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:var(--info);text-decoration:none;">' + escapeHtml(c.phone || '-') + '</a></td>' +
+                    '<td style="color:var(--text-secondary);">' + escapeHtml(c.address || '-') + '</td>' +
+                    '<td style="color:var(--text-muted);font-size:0.85em;">' + escapeHtml(c.created_at || c.created || '-') + '</td>' +
+                    '<td style="white-space:nowrap;">' +
+                        '<button onclick="editCustomer(' + c.id + ')" style="background:none;border:none;color:var(--info);cursor:pointer;padding:4px 8px;font-size:0.9em;"><i class="fas fa-edit"></i></button>' +
+                        '<button onclick="doDeleteCustomer(' + c.id + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:0.9em;"><i class="fas fa-trash"></i></button>' +
                     '</td>' +
                 '</tr>';
             });
@@ -1513,14 +2258,13 @@ function editCustomer(id) {
     if (!customer) return;
 
     var overlay = document.createElement('div');
-    overlay.className = 'confirm-overlay';
+    overlay.className = 'modal-overlay';
     overlay.id = 'customerEditOverlay';
-    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:10000;padding:15px;';
 
     overlay.innerHTML =
-        '<div style="background:white;border-radius:16px;padding:30px 25px;max-width:400px;width:100%;position:relative;">' +
-            '<button onclick="closeCustomerEdit()" style="position:absolute;top:10px;right:15px;background:none;border:none;font-size:1.5em;color:#95a5a6;cursor:pointer;">×</button>' +
-            '<h2 style="color:#2c3e50;margin-bottom:20px;text-align:center;font-size:1.2em;">✏️ Edit Customer</h2>' +
+        '<div class="modal-box">' +
+            '<button class="modal-close" onclick="closeCustomerEdit()">×</button>' +
+            '<h2><i class="fas fa-edit"></i> Edit Customer</h2>' +
             '<div class="form-group">' +
                 '<label>Name</label>' +
                 '<input type="text" id="editCustName" value="' + escapeHtml(customer.name || '').replace(/"/g, '&quot;') + '">' +
@@ -1533,8 +2277,8 @@ function editCustomer(id) {
                 '<label>Address</label>' +
                 '<input type="text" id="editCustAddress" value="' + escapeHtml(customer.address || '').replace(/"/g, '&quot;') + '">' +
             '</div>' +
-            '<div id="editCustError" style="color:#e74c3c;font-size:0.9em;min-height:20px;margin-bottom:10px;"></div>' +
-            '<button onclick="saveCustomerEdit(' + id + ')" style="width:100%;padding:12px;background:#27ae60;color:white;border:none;border-radius:24px;font-weight:bold;cursor:pointer;">Save Changes</button>' +
+            '<div id="editCustError" style="color:var(--danger);font-size:0.85em;min-height:20px;margin-bottom:10px;"></div>' +
+            '<button class="modal-btn-primary" onclick="saveCustomerEdit(' + id + ')">Save Changes</button>' +
         '</div>';
 
     document.body.appendChild(overlay);
@@ -1554,7 +2298,7 @@ function saveCustomerEdit(id) {
     errorEl.textContent = '';
 
     if (!name || !phone || !address) {
-        errorEl.textContent = '❌ All fields are required';
+        errorEl.textContent = 'All fields are required';
         return;
     }
 
@@ -1566,11 +2310,8 @@ function saveCustomerEdit(id) {
     .then(function(res) {
         return res.text().then(function(text) {
             var data;
-            try {
-                data = JSON.parse(text);
-            } catch (e) {
-                data = { error: text || 'Empty response' };
-            }
+            try { data = JSON.parse(text); }
+            catch (e) { data = { error: text || 'Empty response' }; }
             return { ok: res.ok, status: res.status, data: data };
         });
     })
@@ -1580,12 +2321,12 @@ function saveCustomerEdit(id) {
             return;
         }
         closeCustomerEdit();
-        showNotification('✅ Customer updated');
+        showNotification('Customer updated');
         loadCustomers();
     })
     .catch(function(err) {
         console.error('Edit customer error:', err);
-        errorEl.textContent = '❌ Network error: ' + err.message;
+        errorEl.textContent = 'Network error: ' + err.message;
     });
 }
 
@@ -1597,23 +2338,15 @@ function doDeleteCustomer(id) {
             .then(function(list) {
                 window.allCustomers = list;
                 var customer = list.find(function(c) { return c.id === id; });
-                if (!customer) {
-                    alert('Customer not found. Please refresh the page.');
-                    return;
-                }
+                if (!customer) { alert('Customer not found.'); return; }
                 confirmAndDeleteCustomer(customer);
             })
-            .catch(function(err) {
-                alert('Could not load customers: ' + err.message);
-            });
+            .catch(function(err) { alert('Could not load customers: ' + err.message); });
         return;
     }
 
     var customer = customers.find(function(c) { return c.id === id; });
-    if (!customer) {
-        alert('Customer not found');
-        return;
-    }
+    if (!customer) { alert('Customer not found'); return; }
     confirmAndDeleteCustomer(customer);
 }
 
@@ -1626,11 +2359,8 @@ function confirmAndDeleteCustomer(customer) {
         .then(function(res) {
             return res.text().then(function(text) {
                 var data;
-                try {
-                    data = JSON.parse(text);
-                } catch (e) {
-                    data = { error: text || 'Empty response' };
-                }
+                try { data = JSON.parse(text); }
+                catch (e) { data = { error: text || 'Empty response' }; }
                 return { ok: res.ok, status: res.status, data: data };
             });
         })
@@ -1639,12 +2369,12 @@ function confirmAndDeleteCustomer(customer) {
                 alert('❌ ' + (result.data.error || ('Error ' + result.status)));
                 return;
             }
-            showNotification('🗑️ Customer deleted');
+            showNotification('Customer deleted');
             loadCustomers();
         })
         .catch(function(err) {
             console.error('Delete customer error:', err);
-            alert('❌ Network error: ' + err.message);
+            alert('Network error: ' + err.message);
         });
 }
 
@@ -1657,7 +2387,7 @@ function loadAdmins() {
         .then(function(admins) {
             var container = document.getElementById('adminsList');
             var countEl = document.getElementById('adminCount');
-            if (countEl) countEl.textContent = admins.length;
+            if (countEl) countEl.textContent = '(' + admins.length + ')';
             if (!container) return;
 
             if (admins.length === 0) {
@@ -1666,36 +2396,32 @@ function loadAdmins() {
             }
 
             var myId = currentUserId();
-            var html = '<table style="width:100%; border-collapse:collapse;">' +
-                '<thead><tr style="text-align:left; border-bottom:2px solid #ecf0f1;">' +
-                '<th style="padding:10px;">#</th>' +
-                '<th style="padding:10px;">Username</th>' +
-                '<th style="padding:10px;">Role</th>' +
-                '<th style="padding:10px;">Created</th>' +
-                '<th style="padding:10px;">Actions</th>' +
+            var html = '<table class="data-table">' +
+                '<thead><tr>' +
+                '<th>#</th>' +
+                '<th>Username</th>' +
+                '<th>Role</th>' +
+                '<th>Created</th>' +
+                '<th>Actions</th>' +
                 '</tr></thead><tbody>';
 
             admins.forEach(function(a, i) {
-                var roleLabel;
-                if (a.role === 'owner') {
-                    roleLabel = '<span style="background:#f39c12;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">👑 Owner</span>';
-                } else if (a.role === 'driver') {
-                    roleLabel = '<span style="background:#9b59b6;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">🚗 Driver</span>';
-                } else {
-                    roleLabel = '<span style="background:#95a5a6;color:white;padding:3px 10px;border-radius:12px;font-size:0.8em;">👤 Staff</span>';
-                }
+                var roleClass = 'role-staff';
+                var roleLabel = 'Staff';
+                if (a.role === 'owner') { roleClass = 'role-owner'; roleLabel = 'Owner'; }
+                else if (a.role === 'driver') { roleClass = 'role-driver'; roleLabel = 'Driver'; }
 
                 var isMe = a.id === myId;
                 var deleteBtn = isMe
-                    ? '<span style="color:#95a5a6; font-size:0.85em;">(you)</span>'
-                    : '<button onclick="deleteAdmin(' + a.id + ', \'' + a.username.replace(/'/g, "\\'") + '\')" style="background:#e74c3c;color:white;border:none;padding:6px 14px;border-radius:15px;cursor:pointer;font-size:0.85em;"><i class="fas fa-trash"></i> Delete</button>';
+                    ? '<span style="color:var(--text-muted);font-size:0.85em;">(you)</span>'
+                    : '<button onclick="deleteAdmin(' + a.id + ', \'' + a.username.replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:0.9em;"><i class="fas fa-trash"></i></button>';
 
-                html += '<tr style="border-bottom:1px solid #ecf0f1;">' +
-                    '<td style="padding:10px;">' + (i + 1) + '</td>' +
-                    '<td style="padding:10px; font-weight:600; color:#2c3e50;">' + escapeHtml(a.username) + '</td>' +
-                    '<td style="padding:10px;">' + roleLabel + '</td>' +
-                    '<td style="padding:10px; color:#95a5a6; font-size:0.85em;">' + (a.created_at || '-') + '</td>' +
-                    '<td style="padding:10px;">' + deleteBtn + '</td>' +
+                html += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td style="font-weight:600;">' + escapeHtml(a.username) + '</td>' +
+                    '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
+                    '<td style="color:var(--text-muted);font-size:0.85em;">' + (a.created_at || '-') + '</td>' +
+                    '<td>' + deleteBtn + '</td>' +
                 '</tr>';
             });
 
@@ -1713,12 +2439,12 @@ function createAdmin() {
     var role = document.getElementById('newAdminRole').value;
     var errorEl = document.getElementById('adminFormError');
 
-    errorEl.style.color = '#e74c3c';
+    errorEl.style.color = 'var(--danger)';
     errorEl.textContent = '';
 
-    if (!username) { errorEl.textContent = '❌ Enter a username'; return; }
-    if (username.length < 3) { errorEl.textContent = '❌ Username must be at least 3 characters'; return; }
-    if (!password || password.length < 6) { errorEl.textContent = '❌ Password must be at least 6 characters'; return; }
+    if (!username) { errorEl.textContent = 'Enter a username'; return; }
+    if (username.length < 3) { errorEl.textContent = 'Username must be at least 3 characters'; return; }
+    if (!password || password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters'; return; }
 
     authFetch(API + '/admins', {
         method: 'POST',
@@ -1731,7 +2457,7 @@ function createAdmin() {
             errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
             return;
         }
-        errorEl.style.color = '#27ae60';
+        errorEl.style.color = 'var(--success)';
         errorEl.textContent = '✅ Admin "' + username + '" created!';
         document.getElementById('newAdminUsername').value = '';
         document.getElementById('newAdminPassword').value = '';
@@ -1741,7 +2467,7 @@ function createAdmin() {
     })
     .catch(function(err) {
         console.error('Create admin error:', err);
-        errorEl.textContent = '❌ Network error';
+        errorEl.textContent = 'Network error';
     });
 }
 
@@ -1755,12 +2481,12 @@ function deleteAdmin(id, username) {
                 alert('❌ ' + (result.data.error || 'Failed to delete'));
                 return;
             }
-            showNotification('🗑️ Admin "' + username + '" deleted');
+            showNotification('Admin "' + username + '" deleted');
             loadAdmins();
         })
         .catch(function(err) {
             console.error('Delete admin error:', err);
-            alert('❌ Network error');
+            alert('Network error');
         });
 }
 </script>
