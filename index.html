@@ -2884,7 +2884,16 @@ function saveMenuItem() {
     if (!desc) { alert('Please enter a description.'); return; }
     if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
 
-    var itemData = { category: category, name: name, description: desc, price: price, image_url: image };
+      var isPopular = document.getElementById('menuIsPopular').checked ? 1 : 0;
+
+    var itemData = {
+        category: category,
+        name: name,
+        description: desc,
+        price: price,
+        image_url: image,
+        is_popular: isPopular
+    };
     var url = editId ? (API + '/menu/' + editId) : (API + '/menu');
     var method = editId ? 'PUT' : 'POST';
 
@@ -2920,6 +2929,8 @@ function editMenuItem(id) {
     document.getElementById('menuDesc').value = item.description || '';
     document.getElementById('menuPrice').value = item.price;
     document.getElementById('menuImage').value = item.image_url || '';
+    document.getElementById('menuIsPopular').checked =
+    (item.is_popular === 1 || item.is_popular === '1' || item.is_popular === true);
 
     if (item.image_url && item.image_url.startsWith('data:image')) {
         document.getElementById('imagePreview').src = item.image_url;
@@ -2940,6 +2951,7 @@ function cancelEdit() {
     document.getElementById('menuDesc').value = '';
     document.getElementById('menuPrice').value = '';
     document.getElementById('menuImage').value = '';
+    document.getElementById('menuIsPopular').checked = false;
     document.getElementById('menuImageFile').value = '';
     document.getElementById('imagePreviewContainer').style.display = 'none';
     document.getElementById('editItemId').value = '';
