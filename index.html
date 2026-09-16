@@ -1293,7 +1293,7 @@
                     </div>
 
                     <div class="filters">
-                        <input type="text" id="searchInput" placeholder="Search by name or order #..." oninput="applyFilters()">
+                      <input type="text" id="searchInput" placeholder="Search name, phone, driver, address, or order #..." oninput="applyFilters()">
                         <select id="quickDateFilter" onchange="onQuickDateChange()">
                             <option value="all">All time</option>
                             <option value="today">Today</option>
@@ -2308,9 +2308,12 @@ function applyFilters() {
     }
 
     var filtered = allOrders.filter(function(order) {
-        var matchSearch = !search ||
-            (order.name && order.name.toLowerCase().includes(search)) ||
-            String(order.id).includes(search);
+       var matchSearch = !search ||
+    (order.name && order.name.toLowerCase().includes(search)) ||
+    (order.phone && String(order.phone).toLowerCase().includes(search)) ||
+    (order.driver_name && order.driver_name.toLowerCase().includes(search)) ||
+    (order.address && order.address.toLowerCase().includes(search)) ||
+    String(order.id).includes(search);
         var matchStatus = statusFilter === 'all' || order.status === statusFilter;
         var matchDate = true;
         if (rangeStart && rangeEnd && order.date) {
@@ -2557,9 +2560,10 @@ function exportCSV() {
     }
 
     var rows = allOrders.filter(function(order) {
-        var matchSearch = !search ||
-            (order.name && order.name.toLowerCase().includes(search)) ||
-            String(order.id).includes(search);
+       var matchSearch = !search ||
+    (order.name && order.name.toLowerCase().includes(search)) ||
+    (order.phone && String(order.phone).toLowerCase().includes(search)) ||
+    String(order.id).includes(search);
         var matchStatus = statusFilter === 'all' || order.status === statusFilter;
         var matchDate = true;
         if (rangeStart && rangeEnd && order.date) {
