@@ -1229,10 +1229,9 @@
         <option value="Cancelled">Cancelled</option>
     </select>
 </div>
-                    <div class="orders-header">
-                        <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
-                        <div class="actions">
-                            <div class="actions" style="position:relative;">
+    <div class="orders-header">
+    <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+    <div class="actions" style="position:relative;"></div>
     <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
     <button class="btn" onclick="toggleExportMenu(event)"><i class="fas fa-download"></i> Export <i class="fas fa-caret-down" style="font-size:0.8em;"></i></button>
     <div id="exportMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:6px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-lg); min-width:220px; z-index:200; overflow:hidden;">
@@ -2075,11 +2074,24 @@ function loadOrders() {
                     status: order.status || 'New',
                     driver_id: order.driver_id,
                     driver_name: order.driver_name,
-                    items: []
+                    items: order.items || []
                 };
             });
 
           
+                      if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
+                var newCount = allOrders.length - lastOrderCount;
+                playBeep();
+                showNotification(newCount === 1
+                    ? 'New order received!'
+                    : newCount + ' new orders received!');
+                var latest = allOrders[0];
+                sendBrowserNotification(
+                    newCount === 1 ? '🔔 New Order #' + latest.id : '🔔 ' + newCount + ' New Orders',
+                    (latest.name || 'Customer') + ' · BD ' + parseFloat(latest.total).toFixed(2)
+                );
+                flashTitle(newCount);
+            }
             lastOrderCount = allOrders.length;
 
             applyFilters();
@@ -2214,14 +2226,42 @@ function renderOrders(orders) {
             '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
-            (order.driver_name ?
+                       (order.driver_name ?
                 '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
+                : '') +
+            (order.items && order.items.length > 0 ?
+                '<div style="margin: 10px 0 4px;">' +
+                    '<button onclick="toggleItems(' + order.id + ')" ' +
+                        'style="background:none;border:none;color:var(--info);cursor:pointer;font-size:0.85rem;padding:4px 0;font-family:inherit;">' +
+                        '<i class="fas fa-chevron-down" id="itemsChevron' + order.id + '" style="transition:transform 0.2s;"></i> ' +
+                        'View ' + order.items.length + ' item' + (order.items.length > 1 ? 's' : '') +
+                    '</button>' +
+                    '<div id="itemsBox' + order.id + '" style="display:none; margin-top:8px; padding:10px 12px; background:var(--surface-secondary); border-radius:6px; font-size:0.88rem;">' +
+                        order.items.map(function(it) {
+                            return '<div style="display:flex;justify-content:space-between;padding:3px 0;">' +
+                                '<span>' + escapeHtml(it.quantity) + '× ' + escapeHtml(it.item_name) + '</span>' +
+                                '<span style="color:var(--text-secondary);">BD ' + (parseFloat(it.price) * it.quantity).toFixed(2) + '</span>' +
+                            '</div>';
+                        }).join('') +
+                    '</div>' +
+                '</div>'
                 : '') +
             '<div class="order-total">BD ' + order.total.toFixed(2) + '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
     });
     container.innerHTML = html;
+}
+
+function toggleItems(orderId) {
+    var box = document.getElementById('itemsBox' + orderId);
+    var chevron = document.getElementById('itemsChevron' + orderId);
+    if (!box) return;
+    var isHidden = box.style.display === 'none';
+    box.style.display = isHidden ? 'block' : 'none';
+    if (chevron) {
+        chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+    }
 }
 
 function updateStats(orders) {
