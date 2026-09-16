@@ -1678,6 +1678,11 @@ function showDashboard() {
 
     showTrialBanner();
 
+// Ask for notification permission once per session
+if ('Notification' in window && Notification.permission === 'default') {
+    setTimeout(requestNotificationPermission, 3000);
+}
+
     var adminsTabBtn = document.getElementById('tabAdmins');
     if (adminsTabBtn) {
         adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
@@ -1947,17 +1952,86 @@ function switchTab(tab) {
 }
 
 // ============================================================
+// BROWSER NOTIFICATIONS
+// ============================================================
+var notificationsEnabled = false;
+
+function requestNotificationPermission() {
+    if (!('Notification' in window)) {
+        console.warn('This browser does not support notifications');
+        return;
+    }
+    if (Notification.permission === 'granted') {
+        notificationsEnabled = true;
+        return;
+    }
+    if (Notification.permission === 'denied') {
+        console.warn('Notifications blocked by user');
+        return;
+    }
+    Notification.requestPermission().then(function(perm) {
+        notificationsEnabled = (perm === 'granted');
+        if (notificationsEnabled) showNotification('Notifications enabled ✅');
+    });
+}
+
+function sendBrowserNotification(title, body) {
+    if (!notificationsEnabled || Notification.permission !== 'granted') return;
+    try {
+        var n = new Notification(title, {
+            body: body,
+            icon: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/utensils.svg',
+            badge: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/utensils.svg',
+            tag: 'new-order',
+            requireInteraction: false
+        });
+        n.onclick = function() {
+            window.focus();
+            n.close();
+        };
+    } catch (err) {
+        console.warn('Notification failed:', err);
+    }
+}
+
+// ============================================================
+// TITLE FLASH
+// ============================================================
+var titleFlashInterval = null;
+var originalTitle = 'Admin Dashboard — Nabz-Tech Eats';
+var pendingOrderCount = 0;
+
+function flashTitle(count) {
+    pendingOrderCount = count;
+    if (titleFlashInterval) clearInterval(titleFlashInterval);
+
+    var shown = false;
+    titleFlashInterval = setInterval(function() {
+        document.title = shown
+            ? '(' + pendingOrderCount + ') New Orders!'
+            : originalTitle;
+        shown = !shown;
+    }, 1000);
+}
+
+function stopTitleFlash() {
+    if (titleFlashInterval) {
+        clearInterval(titleFlashInterval);
+        titleFlashInterval = null;
+    }
+    pendingOrderCount = 0;
+    document.title = originalTitle;
+}
+
+// Stop flashing when user returns to the tab
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) stopTitleFlash();
+});
+window.addEventListener('focus', stopTitleFlash);
+
+// ============================================================
 // NOTIFICATIONS + BEEP
 // ============================================================
-function showNotification(message) {
-    var existing = document.querySelector('.notification');
-    if (existing) existing.remove();
-    var div = document.createElement('div');
-    div.className = 'notification';
-    div.innerHTML = '<i class="fas fa-check-circle"></i> ' + message;
-    document.body.appendChild(div);
-    setTimeout(function() { div.remove(); }, 3000);
-}
 
 var audioCtx = null;
 function playBeep() {
@@ -2005,12 +2079,7 @@ function loadOrders() {
                 };
             });
 
-            if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
-                playBeep();
-                document.title = '🔔 New Order!';
-                setTimeout(function() { document.title = 'Admin Dashboard — Nabz-Tech Eats'; }, 5000);
-                showNotification('New order received!');
-            }
+          
             lastOrderCount = allOrders.length;
 
             applyFilters();
