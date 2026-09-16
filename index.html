@@ -2845,10 +2845,10 @@ function renderMenu() {
             ? '<img src="' + item.image_url + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">'
             : '<span class="item-icon">' + icon + '</span>';
 
-        html += '<div class="menu-item-row">' +
+               html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
                 '<div class="item-details">' +
-                    '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
+                    '<div class="item-name">#' + item.id + ' · ' + escapeHtml(item.name) + '</div>' +
                     '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
                 '</div>' +
             '</div>' +
