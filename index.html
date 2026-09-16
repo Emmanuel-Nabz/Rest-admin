@@ -262,7 +262,14 @@
             text-align: center;
             font-size: 1.15rem;
         }
+#reportsBadge {
+    animation: badgePulse 1.5s infinite;
+}
 
+@keyframes badgePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
         .sidebar-footer {
             padding: 16px 14px;
             border-top: 1px solid var(--border);
@@ -1207,6 +1214,10 @@
                     <span>Menu</span>
                 </button>
                 <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
+                    <button class="nav-item" onclick="switchTab('reports')" id="tabReports">
+    <i class="fas fa-exclamation-triangle"></i>
+    <span>Reports <span id="reportsBadge" style="background: var(--danger); color: white; padding: 1px 7px; border-radius: 10px; font-size: 0.75em; margin-left: 6px; display: none;">0</span></span>
+</button>
                     <i class="fas fa-users"></i>
                     <span>Customers</span>
                 </button>
@@ -1411,6 +1422,17 @@
                 </div>
 
                 <!-- ===== TAB 4: ADMINS ===== -->
+                 <!-- ===== TAB 5: DRIVER REPORTS ===== -->
+<div id="tabReportsContent" class="tab-content">
+    <div class="orders-header">
+        <h2><i class="fas fa-exclamation-triangle"></i> Driver Reports <span id="reportCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+        <button class="btn" onclick="loadReports()"><i class="fas fa-sync"></i> Refresh</button>
+    </div>
+
+    <div id="reportsContainer" class="menu-list">
+        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading reports...</p>
+    </div>
+</div>
                 <div id="tabAdminsContent" class="tab-content">
                     <div class="orders-header">
                         <h2><i class="fas fa-user-shield"></i> Admin Accounts <span id="adminCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
@@ -1859,9 +1881,13 @@ function showDashboard() {
     var adminsTabBtn = document.getElementById('tabAdmins');
     if (adminsTabBtn) adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
 
-    loadOrders();
+     loadOrders();
     loadMenu();
     loadCustomers();
+    loadReports();
+
+    // Auto-refresh reports every 30 seconds
+    setInterval(loadReports, 30000);
 
     if (ordersInterval) clearInterval(ordersInterval);
     ordersInterval = setInterval(loadOrders, 30000);
@@ -2076,10 +2102,11 @@ function submitAssignDriver() {
 // TABS
 // ============================================================
 var TAB_LABELS = {
-    orders:    { title: 'Orders',    subtitle: 'Manage incoming orders and drivers' },
-    menu:      { title: 'Menu',      subtitle: 'Manage your restaurant menu items' },
-    customers: { title: 'Customers', subtitle: 'View registered customers' },
-    admins:    { title: 'Admins',    subtitle: 'Manage admin accounts and roles' }
+    orders:    { title: 'Orders',         subtitle: 'Manage incoming orders and drivers' },
+    menu:      { title: 'Menu',           subtitle: 'Manage your restaurant menu items' },
+    customers: { title: 'Customers',      subtitle: 'View registered customers' },
+    reports:   { title: 'Driver Reports', subtitle: 'Issues reported by drivers' },
+    admins:    { title: 'Admins',         subtitle: 'Manage admin accounts and roles' }
 };
 
 function switchTab(tab) {
@@ -2102,8 +2129,9 @@ function switchTab(tab) {
         document.getElementById('sidebarBackdrop').classList.remove('open');
     }
 
-    if (tab === 'menu') loadMenu();
+        if (tab === 'menu') loadMenu();
     if (tab === 'customers') loadCustomers();
+    if (tab === 'reports') loadReports();
     if (tab === 'admins') loadAdmins();
 }
 
@@ -3076,6 +3104,105 @@ function confirmAndDeleteCustomer(customer) {
             console.error('Delete customer error:', err);
             alert('Network error: ' + err.message);
         });
+}
+// ============================================================
+// DRIVER REPORTS
+// ============================================================
+function loadReports() {
+    authFetch(API + '/reports')
+        .then(function(res) { return res.json(); })
+        .then(function(reports) {
+            reports = Array.isArray(reports) ? reports : [];
+            window.allReports = reports;
+
+            var container = document.getElementById('reportsContainer');
+            var countEl = document.getElementById('reportCount');
+            var badgeEl = document.getElementById('reportsBadge');
+
+            if (countEl) countEl.textContent = '(' + reports.length + ')';
+
+            if (badgeEl) {
+                if (reports.length > 0) {
+                    badgeEl.textContent = reports.length;
+                    badgeEl.style.display = 'inline-block';
+                } else {
+                    badgeEl.style.display = 'none';
+                }
+            }
+
+            if (!container) return;
+
+            if (reports.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-check-circle"></i><p>No open reports — all clear! 🎉</p></div>';
+                return;
+            }
+
+            var html = '';
+            reports.forEach(function(r) {
+                var timeAgo = formatTimeAgo(r.created_at);
+
+                html += '<div class="order-card" style="border-left-color: var(--danger); margin-bottom: 14px;">' +
+                    '<div class="order-header">' +
+                        '<span class="order-id">Order #' + r.order_id + '</span>' +
+                        '<span class="order-status" style="background: rgba(239,68,68,0.15); color: var(--danger);">REPORT #' + r.id + '</span>' +
+                    '</div>' +
+                    '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color: var(--text);">' + escapeHtml(r.driver_name || 'unknown') + '</strong></div>' +
+                    '<div class="order-details"><i class="fas fa-clock"></i> ' + timeAgo + '</div>' +
+                    (r.customer_name ?
+                        '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(r.customer_name) + (r.customer_phone ? ' · ' + escapeHtml(r.customer_phone) : '') + '</div>'
+                        : '') +
+                    '<div style="margin-top: 12px; padding: 12px 14px; background: rgba(239,68,68,0.08); border-radius: 8px; border-left: 3px solid var(--danger);">' +
+                        '<div style="font-weight:600; font-size: 0.9rem; color: var(--text); margin-bottom: 4px;">⚠️ Issue reported:</div>' +
+                        '<div style="color: var(--text-secondary); font-size: 0.95rem;">' + escapeHtml(r.reason) + '</div>' +
+                    '</div>' +
+                    '<div class="order-actions">' +
+                        '<button class="btn btn-success" onclick="resolveReport(' + r.id + ')"><i class="fas fa-check"></i> Mark Resolved</button>' +
+                        (r.customer_phone ?
+                            '<a class="btn" href="tel:' + (r.customer_phone || '').replace(/[^0-9+]/g, '') + '"><i class="fas fa-phone"></i> Call Customer</a>'
+                            : '') +
+                    '</div>' +
+                '</div>';
+            });
+
+            container.innerHTML = html;
+        })
+        .catch(function(error) {
+            console.error('Reports load error:', error);
+            var container = document.getElementById('reportsContainer');
+            if (container) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load reports</p></div>';
+            }
+        });
+}
+
+function resolveReport(id) {
+    if (!confirm('Mark this report as resolved?')) return;
+
+    authFetch(API + '/reports/' + id + '/resolve', { method: 'PUT' })
+        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+        .then(function(result) {
+            if (!result.ok) {
+                alert('❌ ' + (result.data.error || 'Failed'));
+                return;
+            }
+            showNotification('Report resolved ✅');
+            loadReports();
+        })
+        .catch(function(err) {
+            console.error('Resolve error:', err);
+            alert('Network error');
+        });
+}
+
+function formatTimeAgo(timestamp) {
+    var then = new Date(timestamp).getTime();
+    var now = Date.now();
+    var seconds = Math.floor((now - then) / 1000);
+
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hour' + (Math.floor(seconds / 3600) > 1 ? 's' : '') + ' ago';
+    return Math.floor(seconds / 86400) + ' day' + (Math.floor(seconds / 86400) > 1 ? 's' : '') + ' ago';
 }
 
 // ============================================================
