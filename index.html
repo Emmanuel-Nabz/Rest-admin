@@ -1520,39 +1520,118 @@ function initTheme() {
 initTheme();
 
 // ============================================================
-// AUDIO UNLOCK (fixes beep not playing)
+// AUDIO — correct unlock pattern
 // ============================================================
 var audioCtx = null;
 var audioUnlocked = false;
 
+function getAudioCtx() {
+    if (!audioCtx) {
+        try {
+            var Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            audioCtx = new Ctx();
+            console.log('🎵 AudioContext created, state:', audioCtx.state);
+        } catch (e) {
+            console.error('❌ AudioContext failed:', e);
+            return null;
+        }
+    }
+    return audioCtx;
+}
+
+// Called on user click — this is the ONLY place the browser allows creation
 function unlockAudio() {
-    if (audioUnlocked) return;
-    try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') {
-            audioCtx.resume();
-        }
-        // Play a tiny silent note to fully unlock
-        var osc = audioCtx.createOscillator();
-        var gain = audioCtx.createGain();
-        gain.gain.value = 0;
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.01);
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+
+    if (ctx.state === 'suspended') {
+        ctx.resume().then(function() {
+            // Play a tiny silent blip to fully unlock
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            gain.gain.value = 0.0001;
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(0);
+            osc.stop(ctx.currentTime + 0.02);
+            audioUnlocked = true;
+            console.log('🔊 Audio UNLOCKED — state:', ctx.state);
+        }).catch(function(err) {
+            console.warn('unlock resume failed:', err);
+        });
+    } else if (ctx.state === 'running') {
         audioUnlocked = true;
-        console.log('🔊 Audio unlocked');
-    } catch (err) {
-        console.warn('Audio unlock failed:', err);
     }
 }
 
-// Unlock audio on any user interaction
-['click', 'keydown', 'touchstart'].forEach(function(evt) {
-    document.addEventListener(evt, unlockAudio, { once: false, passive: true });
+// Bind to multiple event types — first click unlocks, but keep listening
+// in case the context gets suspended again (some browsers do this)
+['click', 'keydown', 'touchstart', 'pointerdown'].forEach(function(evt) {
+    document.addEventListener(evt, unlockAudio, { passive: true });
 });
+
+// Also try on window focus — helps when returning to the tab
+window.addEventListener('focus', function() {
+    if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().then(function() {
+            console.log('🔄 Resumed on focus');
+        });
+    }
+});
+
+// ============================================================
+// THE IMPORTANT PART: playBeep always tries to resume first
+// ============================================================
+function playBeep() {
+    var ctx = getAudioCtx();
+    if (!ctx) {
+        console.warn('🔕 No AudioContext');
+        return;
+    }
+
+    // If suspended, try to resume THEN play
+    if (ctx.state === 'suspended') {
+        console.log('⚠️ AudioContext suspended — attempting resume…');
+        ctx.resume().then(function() {
+            console.log('✅ Resumed. Playing beep…');
+            actuallyPlayBeep(ctx);
+        }).catch(function(err) {
+            console.warn('❌ Could not resume — user needs to click the page once:', err);
+        });
+    } else {
+        actuallyPlayBeep(ctx);
+    }
+}
+
+function actuallyPlayBeep(ctx) {
+    try {
+        var now = ctx.currentTime;
+
+        // Two-tone "ding-dong" style beep
+        [
+            { freq: 880,  start: 0.00, dur: 0.15 },
+            { freq: 1320, start: 0.18, dur: 0.20 }
+        ].forEach(function(note) {
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = note.freq;
+            var s = now + note.start;
+            var e = s + note.dur;
+            gain.gain.setValueAtTime(0, s);
+            gain.gain.linearRampToValueAtTime(0.3, s + 0.01);
+            gain.gain.linearRampToValueAtTime(0, e);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(s);
+            osc.stop(e);
+        });
+        console.log('🔔 Beep played');
+    } catch (e) {
+        console.error('❌ Beep failed:', e);
+    }
+}
 
 // ============================================================
 // XSS PROTECTION
