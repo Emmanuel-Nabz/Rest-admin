@@ -1233,7 +1233,31 @@
                         <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
                         <div class="actions">
                             <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
-                            <button class="btn" onclick="exportCSV()"><i class="fas fa-download"></i> Export</button>
+                            <div class="actions" style="position:relative;">
+    <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
+    <button class="btn" onclick="toggleExportMenu(event)"><i class="fas fa-download"></i> Export <i class="fas fa-caret-down" style="font-size:0.8em;"></i></button>
+    <div id="exportMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:6px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-lg); min-width:220px; z-index:200; overflow:hidden;">
+        <div onclick="exportCSV(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem;" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background=''">
+            <i class="fas fa-receipt" style="width:18px;"></i> Orders (filtered)
+        </div>
+        <div onclick="exportCustomersCSV(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem;" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background=''">
+            <i class="fas fa-users" style="width:18px;"></i> Customers
+        </div>
+        <div onclick="exportMenuCSV(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem;" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background=''">
+            <i class="fas fa-book-open" style="width:18px;"></i> Menu items
+        </div>
+        <div style="height:1px; background:var(--border);"></div>
+        <div onclick="exportFullBackup(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem; font-weight:600; color:var(--accent);" onmouseover="this.style.background='var(--accent-soft)'" onmouseout="this.style.background=''">
+            <i class="fas fa-file-csv" style="width:18px;"></i> Full backup (CSV)
+        </div>
+        <div onclick="exportJSONBackup(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem; font-weight:600; color:var(--success);" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background=''">
+            <i class="fas fa-file-code" style="width:18px;"></i> Full backup (JSON) ⭐
+        </div>
+        <div onclick="document.getElementById('importJsonFile').click(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem; font-weight:600; color:var(--info);" onmouseover="this.style.background='rgba(59,130,246,0.1)'" onmouseout="this.style.background=''">
+            <i class="fas fa-upload" style="width:18px;"></i> Restore from JSON
+        </div>
+    </div>
+</div>
                             <button class="btn btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
                         </div>
                     </div>
@@ -2695,6 +2719,193 @@ function deleteAdmin(id, username) {
             alert('Network error');
         });
 }
+// ============================================================
+// EXPORT HELPERS + JSON BACKUP / RESTORE
+// ============================================================
+function toggleExportMenu(e) {
+    e.stopPropagation();
+    var menu = document.getElementById('exportMenu');
+    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+}
+function closeExportMenu() {
+    var menu = document.getElementById('exportMenu');
+    if (menu) menu.style.display = 'none';
+}
+document.addEventListener('click', closeExportMenu);
+
+function downloadCSV(csv, filename) {
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+}
+
+function downloadJSON(jsonString, filename) {
+    var blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+
+// ---- CSV: Customers ----
+function exportCustomersCSV() {
+    var customers = window.allCustomers || [];
+    if (customers.length === 0) { alert('No customers to export. Open the Customers tab first.'); return; }
+    var csv = 'ID,Name,Phone,Address,Registered\n';
+    customers.forEach(function(c) {
+        csv += c.id + ',"' + (c.name || '').replace(/"/g, '""') + '","' + (c.phone || '') + '","' + (c.address || '').replace(/"/g, '""') + '","' + (c.created_at || c.created || '') + '"\n';
+    });
+    downloadCSV(csv, 'customers-' + new Date().toISOString().split('T')[0] + '.csv');
+    showNotification('Exported ' + customers.length + ' customer(s)');
+}
+
+// ---- CSV: Menu ----
+function exportMenuCSV() {
+    if (allMenuItems.length === 0) { alert('No menu items to export.'); return; }
+    var csv = 'ID,Category,Name,Description,Price (BD)\n';
+    allMenuItems.forEach(function(m) {
+        csv += m.id + ',"' + (m.category || '') + '","' + (m.name || '').replace(/"/g, '""') + '","' + (m.description || '').replace(/"/g, '""') + '",' + parseFloat(m.price).toFixed(2) + '\n';
+    });
+    downloadCSV(csv, 'menu-' + new Date().toISOString().split('T')[0] + '.csv');
+    showNotification('Exported ' + allMenuItems.length + ' menu item(s)');
+}
+
+// ---- CSV: Full backup ----
+function exportFullBackup() {
+    Promise.all([
+        authFetch(API + '/orders').then(function(r){return r.json();}).catch(function(){return [];}),
+        authFetch(API + '/customers').then(function(r){return r.json();}).catch(function(){return [];}),
+        authFetch(API + '/menu').then(function(r){return r.json();}).catch(function(){return [];})
+    ]).then(function(results) {
+        var orders = results[0] || [], customers = results[1] || [], menu = results[2] || [];
+        var lines = [];
+        var stamp = new Date().toISOString().split('T')[0];
+        lines.push('=== ORDERS ===');
+        lines.push('Order #,Date,Customer,Phone,Address,Payment,Driver,Total (BD),Status');
+        orders.forEach(function(o) {
+            lines.push(o.id + ',"' + (o.created_at || '') + '","' + (o.customer_name || '').replace(/"/g, '""') + '","' + (o.customer_phone || '') + '","' + (o.customer_address || '').replace(/"/g, '""') + '","' + (o.payment_method || '') + '","' + (o.driver_name || '') + '",' + parseFloat(o.total || 0).toFixed(2) + ',"' + (o.status || '') + '"');
+        });
+        lines.push('');
+        lines.push('=== CUSTOMERS ===');
+        lines.push('ID,Name,Phone,Address,Registered');
+        customers.forEach(function(c) {
+            lines.push(c.id + ',"' + (c.name || '').replace(/"/g, '""') + '","' + (c.phone || '') + '","' + (c.address || '').replace(/"/g, '""') + '","' + (c.created_at || c.created || '') + '"');
+        });
+        lines.push('');
+        lines.push('=== MENU ===');
+        lines.push('ID,Category,Name,Description,Price (BD)');
+        menu.forEach(function(m) {
+            lines.push(m.id + ',"' + (m.category || '') + '","' + (m.name || '').replace(/"/g, '""') + '","' + (m.description || '').replace(/"/g, '""') + '",' + parseFloat(m.price || 0).toFixed(2));
+        });
+        lines.push('');
+        lines.push('=== BACKUP INFO ===');
+        lines.push('Generated,"' + new Date().toISOString() + '"');
+        lines.push('Orders,"' + orders.length + '"');
+        lines.push('Customers,"' + customers.length + '"');
+        lines.push('Menu items,"' + menu.length + '"');
+        downloadCSV(lines.join('\n'), 'nabztech-backup-' + stamp + '.csv');
+        showNotification('Full CSV backup downloaded');
+    }).catch(function(err) { alert('Backup failed: ' + err.message); });
+}
+
+// ---- JSON: Full backup ----
+function exportJSONBackup() {
+    if (!confirm('📦 Create full JSON backup?\n\nDownloads ALL orders, customers, and menu items in one file.\n\nContinue?')) return;
+    showNotification('Fetching all data…');
+    Promise.all([
+        authFetch(API + '/orders').then(function(r){return r.json();}).catch(function(){return [];}),
+        authFetch(API + '/customers').then(function(r){return r.json();}).catch(function(){return [];}),
+        authFetch(API + '/menu').then(function(r){return r.json();}).catch(function(){return [];})
+    ]).then(function(results) {
+        var orders = Array.isArray(results[0]) ? results[0] : [];
+        var customers = Array.isArray(results[1]) ? results[1] : [];
+        var menu = Array.isArray(results[2]) ? results[2] : [];
+        var backup = {
+            meta: {
+                app: 'Nabz-Tech Eats',
+                format: 'nabztech-backup-v1',
+                exportedAt: new Date().toISOString(),
+                exportedBy: localStorage.getItem('adminUser') || 'unknown',
+                version: 1,
+                counts: { orders: orders.length, customers: customers.length, menu: menu.length }
+            },
+            data: { orders: orders, customers: customers, menu: menu }
+        };
+        var json = JSON.stringify(backup, null, 2);
+        var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        downloadJSON(json, 'nabztech-backup-' + stamp + '.json');
+        showNotification('✅ Backup created (' + orders.length + ' orders, ' + customers.length + ' customers, ' + menu.length + ' items)');
+    }).catch(function(err) { alert('❌ Backup failed: ' + err.message); });
+}
+
+// ---- JSON: Restore ----
+function importJSONBackup(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+    if (file.size > 20 * 1024 * 1024) { alert('❌ File is too large (over 20 MB).'); return; }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var parsed;
+        try { parsed = JSON.parse(e.target.result); }
+        catch (err) { alert('❌ Invalid JSON file.'); return; }
+        var orders, customers, menu, meta;
+        if (parsed && parsed.data && parsed.meta) {
+            orders = parsed.data.orders || [];
+            customers = parsed.data.customers || [];
+            menu = parsed.data.menu || [];
+            meta = parsed.meta;
+        } else if (parsed && (parsed.orders || parsed.customers || parsed.menu)) {
+            orders = parsed.orders || [];
+            customers = parsed.customers || [];
+            menu = parsed.menu || [];
+            meta = { exportedAt: 'unknown' };
+        } else {
+            alert('❌ This file does not look like a Nabz-Tech backup.');
+            return;
+        }
+        var exportedInfo = meta.exportedAt ? new Date(meta.exportedAt).toLocaleString() : 'unknown date';
+        if (!confirm('⚠️ RESTORE FROM BACKUP?\n\n📅 Backup date: ' + exportedInfo + '\n\n📊 Content:\n• ' + orders.length + ' orders\n• ' + customers.length + ' customers\n• ' + menu.length + ' menu items\n\n⚠️ This will ADD data to your current database.\n\nContinue?')) return;
+        performRestore(orders, customers, menu);
+    };
+    reader.readAsText(file);
+}
+
+function performRestore(orders, customers, menu) {
+    showNotification('Restoring… do not close this tab');
+    authFetch(API + '/admin/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orders: orders, customers: customers, menu: menu })
+    })
+    .then(function(res) {
+        return res.text().then(function(text) {
+            var data;
+            try { data = JSON.parse(text); } catch (err) { data = { raw: text }; }
+            return { ok: res.ok, status: res.status, data: data };
+        });
+    })
+    .then(function(result) {
+        if (!result.ok) {
+            var msg = result.data.error || ('HTTP ' + result.status);
+            if (result.status === 404) msg = 'Restore endpoint not found on the server.\n\nAsk your developer to add POST /api/admin/restore.';
+            else if (result.status === 403) msg = 'Only owners can restore backups.';
+            else if (result.status === 413) msg = 'Backup is too large for the server.';
+            alert('❌ Restore failed:\n\n' + msg);
+            return;
+        }
+        var summary = result.data.summary || result.data;
+        var restored = (summary.orders || 0) + (summary.customers || 0) + (summary.menu || 0);
+        showNotification('✅ Restore complete (' + restored + ' records)');
+        loadOrders(); loadMenu(); loadCustomers();
+    })
+    .catch(function(err) { alert('❌ Network error during restore: ' + err.message); });
+}
+
 </script>
+<input type="file" id="importJsonFile" accept=".json,application/json" style="display:none;" onchange="importJSONBackup(event)">
 </body>
 </html>
