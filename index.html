@@ -708,6 +708,44 @@
             font-size: 0.88rem;
             border-radius: var(--radius-sm);
         }
+        /* ===== ORDER CARD — two-column layout ===== */
+.order-card {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.order-card .order-header,
+.order-card .order-actions {
+    grid-column: 1 / -1;
+}
+
+.order-card .order-info {
+    min-width: 0;
+}
+
+.order-card .order-summary {
+    background: var(--surface-secondary);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    min-width: 0;
+}
+
+.order-card .order-summary .items-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+    .order-card {
+        grid-template-columns: 1fr;
+    }
+}
 
         /* ===== EMPTY STATE ===== */
         .empty {
@@ -2334,39 +2372,53 @@ function renderOrders(orders) {
                 '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
         }
 
-        html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
-            '<div class="order-header">' +
-                '<span class="order-id">Order #' + order.id + '</span>' +
-                '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
-            '</div>' +
-            '<div class="order-details"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
-            (order.driver_name ?
-                '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
-                : '') +
-            (order.items && order.items.length > 0 ?
-                '<div style="margin: 10px 0 4px;">' +
-                    '<button onclick="toggleItems(' + order.id + ')" ' +
-                        'style="background:none;border:none;color:var(--info);cursor:pointer;font-size:0.85rem;padding:4px 0;font-family:inherit;">' +
-                        '<i class="fas fa-chevron-down" id="itemsChevron' + order.id + '" style="transition:transform 0.2s;"></i> ' +
-                        'View ' + order.items.length + ' item' + (order.items.length > 1 ? 's' : '') +
-                    '</button>' +
-                    '<div id="itemsBox' + order.id + '" style="display:none; margin-top:8px; padding:10px 12px; background:var(--surface-secondary); border-radius:6px; font-size:0.88rem;">' +
-                        order.items.map(function(it) {
-                            return '<div style="display:flex;justify-content:space-between;padding:3px 0;">' +
-                                '<span>' + escapeHtml(it.quantity) + '× ' + escapeHtml(it.item_name) + '</span>' +
-                                '<span style="color:var(--text-secondary);">BD ' + (parseFloat(it.price) * it.quantity).toFixed(2) + '</span>' +
-                            '</div>';
-                        }).join('') +
-                    '</div>' +
-                '</div>'
-                : '') +
-            '<div class="order-total">BD ' + order.total.toFixed(2) + '</div>' +
-            '<div class="order-actions">' + actionButtons + '</div>' +
-        '</div>';
+       html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
+
+    // ---- HEADER (spans full width) ----
+    '<div class="order-header">' +
+        '<span class="order-id">Order #' + order.id + '</span>' +
+        '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
+    '</div>' +
+
+    // ---- LEFT COLUMN: customer info ----
+    '<div class="order-info">' +
+        '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
+        '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
+        '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
+        '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
+        (order.driver_name ?
+            '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
+            : '') +
+        '<div class="order-details" style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
+    '</div>' +
+
+    // ---- RIGHT COLUMN: items + total ----
+    '<div class="order-summary">' +
+        '<div class="items-title"><i class="fas fa-utensils"></i> Order Items</div>' +
+        (order.items && order.items.length > 0 ?
+            order.items.map(function(it) {
+                var lineTotal = parseFloat(it.price) * it.quantity;
+                return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);font-size:0.9rem;">' +
+                    '<span><strong style="color:var(--accent);">' + escapeHtml(it.quantity) + '×</strong> ' + escapeHtml(it.item_name) + '</span>' +
+                    '<span style="color:var(--text-secondary);white-space:nowrap;">BD ' + lineTotal.toFixed(2) + '</span>' +
+                '</div>';
+            }).join('') +
+            '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
+                '<span>Total</span>' +
+                '<span>BD ' + order.total.toFixed(2) + '</span>' +
+            '</div>'
+            : '<div style="color:var(--text-muted);font-size:0.9rem;padding:6px 0;">No items recorded</div>' +
+              '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
+                '<span>Total</span>' +
+                '<span>BD ' + order.total.toFixed(2) + '</span>' +
+              '</div>'
+        ) +
+    '</div>' +
+
+    // ---- ACTION BUTTONS (spans full width) ----
+    '<div class="order-actions">' + actionButtons + '</div>' +
+
+'</div>';
     });
     container.innerHTML = html;
 }
