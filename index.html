@@ -36,7 +36,6 @@
             --font-size-2xl: 22px;
         }
 
-        /* ===== Dark Theme ===== */
         body.dark {
             --bg: #0f172a;
             --surface: #1e293b;
@@ -557,7 +556,13 @@
 
         .orders-header h2 i { color: var(--text-secondary); }
 
-        .orders-header .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .orders-header .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            position: relative;
+            align-items: center;
+        }
 
         .btn {
             padding: 9px 16px;
@@ -573,6 +578,7 @@
             gap: 6px;
             transition: background 0.12s, border-color 0.12s, color 0.25s;
             font-family: inherit;
+            white-space: nowrap;
         }
 
         .btn:hover { background: var(--surface-secondary); }
@@ -585,6 +591,50 @@
 
         .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
         .btn-danger:hover { background: #dc2626; }
+
+        /* Export dropdown */
+        #exportMenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 6px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            min-width: 220px;
+            z-index: 500;
+            overflow: hidden;
+        }
+
+        #exportMenu > div {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.12s;
+        }
+
+        #exportMenu > div:hover {
+            background: var(--surface-secondary);
+        }
+
+        #exportMenu .menu-divider {
+            height: 1px;
+            background: var(--border);
+            padding: 0;
+            cursor: default;
+        }
+        #exportMenu .menu-divider:hover { background: var(--border); }
+
+        #exportMenu .menu-item-accent { color: var(--accent); font-weight: 600; }
+        #exportMenu .menu-item-accent:hover { background: var(--accent-soft); }
+
+        #exportMenu .menu-item-success { color: var(--success); font-weight: 600; }
+        #exportMenu .menu-item-success:hover { background: rgba(16,185,129,0.1); }
+
+        #exportMenu .menu-item-info { color: var(--info); font-weight: 600; }
+        #exportMenu .menu-item-info:hover { background: rgba(59,130,246,0.1); }
 
         /* ===== ORDER CARD ===== */
         .order-card {
@@ -1161,7 +1211,6 @@
                         <div class="subtitle" id="pageSubtitle">Manage incoming orders and drivers</div>
                     </div>
                 </div>
-                <!-- Theme toggle button -->
                 <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Toggle dark mode">
                     <i class="fas fa-moon" id="themeIcon"></i>
                     <span id="themeLabel">Dark Mode</span>
@@ -1205,58 +1254,43 @@
                         </div>
                     </div>
 
-                   <div class="filters">
-    <input type="text" id="searchInput" placeholder="Search by name or order #..." oninput="applyFilters()">
+                    <div class="filters">
+                        <input type="text" id="searchInput" placeholder="Search by name or order #..." oninput="applyFilters()">
+                        <select id="quickDateFilter" onchange="onQuickDateChange()">
+                            <option value="all">All time</option>
+                            <option value="today">Today</option>
+                            <option value="yesterday">Yesterday</option>
+                            <option value="week">Last 7 days</option>
+                            <option value="month">This month</option>
+                            <option value="custom">Custom date…</option>
+                        </select>
+                        <input type="date" id="customDate" onchange="applyFilters()" style="display:none;">
+                        <select id="statusFilter" onchange="applyFilters()">
+                            <option value="all">All statuses</option>
+                            <option value="New">New</option>
+                            <option value="Confirmed">Confirmed</option>
+                            <option value="Preparing">Preparing</option>
+                            <option value="On the Way">On the Way</option>
+                            <option value="Delivered">Delivered</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
 
-    <select id="quickDateFilter" onchange="onQuickDateChange()">
-        <option value="all">All time</option>
-        <option value="today">Today</option>
-        <option value="yesterday">Yesterday</option>
-        <option value="week">Last 7 days</option>
-        <option value="month">This month</option>
-        <option value="custom">Custom date…</option>
-    </select>
-
-    <input type="date" id="customDate" onchange="applyFilters()" style="display:none;">
-
-    <select id="statusFilter" onchange="applyFilters()">
-        <option value="all">All statuses</option>
-        <option value="New">New</option>
-        <option value="Confirmed">Confirmed</option>
-        <option value="Preparing">Preparing</option>
-        <option value="On the Way">On the Way</option>
-        <option value="Delivered">Delivered</option>
-        <option value="Cancelled">Cancelled</option>
-    </select>
-</div>
-    <div class="orders-header">
-    <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
-    <div class="actions" style="position:relative;"></div>
-    <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
-    <button class="btn" onclick="toggleExportMenu(event)"><i class="fas fa-download"></i> Export <i class="fas fa-caret-down" style="font-size:0.8em;"></i></button>
-    <div id="exportMenu" style="display:none; position:absolute; top:100%; right:0; margin-top:6px; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow-lg); min-width:220px; z-index:200; overflow:hidden;">
-        <div onclick="exportCSV(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem;" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background=''">
-            <i class="fas fa-receipt" style="width:18px;"></i> Orders (filtered)
-        </div>
-        <div onclick="exportCustomersCSV(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem;" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background=''">
-            <i class="fas fa-users" style="width:18px;"></i> Customers
-        </div>
-        <div onclick="exportMenuCSV(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem;" onmouseover="this.style.background='var(--surface-secondary)'" onmouseout="this.style.background=''">
-            <i class="fas fa-book-open" style="width:18px;"></i> Menu items
-        </div>
-        <div style="height:1px; background:var(--border);"></div>
-        <div onclick="exportFullBackup(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem; font-weight:600; color:var(--accent);" onmouseover="this.style.background='var(--accent-soft)'" onmouseout="this.style.background=''">
-            <i class="fas fa-file-csv" style="width:18px;"></i> Full backup (CSV)
-        </div>
-        <div onclick="exportJSONBackup(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem; font-weight:600; color:var(--success);" onmouseover="this.style.background='rgba(16,185,129,0.1)'" onmouseout="this.style.background=''">
-            <i class="fas fa-file-code" style="width:18px;"></i> Full backup (JSON) ⭐
-        </div>
-        <div onclick="document.getElementById('importJsonFile').click(); closeExportMenu();" style="padding:10px 14px; cursor:pointer; font-size:0.9rem; font-weight:600; color:var(--info);" onmouseover="this.style.background='rgba(59,130,246,0.1)'" onmouseout="this.style.background=''">
-            <i class="fas fa-upload" style="width:18px;"></i> Restore from JSON
-        </div>
-    </div>
-</div>
+                    <div class="orders-header">
+                        <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+                        <div class="actions">
+                            <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
+                            <button class="btn" onclick="toggleExportMenu(event)"><i class="fas fa-download"></i> Export <i class="fas fa-caret-down" style="font-size:0.8em;"></i></button>
                             <button class="btn btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
+                            <div id="exportMenu">
+                                <div onclick="exportCSV(); closeExportMenu();"><i class="fas fa-receipt" style="width:18px;"></i> Orders (filtered)</div>
+                                <div onclick="exportCustomersCSV(); closeExportMenu();"><i class="fas fa-users" style="width:18px;"></i> Customers</div>
+                                <div onclick="exportMenuCSV(); closeExportMenu();"><i class="fas fa-book-open" style="width:18px;"></i> Menu items</div>
+                                <div class="menu-divider"></div>
+                                <div class="menu-item-accent" onclick="exportFullBackup(); closeExportMenu();"><i class="fas fa-file-csv" style="width:18px;"></i> Full backup (CSV)</div>
+                                <div class="menu-item-success" onclick="exportJSONBackup(); closeExportMenu();"><i class="fas fa-file-code" style="width:18px;"></i> Full backup (JSON) ⭐</div>
+                                <div class="menu-item-info" onclick="document.getElementById('importJsonFile').click(); closeExportMenu();"><i class="fas fa-upload" style="width:18px;"></i> Restore from JSON</div>
+                            </div>
                         </div>
                     </div>
 
@@ -1430,6 +1464,8 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
+<input type="file" id="importJsonFile" accept=".json,application/json" style="display:none;" onchange="importJSONBackup(event)">
+
 <script>
 // ============================================================
 // CONFIG
@@ -1477,18 +1513,46 @@ function updateThemeToggleUI(theme) {
 
 function initTheme() {
     var saved = localStorage.getItem('adminTheme');
-    if (saved === 'dark') {
-        applyTheme('dark');
-    } else if (saved === 'light') {
-        applyTheme('light');
-    } else {
-        // Default to light
-        applyTheme('light');
+    if (saved === 'dark') applyTheme('dark');
+    else applyTheme('light');
+}
+
+initTheme();
+
+// ============================================================
+// AUDIO UNLOCK (fixes beep not playing)
+// ============================================================
+var audioCtx = null;
+var audioUnlocked = false;
+
+function unlockAudio() {
+    if (audioUnlocked) return;
+    try {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        // Play a tiny silent note to fully unlock
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        gain.gain.value = 0;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.01);
+        audioUnlocked = true;
+        console.log('🔊 Audio unlocked');
+    } catch (err) {
+        console.warn('Audio unlock failed:', err);
     }
 }
 
-// Initialize theme as soon as possible (before DOMContentLoaded even)
-initTheme();
+// Unlock audio on any user interaction
+['click', 'keydown', 'touchstart'].forEach(function(evt) {
+    document.addEventListener(evt, unlockAudio, { once: false, passive: true });
+});
 
 // ============================================================
 // XSS PROTECTION
@@ -1520,9 +1584,7 @@ function currentUserRole() {
         if (!token) return null;
         var payload = JSON.parse(atob(token.split('.')[1]));
         return payload.role || 'staff';
-    } catch (e) {
-        return null;
-    }
+    } catch (e) { return null; }
 }
 
 function currentUserId() {
@@ -1531,9 +1593,7 @@ function currentUserId() {
         if (!token) return null;
         var payload = JSON.parse(atob(token.split('.')[1]));
         return payload.id;
-    } catch (e) {
-        return null;
-    }
+    } catch (e) { return null; }
 }
 
 // ============================================================
@@ -1546,15 +1606,12 @@ function scrollToTop() {
 window.addEventListener('scroll', function() {
     var btn = document.getElementById('floatingHomeBtn');
     if (!btn) return;
-    if (window.scrollY > 300) {
-        btn.style.display = 'flex';
-    } else {
-        btn.style.display = 'none';
-    }
+    if (window.scrollY > 300) btn.style.display = 'flex';
+    else btn.style.display = 'none';
 });
 
 // ============================================================
-// SIDEBAR (mobile)
+// SIDEBAR
 // ============================================================
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
@@ -1589,6 +1646,7 @@ function login() {
         localStorage.setItem('adminUser', result.data.username);
         localStorage.setItem('adminLoggedIn', 'true');
         errorEl.textContent = '';
+        unlockAudio();
         showDashboard();
     })
     .catch(function(err) {
@@ -1677,15 +1735,12 @@ function showDashboard() {
 
     showTrialBanner();
 
-// Ask for notification permission once per session
-if ('Notification' in window && Notification.permission === 'default') {
-    setTimeout(requestNotificationPermission, 3000);
-}
+    if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(requestNotificationPermission, 3000);
+    }
 
     var adminsTabBtn = document.getElementById('tabAdmins');
-    if (adminsTabBtn) {
-        adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
-    }
+    if (adminsTabBtn) adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
 
     loadOrders();
     loadMenu();
@@ -1702,7 +1757,6 @@ function checkSession() {
     }
 }
 
-// Ensure theme is applied on page load
 window.addEventListener('DOMContentLoaded', function() {
     initTheme();
     checkSession();
@@ -1719,18 +1773,12 @@ function showTrialBanner() {
     try {
         var payload = JSON.parse(atob(token.split('.')[1]));
         isTrial = payload.is_trial === 1 || payload.is_trial === '1';
-    } catch (e) {
-        return;
-    }
+    } catch (e) { return; }
 
     var banner = document.getElementById('trialBanner');
     if (!banner) return;
 
-    if (isTrial) {
-        banner.style.display = 'flex';
-    } else {
-        banner.style.display = 'none';
-    }
+    banner.style.display = isTrial ? 'flex' : 'none';
 }
 
 function showTrialUpgradeInfo() {
@@ -1860,16 +1908,11 @@ function openAssignDriverModal(orderId) {
             var html = '<option value="">— Select a driver —</option>';
             drivers.forEach(function(d) {
                 var label = d.username;
-                if (currentDriverId === d.id) {
-                    label += ' (currently assigned)';
-                }
+                if (currentDriverId === d.id) label += ' (currently assigned)';
                 html += '<option value="' + d.id + '">' + label + '</option>';
             });
             select.innerHTML = html;
-
-            if (currentDriverId) {
-                select.value = currentDriverId;
-            }
+            if (currentDriverId) select.value = currentDriverId;
         })
         .catch(function(err) {
             console.error('Load drivers error:', err);
@@ -1896,9 +1939,7 @@ function submitAssignDriver() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ driver_id: parseInt(driverId) })
     })
-    .then(function(res) {
-        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
-    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
         if (!result.ok) {
             errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
@@ -1939,7 +1980,6 @@ function switchTab(tab) {
     document.getElementById('pageTitle').textContent = labels.title;
     document.getElementById('pageSubtitle').textContent = labels.subtitle;
 
-    // Close sidebar on mobile after tapping
     if (window.innerWidth <= 768) {
         document.getElementById('sidebar').classList.remove('open');
         document.getElementById('sidebarBackdrop').classList.remove('open');
@@ -2022,32 +2062,34 @@ function stopTitleFlash() {
     document.title = originalTitle;
 }
 
-// Stop flashing when user returns to the tab
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) stopTitleFlash();
 });
 window.addEventListener('focus', stopTitleFlash);
 
 // ============================================================
-// NOTIFICATIONS + BEEP
+// BEEP
 // ============================================================
-
-var audioCtx = null;
 function playBeep() {
     try {
         if (!audioCtx) {
             audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
         if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        var now = audioCtx.currentTime;
         var osc = audioCtx.createOscillator();
         var gain = audioCtx.createGain();
         osc.type = 'sine';
         osc.frequency.value = 880;
-        gain.gain.value = 0.15;
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.2, now + 0.01);
+        gain.gain.linearRampToValueAtTime(0, now + 0.35);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
-        osc.start();
-        osc.stop(audioCtx.currentTime + 0.25);
+        osc.start(now);
+        osc.stop(now + 0.35);
+        console.log('🔔 Beep played');
     } catch (err) {
         console.warn('Beep failed:', err);
     }
@@ -2078,13 +2120,10 @@ function loadOrders() {
                 };
             });
 
-          
-                      if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
+            if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
                 var newCount = allOrders.length - lastOrderCount;
                 playBeep();
-                showNotification(newCount === 1
-                    ? 'New order received!'
-                    : newCount + ' new orders received!');
+                showNotification(newCount === 1 ? 'New order received!' : newCount + ' new orders received!');
                 var latest = allOrders[0];
                 sendBrowserNotification(
                     newCount === 1 ? '🔔 New Order #' + latest.id : '🔔 ' + newCount + ' New Orders',
@@ -2125,29 +2164,20 @@ function applyFilters() {
 
     var today = new Date();
     var todayStr = today.toISOString().split('T')[0];
+    var rangeStart = null, rangeEnd = null;
 
-    var rangeStart = null;
-    var rangeEnd = null;
-
-    if (quickDate === 'today') {
-        rangeStart = todayStr;
-        rangeEnd = todayStr;
-    } else if (quickDate === 'yesterday') {
-        var y = new Date(today);
-        y.setDate(y.getDate() - 1);
+    if (quickDate === 'today') { rangeStart = rangeEnd = todayStr; }
+    else if (quickDate === 'yesterday') {
+        var y = new Date(today); y.setDate(y.getDate() - 1);
         rangeStart = rangeEnd = y.toISOString().split('T')[0];
     } else if (quickDate === 'week') {
-        var w = new Date(today);
-        w.setDate(w.getDate() - 6);
-        rangeStart = w.toISOString().split('T')[0];
-        rangeEnd = todayStr;
+        var w = new Date(today); w.setDate(w.getDate() - 6);
+        rangeStart = w.toISOString().split('T')[0]; rangeEnd = todayStr;
     } else if (quickDate === 'month') {
         var m = new Date(today.getFullYear(), today.getMonth(), 1);
-        rangeStart = m.toISOString().split('T')[0];
-        rangeEnd = todayStr;
+        rangeStart = m.toISOString().split('T')[0]; rangeEnd = todayStr;
     } else if (quickDate === 'custom' && customDate) {
-        rangeStart = customDate;
-        rangeEnd = customDate;
+        rangeStart = rangeEnd = customDate;
     }
 
     var filtered = allOrders.filter(function(order) {
@@ -2155,19 +2185,18 @@ function applyFilters() {
             (order.name && order.name.toLowerCase().includes(search)) ||
             String(order.id).includes(search);
         var matchStatus = statusFilter === 'all' || order.status === statusFilter;
-
         var matchDate = true;
         if (rangeStart && rangeEnd && order.date) {
             var orderDate = new Date(order.date).toISOString().split('T')[0];
             if (orderDate < rangeStart || orderDate > rangeEnd) matchDate = false;
         }
-
         return matchSearch && matchStatus && matchDate;
     });
 
     renderOrders(filtered);
     updateStats(filtered);
 }
+
 function renderOrders(orders) {
     var container = document.getElementById('ordersContainer');
     document.getElementById('orderCount').textContent = '(' + orders.length + ')';
@@ -2226,7 +2255,7 @@ function renderOrders(orders) {
             '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
             '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
-                       (order.driver_name ?
+            (order.driver_name ?
                 '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
                 : '') +
             (order.items && order.items.length > 0 ?
@@ -2259,9 +2288,7 @@ function toggleItems(orderId) {
     if (!box) return;
     var isHidden = box.style.display === 'none';
     box.style.display = isHidden ? 'block' : 'none';
-    if (chevron) {
-        chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
-    }
+    if (chevron) chevron.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
 }
 
 function updateStats(orders) {
@@ -2331,509 +2358,13 @@ function clearAllOrders() {
     });
 }
 
-function exportCSV() {
-    if (allOrders.length === 0) { alert('No orders to export.'); return; }
-    var csv = 'Order #,Date,Name,Phone,Address,Payment,Total,Status\n';
-    allOrders.forEach(function(order) {
-        csv += order.id + ',' +
-               '"' + (order.date || '') + '",' +
-               '"' + (order.name || '') + '",' +
-               '"' + (order.phone || '') + '",' +
-               '"' + (order.address || '') + '",' +
-               '"' + (order.payment || '') + '",' +
-               order.total.toFixed(2) + ',' +
-               (order.status || '') + '\n';
-    });
-    var blob = new Blob([csv], { type: 'text/csv' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'orders-' + new Date().toISOString().split('T')[0] + '.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-    showNotification('Exported');
-}
-
-// ============================================================
-// MENU
-// ============================================================
-function loadMenu() {
-    authFetch(API + '/menu')
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            console.log('✅ Menu loaded:', data.length);
-            allMenuItems = Array.isArray(data) ? data : [];
-            renderMenu();
-        })
-        .catch(function(error) {
-            console.error('❌ Menu error:', error);
-            allMenuItems = [];
-            renderMenu();
-        });
-}
-
-function previewImage(event) {
-    var file = event.target.files[0];
-    if (!file) return;
-
-    var reader = new FileReader();
-    reader.onload = function(e) {
-        var img = new Image();
-        img.onload = function() {
-            var canvas = document.createElement('canvas');
-            var ctx = canvas.getContext('2d');
-            var maxSize = 600;
-            var width = img.width, height = img.height;
-
-            if (width > height) {
-                if (width > maxSize) { height *= maxSize / width; width = maxSize; }
-            } else {
-                if (height > maxSize) { width *= maxSize / height; height = maxSize; }
-            }
-
-            canvas.width = width;
-            canvas.height = height;
-            ctx.drawImage(img, 0, 0, width, height);
-
-            var compressed = canvas.toDataURL('image/jpeg', 0.7);
-            document.getElementById('imagePreview').src = compressed;
-            document.getElementById('imagePreviewContainer').style.display = 'block';
-            document.getElementById('menuImage').value = compressed;
-        };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-}
-
-function renderMenu() {
-    var container = document.getElementById('menuList');
-    if (!container) return;
-
-    if (allMenuItems.length === 0) {
-        container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
-        return;
-    }
-
-    var catIcons = { 'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦' };
-    var html = '';
-    allMenuItems.forEach(function(item) {
-        var icon = catIcons[item.category] || '🍽️';
-        var imageHtml = (item.image_url && item.image_url.startsWith('data:image'))
-            ? '<img src="' + item.image_url + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">'
-            : '<span class="item-icon">' + icon + '</span>';
-
-        html += '<div class="menu-item-row">' +
-            '<div class="item-info">' + imageHtml +
-                '<div class="item-details">' +
-                    '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
-                    '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
-                '</div>' +
-            '</div>' +
-            '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
-            '<div class="item-actions">' +
-                '<button class="btn-edit" onclick="editMenuItem(' + item.id + ')"><i class="fas fa-edit"></i></button>' +
-                '<button class="btn-delete-item" onclick="deleteMenuItem(' + item.id + ')"><i class="fas fa-trash"></i></button>' +
-            '</div>' +
-        '</div>';
-    });
-    container.innerHTML = html;
-}
-
-function saveMenuItem() {
-    var category = document.getElementById('menuCategory').value;
-    var name = document.getElementById('menuName').value.trim();
-    var desc = document.getElementById('menuDesc').value.trim();
-    var price = parseFloat(document.getElementById('menuPrice').value);
-    var image = document.getElementById('menuImage').value || 'default.jpg';
-    var editId = document.getElementById('editItemId').value;
-
-    if (!name) { alert('Please enter an item name.'); return; }
-    if (!desc) { alert('Please enter a description.'); return; }
-    if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
-
-    var itemData = {
-        category: category,
-        name: name,
-        description: desc,
-        price: price,
-        image_url: image
-    };
-
-    var url = editId ? (API + '/menu/' + editId) : (API + '/menu');
-    var method = editId ? 'PUT' : 'POST';
-
-    authFetch(url, {
-        method: method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(itemData)
-    })
-    .then(function(response) {
-        return response.text().then(function(text) {
-            console.log('📥 Server response:', text);
-            try { return JSON.parse(text); }
-            catch (e) { throw new Error('Server returned: ' + text.substring(0, 100)); }
-        });
-    })
-    .then(function() {
-        showNotification('Item saved!');
-        cancelEdit();
-        loadMenu();
-    })
-    .catch(function(error) {
-        console.error('❌ Save error:', error);
-        alert('Failed: ' + error.message);
-    });
-}
-
-function editMenuItem(id) {
-    var item = allMenuItems.find(function(i) { return i.id === id; });
-    if (!item) return;
-
-    document.getElementById('menuCategory').value = item.category;
-    document.getElementById('menuName').value = item.name;
-    document.getElementById('menuDesc').value = item.description || '';
-    document.getElementById('menuPrice').value = item.price;
-    document.getElementById('menuImage').value = item.image_url || '';
-
-    if (item.image_url && item.image_url.startsWith('data:image')) {
-        document.getElementById('imagePreview').src = item.image_url;
-        document.getElementById('imagePreviewContainer').style.display = 'block';
-    } else {
-        document.getElementById('imagePreviewContainer').style.display = 'none';
-    }
-
-    document.getElementById('editItemId').value = item.id;
-    document.getElementById('menuFormTitle').textContent = '✏️ Edit Item';
-    document.querySelector('.btn-save').textContent = 'Update Item';
-    document.getElementById('menuForm').scrollIntoView({ behavior: 'smooth' });
-}
-
-function cancelEdit() {
-    document.getElementById('menuCategory').value = 'Burgers';
-    document.getElementById('menuName').value = '';
-    document.getElementById('menuDesc').value = '';
-    document.getElementById('menuPrice').value = '';
-    document.getElementById('menuImage').value = '';
-    document.getElementById('menuImageFile').value = '';
-    document.getElementById('imagePreviewContainer').style.display = 'none';
-    document.getElementById('editItemId').value = '';
-    document.getElementById('menuFormTitle').textContent = 'Add New Item';
-    document.querySelector('.btn-save').textContent = 'Save Item';
-}
-
-function deleteMenuItem(id) {
-    var item = allMenuItems.find(function(i) { return i.id === id; });
-    if (!item) return;
-    if (!confirm('Delete "' + item.name + '"?')) return;
-
-    authFetch(API + '/menu/' + id, { method: 'DELETE' })
-        .then(function(response) { return response.json(); })
-        .then(function() {
-            showNotification('Item deleted');
-            loadMenu();
-        })
-        .catch(function(error) {
-            console.error('❌ Delete error:', error);
-            alert('Failed to delete item');
-        });
-}
-
-// ============================================================
-// CUSTOMERS
-// ============================================================
-function loadCustomers() {
-    authFetch(API + '/customers')
-        .then(function(response) { return response.json(); })
-        .then(function(customers) {
-            customers = Array.isArray(customers) ? customers : [];
-            var container = document.getElementById('customersContainer');
-            var countEl = document.getElementById('customerCount');
-
-            if (countEl) countEl.textContent = '(' + customers.length + ')';
-            if (!container) return;
-
-            if (customers.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No customers registered yet</p></div>';
-                return;
-            }
-
-            window.allCustomers = customers;
-
-            var html = '<table class="data-table">' +
-                '<thead><tr>' +
-                '<th>#</th>' +
-                '<th>Name</th>' +
-                '<th>Phone</th>' +
-                '<th>Address</th>' +
-                '<th>Registered</th>' +
-                '<th>Actions</th>' +
-                '</tr></thead><tbody>';
-
-            customers.forEach(function(c, i) {
-                html += '<tr>' +
-                    '<td>' + (i + 1) + '</td>' +
-                    '<td style="font-weight:600;">' + escapeHtml(c.name || '-') + '</td>' +
-                    '<td><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:var(--info);text-decoration:none;">' + escapeHtml(c.phone || '-') + '</a></td>' +
-                    '<td style="color:var(--text-secondary);">' + escapeHtml(c.address || '-') + '</td>' +
-                    '<td style="color:var(--text-muted);font-size:0.9rem;">' + escapeHtml(c.created_at || c.created || '-') + '</td>' +
-                    '<td style="white-space:nowrap;">' +
-                        '<button onclick="editCustomer(' + c.id + ')" style="background:none;border:none;color:var(--info);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-edit"></i></button>' +
-                        '<button onclick="doDeleteCustomer(' + c.id + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>' +
-                    '</td>' +
-                '</tr>';
-            });
-
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        })
-        .catch(function(error) {
-            console.error('❌ Customers error:', error);
-        });
-}
-
-function editCustomer(id) {
-    var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
-    if (!customer) return;
-
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.id = 'customerEditOverlay';
-
-    overlay.innerHTML =
-        '<div class="modal-box">' +
-            '<button class="modal-close" onclick="closeCustomerEdit()">×</button>' +
-            '<h2><i class="fas fa-edit"></i> Edit Customer</h2>' +
-            '<div class="form-group">' +
-                '<label>Name</label>' +
-                '<input type="text" id="editCustName" value="' + escapeHtml(customer.name || '').replace(/"/g, '&quot;') + '">' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label>Phone</label>' +
-                '<input type="text" id="editCustPhone" value="' + escapeHtml(customer.phone || '').replace(/"/g, '&quot;') + '">' +
-            '</div>' +
-            '<div class="form-group">' +
-                '<label>Address</label>' +
-                '<input type="text" id="editCustAddress" value="' + escapeHtml(customer.address || '').replace(/"/g, '&quot;') + '">' +
-            '</div>' +
-            '<div id="editCustError" style="color:var(--danger);font-size:0.9rem;min-height:20px;margin-bottom:10px;"></div>' +
-            '<button class="modal-btn-primary" onclick="saveCustomerEdit(' + id + ')">Save Changes</button>' +
-        '</div>';
-
-    document.body.appendChild(overlay);
-}
-
-function closeCustomerEdit() {
-    var el = document.getElementById('customerEditOverlay');
-    if (el) el.remove();
-}
-
-function saveCustomerEdit(id) {
-    var name = document.getElementById('editCustName').value.trim();
-    var phone = document.getElementById('editCustPhone').value.trim();
-    var address = document.getElementById('editCustAddress').value.trim();
-    var errorEl = document.getElementById('editCustError');
-
-    errorEl.textContent = '';
-
-    if (!name || !phone || !address) {
-        errorEl.textContent = 'All fields are required';
-        return;
-    }
-
-    authFetch(API + '/customers/' + id, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, phone: phone, address: address })
-    })
-    .then(function(res) {
-        return res.text().then(function(text) {
-            var data;
-            try { data = JSON.parse(text); }
-            catch (e) { data = { error: text || 'Empty response' }; }
-            return { ok: res.ok, status: res.status, data: data };
-        });
-    })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || ('Error ' + result.status));
-            return;
-        }
-        closeCustomerEdit();
-        showNotification('Customer updated');
-        loadCustomers();
-    })
-    .catch(function(err) {
-        console.error('Edit customer error:', err);
-        errorEl.textContent = 'Network error: ' + err.message;
-    });
-}
-
-function doDeleteCustomer(id) {
-    var customers = window.allCustomers;
-    if (!customers || !customers.length) {
-        authFetch(API + '/customers')
-            .then(function(res) { return res.json(); })
-            .then(function(list) {
-                window.allCustomers = list;
-                var customer = list.find(function(c) { return c.id === id; });
-                if (!customer) { alert('Customer not found.'); return; }
-                confirmAndDeleteCustomer(customer);
-            })
-            .catch(function(err) { alert('Could not load customers: ' + err.message); });
-        return;
-    }
-
-    var customer = customers.find(function(c) { return c.id === id; });
-    if (!customer) { alert('Customer not found'); return; }
-    confirmAndDeleteCustomer(customer);
-}
-
-function confirmAndDeleteCustomer(customer) {
-    if (!confirm('Delete customer "' + customer.name + '"?\n\nThis cannot be undone. Their past orders will remain.')) {
-        return;
-    }
-
-    authFetch(API + '/customers/' + customer.id, { method: 'DELETE' })
-        .then(function(res) {
-            return res.text().then(function(text) {
-                var data;
-                try { data = JSON.parse(text); }
-                catch (e) { data = { error: text || 'Empty response' }; }
-                return { ok: res.ok, status: res.status, data: data };
-            });
-        })
-        .then(function(result) {
-            if (!result.ok) {
-                alert('❌ ' + (result.data.error || ('Error ' + result.status)));
-                return;
-            }
-            showNotification('Customer deleted');
-            loadCustomers();
-        })
-        .catch(function(err) {
-            console.error('Delete customer error:', err);
-            alert('Network error: ' + err.message);
-        });
-}
-
-// ============================================================
-// ADMIN MANAGEMENT
-// ============================================================
-function loadAdmins() {
-    authFetch(API + '/admins')
-        .then(function(res) { return res.json(); })
-        .then(function(admins) {
-            var container = document.getElementById('adminsList');
-            var countEl = document.getElementById('adminCount');
-            if (countEl) countEl.textContent = '(' + admins.length + ')';
-            if (!container) return;
-
-            if (admins.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No admins found</p></div>';
-                return;
-            }
-
-            var myId = currentUserId();
-            var html = '<table class="data-table">' +
-                '<thead><tr>' +
-                '<th>#</th>' +
-                '<th>Username</th>' +
-                '<th>Role</th>' +
-                '<th>Created</th>' +
-                '<th>Actions</th>' +
-                '</tr></thead><tbody>';
-
-            admins.forEach(function(a, i) {
-                var roleClass = 'role-staff';
-                var roleLabel = 'Staff';
-                if (a.role === 'owner') { roleClass = 'role-owner'; roleLabel = 'Owner'; }
-                else if (a.role === 'driver') { roleClass = 'role-driver'; roleLabel = 'Driver'; }
-
-                var isMe = a.id === myId;
-                var deleteBtn = isMe
-                    ? '<span style="color:var(--text-muted);font-size:0.9rem;">(you)</span>'
-                    : '<button onclick="deleteAdmin(' + a.id + ', \'' + a.username.replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>';
-
-                html += '<tr>' +
-                    '<td>' + (i + 1) + '</td>' +
-                    '<td style="font-weight:600;">' + escapeHtml(a.username) + '</td>' +
-                    '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
-                    '<td style="color:var(--text-muted);font-size:0.9rem;">' + (a.created_at || '-') + '</td>' +
-                    '<td>' + deleteBtn + '</td>' +
-                '</tr>';
-            });
-
-            html += '</tbody></table>';
-            container.innerHTML = html;
-        })
-        .catch(function(error) {
-            console.error('Admins load error:', error);
-        });
-}
-
-function createAdmin() {
-    var username = document.getElementById('newAdminUsername').value.trim();
-    var password = document.getElementById('newAdminPassword').value;
-    var role = document.getElementById('newAdminRole').value;
-    var errorEl = document.getElementById('adminFormError');
-
-    errorEl.style.color = 'var(--danger)';
-    errorEl.textContent = '';
-
-    if (!username) { errorEl.textContent = 'Enter a username'; return; }
-    if (username.length < 3) { errorEl.textContent = 'Username must be at least 3 characters'; return; }
-    if (!password || password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters'; return; }
-
-    authFetch(API + '/admins', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, password: password, role: role })
-    })
-    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
-            return;
-        }
-        errorEl.style.color = 'var(--success)';
-        errorEl.textContent = '✅ Admin "' + username + '" created!';
-        document.getElementById('newAdminUsername').value = '';
-        document.getElementById('newAdminPassword').value = '';
-        document.getElementById('newAdminRole').value = 'staff';
-        loadAdmins();
-        setTimeout(function() { errorEl.textContent = ''; }, 3000);
-    })
-    .catch(function(err) {
-        console.error('Create admin error:', err);
-        errorEl.textContent = 'Network error';
-    });
-}
-
-function deleteAdmin(id, username) {
-    if (!confirm('Delete admin "' + username + '"?\n\nThey will lose access immediately.')) return;
-
-    authFetch(API + '/admins/' + id, { method: 'DELETE' })
-        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-        .then(function(result) {
-            if (!result.ok) {
-                alert('❌ ' + (result.data.error || 'Failed to delete'));
-                return;
-            }
-            showNotification('Admin "' + username + '" deleted');
-            loadAdmins();
-        })
-        .catch(function(err) {
-            console.error('Delete admin error:', err);
-            alert('Network error');
-        });
-}
 // ============================================================
 // EXPORT HELPERS + JSON BACKUP / RESTORE
 // ============================================================
 function toggleExportMenu(e) {
     e.stopPropagation();
     var menu = document.getElementById('exportMenu');
-    menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
 }
 function closeExportMenu() {
     var menu = document.getElementById('exportMenu');
@@ -2856,6 +2387,63 @@ function downloadJSON(jsonString, filename) {
     a.href = url; a.download = filename;
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+}
+
+// ---- CSV: Orders (filtered) ----
+function exportCSV() {
+    // Rebuild the filtered list
+    var search = document.getElementById('searchInput').value.toLowerCase();
+    var statusFilter = document.getElementById('statusFilter').value;
+    var quickDate = document.getElementById('quickDateFilter').value;
+    var customDate = document.getElementById('customDate').value;
+
+    var today = new Date();
+    var todayStr = today.toISOString().split('T')[0];
+    var rangeStart = null, rangeEnd = null;
+
+    if (quickDate === 'today') { rangeStart = rangeEnd = todayStr; }
+    else if (quickDate === 'yesterday') {
+        var y = new Date(today); y.setDate(y.getDate() - 1);
+        rangeStart = rangeEnd = y.toISOString().split('T')[0];
+    } else if (quickDate === 'week') {
+        var w = new Date(today); w.setDate(w.getDate() - 6);
+        rangeStart = w.toISOString().split('T')[0]; rangeEnd = todayStr;
+    } else if (quickDate === 'month') {
+        var m = new Date(today.getFullYear(), today.getMonth(), 1);
+        rangeStart = m.toISOString().split('T')[0]; rangeEnd = todayStr;
+    } else if (quickDate === 'custom' && customDate) {
+        rangeStart = rangeEnd = customDate;
+    }
+
+    var rows = allOrders.filter(function(order) {
+        var matchSearch = !search ||
+            (order.name && order.name.toLowerCase().includes(search)) ||
+            String(order.id).includes(search);
+        var matchStatus = statusFilter === 'all' || order.status === statusFilter;
+        var matchDate = true;
+        if (rangeStart && rangeEnd && order.date) {
+            var od = new Date(order.date).toISOString().split('T')[0];
+            if (od < rangeStart || od > rangeEnd) matchDate = false;
+        }
+        return matchSearch && matchStatus && matchDate;
+    });
+
+    if (rows.length === 0) { alert('No orders match the current filters.'); return; }
+
+    var csv = 'Order #,Date,Customer,Phone,Address,Payment,Driver,Total (BD),Status\n';
+    rows.forEach(function(o) {
+        csv += o.id + ',' +
+               '"' + (o.date || '') + '",' +
+               '"' + (o.name || '').replace(/"/g, '""') + '",' +
+               '"' + (o.phone || '') + '",' +
+               '"' + (o.address || '').replace(/"/g, '""') + '",' +
+               '"' + (o.payment || '') + '",' +
+               '"' + (o.driver_name || '') + '",' +
+               o.total.toFixed(2) + ',' +
+               '"' + (o.status || '') + '"\n';
+    });
+    downloadCSV(csv, 'orders-' + new Date().toISOString().split('T')[0] + '.csv');
+    showNotification('Exported ' + rows.length + ' order(s)');
 }
 
 // ---- CSV: Customers ----
@@ -3013,7 +2601,456 @@ function performRestore(orders, customers, menu) {
     .catch(function(err) { alert('❌ Network error during restore: ' + err.message); });
 }
 
+// ============================================================
+// MENU
+// ============================================================
+function loadMenu() {
+    authFetch(API + '/menu')
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            console.log('✅ Menu loaded:', data.length);
+            allMenuItems = Array.isArray(data) ? data : [];
+            renderMenu();
+        })
+        .catch(function(error) {
+            console.error('❌ Menu error:', error);
+            allMenuItems = [];
+            renderMenu();
+        });
+}
+
+function previewImage(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            var maxSize = 600;
+            var width = img.width, height = img.height;
+
+            if (width > height) {
+                if (width > maxSize) { height *= maxSize / width; width = maxSize; }
+            } else {
+                if (height > maxSize) { width *= maxSize / height; height = maxSize; }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            var compressed = canvas.toDataURL('image/jpeg', 0.7);
+            document.getElementById('imagePreview').src = compressed;
+            document.getElementById('imagePreviewContainer').style.display = 'block';
+            document.getElementById('menuImage').value = compressed;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function renderMenu() {
+    var container = document.getElementById('menuList');
+    if (!container) return;
+
+    if (allMenuItems.length === 0) {
+        container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
+        return;
+    }
+
+    var catIcons = { 'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦' };
+    var html = '';
+    allMenuItems.forEach(function(item) {
+        var icon = catIcons[item.category] || '🍽️';
+        var imageHtml = (item.image_url && item.image_url.startsWith('data:image'))
+            ? '<img src="' + item.image_url + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">'
+            : '<span class="item-icon">' + icon + '</span>';
+
+        html += '<div class="menu-item-row">' +
+            '<div class="item-info">' + imageHtml +
+                '<div class="item-details">' +
+                    '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
+                    '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="item-price">BD ' + parseFloat(item.price).toFixed(2) + '</div>' +
+            '<div class="item-actions">' +
+                '<button class="btn-edit" onclick="editMenuItem(' + item.id + ')"><i class="fas fa-edit"></i></button>' +
+                '<button class="btn-delete-item" onclick="deleteMenuItem(' + item.id + ')"><i class="fas fa-trash"></i></button>' +
+            '</div>' +
+        '</div>';
+    });
+    container.innerHTML = html;
+}
+
+function saveMenuItem() {
+    var category = document.getElementById('menuCategory').value;
+    var name = document.getElementById('menuName').value.trim();
+    var desc = document.getElementById('menuDesc').value.trim();
+    var price = parseFloat(document.getElementById('menuPrice').value);
+    var image = document.getElementById('menuImage').value || 'default.jpg';
+    var editId = document.getElementById('editItemId').value;
+
+    if (!name) { alert('Please enter an item name.'); return; }
+    if (!desc) { alert('Please enter a description.'); return; }
+    if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
+
+    var itemData = { category: category, name: name, description: desc, price: price, image_url: image };
+    var url = editId ? (API + '/menu/' + editId) : (API + '/menu');
+    var method = editId ? 'PUT' : 'POST';
+
+    authFetch(url, {
+        method: method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(itemData)
+    })
+    .then(function(response) {
+        return response.text().then(function(text) {
+            console.log('📥 Server response:', text);
+            try { return JSON.parse(text); }
+            catch (e) { throw new Error('Server returned: ' + text.substring(0, 100)); }
+        });
+    })
+    .then(function() {
+        showNotification('Item saved!');
+        cancelEdit();
+        loadMenu();
+    })
+    .catch(function(error) {
+        console.error('❌ Save error:', error);
+        alert('Failed: ' + error.message);
+    });
+}
+
+function editMenuItem(id) {
+    var item = allMenuItems.find(function(i) { return i.id === id; });
+    if (!item) return;
+
+    document.getElementById('menuCategory').value = item.category;
+    document.getElementById('menuName').value = item.name;
+    document.getElementById('menuDesc').value = item.description || '';
+    document.getElementById('menuPrice').value = item.price;
+    document.getElementById('menuImage').value = item.image_url || '';
+
+    if (item.image_url && item.image_url.startsWith('data:image')) {
+        document.getElementById('imagePreview').src = item.image_url;
+        document.getElementById('imagePreviewContainer').style.display = 'block';
+    } else {
+        document.getElementById('imagePreviewContainer').style.display = 'none';
+    }
+
+    document.getElementById('editItemId').value = item.id;
+    document.getElementById('menuFormTitle').textContent = '✏️ Edit Item';
+    document.querySelector('.btn-save').textContent = 'Update Item';
+    document.getElementById('menuForm').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelEdit() {
+    document.getElementById('menuCategory').value = 'Burgers';
+    document.getElementById('menuName').value = '';
+    document.getElementById('menuDesc').value = '';
+    document.getElementById('menuPrice').value = '';
+    document.getElementById('menuImage').value = '';
+    document.getElementById('menuImageFile').value = '';
+    document.getElementById('imagePreviewContainer').style.display = 'none';
+    document.getElementById('editItemId').value = '';
+    document.getElementById('menuFormTitle').textContent = 'Add New Item';
+    document.querySelector('.btn-save').textContent = 'Save Item';
+}
+
+function deleteMenuItem(id) {
+    var item = allMenuItems.find(function(i) { return i.id === id; });
+    if (!item) return;
+    if (!confirm('Delete "' + item.name + '"?')) return;
+
+    authFetch(API + '/menu/' + id, { method: 'DELETE' })
+        .then(function(response) { return response.json(); })
+        .then(function() {
+            showNotification('Item deleted');
+            loadMenu();
+        })
+        .catch(function(error) {
+            console.error('❌ Delete error:', error);
+            alert('Failed to delete item');
+        });
+}
+
+// ============================================================
+// CUSTOMERS
+// ============================================================
+function loadCustomers() {
+    authFetch(API + '/customers')
+        .then(function(response) { return response.json(); })
+        .then(function(customers) {
+            customers = Array.isArray(customers) ? customers : [];
+            var container = document.getElementById('customersContainer');
+            var countEl = document.getElementById('customerCount');
+
+            if (countEl) countEl.textContent = '(' + customers.length + ')';
+            if (!container) return;
+
+            if (customers.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No customers registered yet</p></div>';
+                return;
+            }
+
+            window.allCustomers = customers;
+
+            var html = '<table class="data-table">' +
+                '<thead><tr>' +
+                '<th>#</th><th>Name</th><th>Phone</th><th>Address</th><th>Registered</th><th>Actions</th>' +
+                '</tr></thead><tbody>';
+
+            customers.forEach(function(c, i) {
+                html += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td style="font-weight:600;">' + escapeHtml(c.name || '-') + '</td>' +
+                    '<td><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:var(--info);text-decoration:none;">' + escapeHtml(c.phone || '-') + '</a></td>' +
+                    '<td style="color:var(--text-secondary);">' + escapeHtml(c.address || '-') + '</td>' +
+                    '<td style="color:var(--text-muted);font-size:0.9rem;">' + escapeHtml(c.created_at || c.created || '-') + '</td>' +
+                    '<td style="white-space:nowrap;">' +
+                        '<button onclick="editCustomer(' + c.id + ')" style="background:none;border:none;color:var(--info);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-edit"></i></button>' +
+                        '<button onclick="doDeleteCustomer(' + c.id + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>' +
+                    '</td>' +
+                '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        })
+        .catch(function(error) {
+            console.error('❌ Customers error:', error);
+        });
+}
+
+function editCustomer(id) {
+    var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
+    if (!customer) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'customerEditOverlay';
+
+    overlay.innerHTML =
+        '<div class="modal-box">' +
+            '<button class="modal-close" onclick="closeCustomerEdit()">×</button>' +
+            '<h2><i class="fas fa-edit"></i> Edit Customer</h2>' +
+            '<div class="form-group"><label>Name</label><input type="text" id="editCustName" value="' + escapeHtml(customer.name || '').replace(/"/g, '&quot;') + '"></div>' +
+            '<div class="form-group"><label>Phone</label><input type="text" id="editCustPhone" value="' + escapeHtml(customer.phone || '').replace(/"/g, '&quot;') + '"></div>' +
+            '<div class="form-group"><label>Address</label><input type="text" id="editCustAddress" value="' + escapeHtml(customer.address || '').replace(/"/g, '&quot;') + '"></div>' +
+            '<div id="editCustError" style="color:var(--danger);font-size:0.9rem;min-height:20px;margin-bottom:10px;"></div>' +
+            '<button class="modal-btn-primary" onclick="saveCustomerEdit(' + id + ')">Save Changes</button>' +
+        '</div>';
+
+    document.body.appendChild(overlay);
+}
+
+function closeCustomerEdit() {
+    var el = document.getElementById('customerEditOverlay');
+    if (el) el.remove();
+}
+
+function saveCustomerEdit(id) {
+    var name = document.getElementById('editCustName').value.trim();
+    var phone = document.getElementById('editCustPhone').value.trim();
+    var address = document.getElementById('editCustAddress').value.trim();
+    var errorEl = document.getElementById('editCustError');
+
+    errorEl.textContent = '';
+    if (!name || !phone || !address) { errorEl.textContent = 'All fields are required'; return; }
+
+    authFetch(API + '/customers/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: name, phone: phone, address: address })
+    })
+    .then(function(res) {
+        return res.text().then(function(text) {
+            var data;
+            try { data = JSON.parse(text); }
+            catch (e) { data = { error: text || 'Empty response' }; }
+            return { ok: res.ok, status: res.status, data: data };
+        });
+    })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || ('Error ' + result.status));
+            return;
+        }
+        closeCustomerEdit();
+        showNotification('Customer updated');
+        loadCustomers();
+    })
+    .catch(function(err) {
+        console.error('Edit customer error:', err);
+        errorEl.textContent = 'Network error: ' + err.message;
+    });
+}
+
+function doDeleteCustomer(id) {
+    var customers = window.allCustomers;
+    if (!customers || !customers.length) {
+        authFetch(API + '/customers')
+            .then(function(res) { return res.json(); })
+            .then(function(list) {
+                window.allCustomers = list;
+                var customer = list.find(function(c) { return c.id === id; });
+                if (!customer) { alert('Customer not found.'); return; }
+                confirmAndDeleteCustomer(customer);
+            })
+            .catch(function(err) { alert('Could not load customers: ' + err.message); });
+        return;
+    }
+
+    var customer = customers.find(function(c) { return c.id === id; });
+    if (!customer) { alert('Customer not found'); return; }
+    confirmAndDeleteCustomer(customer);
+}
+
+function confirmAndDeleteCustomer(customer) {
+    if (!confirm('Delete customer "' + customer.name + '"?\n\nThis cannot be undone. Their past orders will remain.')) return;
+
+    authFetch(API + '/customers/' + customer.id, { method: 'DELETE' })
+        .then(function(res) {
+            return res.text().then(function(text) {
+                var data;
+                try { data = JSON.parse(text); }
+                catch (e) { data = { error: text || 'Empty response' }; }
+                return { ok: res.ok, status: res.status, data: data };
+            });
+        })
+        .then(function(result) {
+            if (!result.ok) { alert('❌ ' + (result.data.error || ('Error ' + result.status))); return; }
+            showNotification('Customer deleted');
+            loadCustomers();
+        })
+        .catch(function(err) {
+            console.error('Delete customer error:', err);
+            alert('Network error: ' + err.message);
+        });
+}
+
+// ============================================================
+// ADMIN MANAGEMENT
+// ============================================================
+function loadAdmins() {
+    authFetch(API + '/admins')
+        .then(function(res) { return res.json(); })
+        .then(function(admins) {
+            var container = document.getElementById('adminsList');
+            var countEl = document.getElementById('adminCount');
+            if (countEl) countEl.textContent = '(' + admins.length + ')';
+            if (!container) return;
+
+            if (admins.length === 0) {
+                container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No admins found</p></div>';
+                return;
+            }
+
+            var myId = currentUserId();
+            var html = '<table class="data-table">' +
+                '<thead><tr><th>#</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
+
+            admins.forEach(function(a, i) {
+                var roleClass = 'role-staff';
+                var roleLabel = 'Staff';
+                if (a.role === 'owner') { roleClass = 'role-owner'; roleLabel = 'Owner'; }
+                else if (a.role === 'driver') { roleClass = 'role-driver'; roleLabel = 'Driver'; }
+
+                var isMe = a.id === myId;
+                var deleteBtn = isMe
+                    ? '<span style="color:var(--text-muted);font-size:0.9rem;">(you)</span>'
+                    : '<button onclick="deleteAdmin(' + a.id + ', \'' + a.username.replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>';
+
+                html += '<tr>' +
+                    '<td>' + (i + 1) + '</td>' +
+                    '<td style="font-weight:600;">' + escapeHtml(a.username) + '</td>' +
+                    '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
+                    '<td style="color:var(--text-muted);font-size:0.9rem;">' + (a.created_at || '-') + '</td>' +
+                    '<td>' + deleteBtn + '</td>' +
+                '</tr>';
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        })
+        .catch(function(error) {
+            console.error('Admins load error:', error);
+        });
+}
+
+function createAdmin() {
+    var username = document.getElementById('newAdminUsername').value.trim();
+    var password = document.getElementById('newAdminPassword').value;
+    var role = document.getElementById('newAdminRole').value;
+    var errorEl = document.getElementById('adminFormError');
+
+    errorEl.style.color = 'var(--danger)';
+    errorEl.textContent = '';
+
+    if (!username) { errorEl.textContent = 'Enter a username'; return; }
+    if (username.length < 3) { errorEl.textContent = 'Username must be at least 3 characters'; return; }
+    if (!password || password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters'; return; }
+
+    authFetch(API + '/admins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password, role: role })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
+            return;
+        }
+        errorEl.style.color = 'var(--success)';
+        errorEl.textContent = '✅ Admin "' + username + '" created!';
+        document.getElementById('newAdminUsername').value = '';
+        document.getElementById('newAdminPassword').value = '';
+        document.getElementById('newAdminRole').value = 'staff';
+        loadAdmins();
+        setTimeout(function() { errorEl.textContent = ''; }, 3000);
+    })
+    .catch(function(err) {
+        console.error('Create admin error:', err);
+        errorEl.textContent = 'Network error';
+    });
+}
+
+function deleteAdmin(id, username) {
+    if (!confirm('Delete admin "' + username + '"?\n\nThey will lose access immediately.')) return;
+
+    authFetch(API + '/admins/' + id, { method: 'DELETE' })
+        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+        .then(function(result) {
+            if (!result.ok) {
+                alert('❌ ' + (result.data.error || 'Failed to delete'));
+                return;
+            }
+            showNotification('Admin "' + username + '" deleted');
+            loadAdmins();
+        })
+        .catch(function(err) {
+            console.error('Delete admin error:', err);
+            alert('Network error');
+        });
+}
+
+// ============================================================
+// NOTIFICATIONS (in-app toast)
+// ============================================================
+function showNotification(message) {
+    var existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    var div = document.createElement('div');
+    div.className = 'notification';
+    div.innerHTML = '<i class="fas fa-check-circle"></i> ' + message;
+    document.body.appendChild(div);
+    setTimeout(function() { div.remove(); }, 3000);
+}
 </script>
-<input type="file" id="importJsonFile" accept=".json,application/json" style="display:none;" onchange="importJSONBackup(event)">
 </body>
 </html>
