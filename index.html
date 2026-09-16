@@ -1205,21 +1205,30 @@
                         </div>
                     </div>
 
-                    <div class="filters">
-                        <input type="text" id="searchInput" placeholder="Search by name or order #..." oninput="applyFilters()">
-                        <input type="date" id="dateFrom" onchange="applyFilters()">
-                        <input type="date" id="dateTo" onchange="applyFilters()">
-                        <select id="statusFilter" onchange="applyFilters()">
-                            <option value="all">All statuses</option>
-                            <option value="New">New</option>
-                            <option value="Confirmed">Confirmed</option>
-                            <option value="Preparing">Preparing</option>
-                            <option value="On the Way">On the Way</option>
-                            <option value="Delivered">Delivered</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
-                    </div>
+                   <div class="filters">
+    <input type="text" id="searchInput" placeholder="Search by name or order #..." oninput="applyFilters()">
 
+    <select id="quickDateFilter" onchange="onQuickDateChange()">
+        <option value="all">All time</option>
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="week">Last 7 days</option>
+        <option value="month">This month</option>
+        <option value="custom">Custom date…</option>
+    </select>
+
+    <input type="date" id="customDate" onchange="applyFilters()" style="display:none;">
+
+    <select id="statusFilter" onchange="applyFilters()">
+        <option value="all">All statuses</option>
+        <option value="New">New</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Preparing">Preparing</option>
+        <option value="On the Way">On the Way</option>
+        <option value="Delivered">Delivered</option>
+        <option value="Cancelled">Cancelled</option>
+    </select>
+</div>
                     <div class="orders-header">
                         <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
                         <div class="actions">
@@ -1990,30 +1999,71 @@ function loadOrders() {
         });
 }
 
+function onQuickDateChange() {
+    var val = document.getElementById('quickDateFilter').value;
+    var customInput = document.getElementById('customDate');
+    if (val === 'custom') {
+        customInput.style.display = 'inline-block';
+        customInput.focus();
+        if (customInput.showPicker) customInput.showPicker();
+    } else {
+        customInput.style.display = 'none';
+        customInput.value = '';
+    }
+    applyFilters();
+}
+
 function applyFilters() {
     var search = document.getElementById('searchInput').value.toLowerCase();
     var statusFilter = document.getElementById('statusFilter').value;
-    var dateFrom = document.getElementById('dateFrom').value;
-    var dateTo = document.getElementById('dateTo').value;
+    var quickDate = document.getElementById('quickDateFilter').value;
+    var customDate = document.getElementById('customDate').value;
+
+    var today = new Date();
+    var todayStr = today.toISOString().split('T')[0];
+
+    var rangeStart = null;
+    var rangeEnd = null;
+
+    if (quickDate === 'today') {
+        rangeStart = todayStr;
+        rangeEnd = todayStr;
+    } else if (quickDate === 'yesterday') {
+        var y = new Date(today);
+        y.setDate(y.getDate() - 1);
+        rangeStart = rangeEnd = y.toISOString().split('T')[0];
+    } else if (quickDate === 'week') {
+        var w = new Date(today);
+        w.setDate(w.getDate() - 6);
+        rangeStart = w.toISOString().split('T')[0];
+        rangeEnd = todayStr;
+    } else if (quickDate === 'month') {
+        var m = new Date(today.getFullYear(), today.getMonth(), 1);
+        rangeStart = m.toISOString().split('T')[0];
+        rangeEnd = todayStr;
+    } else if (quickDate === 'custom' && customDate) {
+        rangeStart = customDate;
+        rangeEnd = customDate;
+    }
 
     var filtered = allOrders.filter(function(order) {
         var matchSearch = !search ||
             (order.name && order.name.toLowerCase().includes(search)) ||
             String(order.id).includes(search);
         var matchStatus = statusFilter === 'all' || order.status === statusFilter;
+
         var matchDate = true;
-        if (dateFrom || dateTo) {
+        if (rangeStart && rangeEnd && order.date) {
             var orderDate = new Date(order.date).toISOString().split('T')[0];
-            if (dateFrom && orderDate < dateFrom) matchDate = false;
-            if (dateTo && orderDate > dateTo) matchDate = false;
+            if (orderDate < rangeStart || orderDate > rangeEnd) matchDate = false;
         }
+
         return matchSearch && matchStatus && matchDate;
     });
 
     renderOrders(filtered);
     updateStats(filtered);
 }
-
 function renderOrders(orders) {
     var container = document.getElementById('ordersContainer');
     document.getElementById('orderCount').textContent = '(' + orders.length + ')';
