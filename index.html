@@ -2150,30 +2150,40 @@ window.addEventListener('focus', stopTitleFlash);
 // BEEP
 // ============================================================
 function playBeep() {
-    try {
-        if (!audioCtx) {
-            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        if (audioCtx.state === 'suspended') audioCtx.resume();
+    var ctx = getAudioCtx();
+    if (!ctx) {
+        playFallbackBeep();
+        return;
+    }
 
-        var now = audioCtx.currentTime;
-        var osc = audioCtx.createOscillator();
-        var gain = audioCtx.createGain();
-        osc.type = 'sine';
-        osc.frequency.value = 880;
-        gain.gain.setValueAtTime(0, now);
-        gain.gain.linearRampToValueAtTime(0.2, now + 0.01);
-        gain.gain.linearRampToValueAtTime(0, now + 0.35);
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        osc.start(now);
-        osc.stop(now + 0.35);
-        console.log('🔔 Beep played');
-    } catch (err) {
-        console.warn('Beep failed:', err);
+    if (ctx.state === 'suspended') {
+        ctx.resume().then(function() {
+            actuallyPlayBeep(ctx);
+        }).catch(function() {
+            playFallbackBeep();
+        });
+    } else {
+        actuallyPlayBeep(ctx);
     }
 }
 
+// Fallback: use an <audio> element with a hosted MP3
+var fallbackAudio = null;
+function playFallbackBeep() {
+    try {
+        if (!fallbackAudio) {
+            fallbackAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
+            fallbackAudio.volume = 0.7;
+        }
+        fallbackAudio.currentTime = 0;
+        fallbackAudio.play().catch(function(err) {
+            console.warn('Fallback audio blocked:', err);
+        });
+        console.log('🔔 Fallback beep played');
+    } catch (e) {
+        console.warn('Fallback failed:', e);
+    }
+}
 // ============================================================
 // ORDERS
 // ============================================================
