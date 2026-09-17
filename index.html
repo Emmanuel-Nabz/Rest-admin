@@ -990,6 +990,42 @@
         body.dark .role-owner  { background: rgba(249, 115, 22, 0.22); color: #fdba74; }
         body.dark .role-driver { background: rgba(167, 139, 250, 0.22); color: #c4b5fd; }
         body.dark .role-staff  { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
+        /* ===== PASSWORD EYE TOGGLE ===== */
+.pw-wrap {
+    position: relative;
+    display: block;
+}
+.pw-wrap input {
+    padding-right: 42px !important;
+}
+.pw-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    transition: color 0.15s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+}
+.pw-toggle:hover {
+    color: var(--accent);
+    background: var(--surface-secondary);
+}
+.pw-toggle.showing {
+    color: var(--accent);
+}
+
 /* ===== CONFIRMATION MODAL ===== */
 .confirm-modal {
     position: fixed;
@@ -2123,6 +2159,9 @@ function openChangePassword() {
     document.getElementById('newPwd').value = '';
     document.getElementById('newPwd2').value = '';
     document.getElementById('pwdError').textContent = '';
+
+    // Attach eye toggles to the password fields in this modal
+    attachPasswordEyes();
 }
 
 function closeChangePassword() {
@@ -2405,6 +2444,55 @@ function playFallbackBeep() {
         console.warn('Fallback failed:', e);
     }
 }
+// ============================================================
+// PASSWORD EYE TOGGLE
+// ============================================================
+// Automatically adds a 👁️ toggle to every password input on the page
+function attachPasswordEyes() {
+    var passwordInputs = document.querySelectorAll('input[type="password"]');
+
+    passwordInputs.forEach(function(input) {
+        // Skip if already wrapped
+        if (input.dataset.pwWrapped === '1') return;
+        input.dataset.pwWrapped = '1';
+
+        // Create wrapper
+        var wrap = document.createElement('div');
+        wrap.className = 'pw-wrap';
+
+        // Insert wrapper before input
+        input.parentNode.insertBefore(wrap, input);
+
+        // Move input inside wrapper
+        wrap.appendChild(input);
+
+        // Create eye button
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pw-toggle';
+        btn.title = 'Show password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var isPassword = input.type === 'password';
+
+            input.type = isPassword ? 'text' : 'password';
+
+            btn.classList.toggle('showing', isPassword);
+            btn.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+            btn.title = isPassword ? 'Hide password' : 'Show password';
+        });
+
+        wrap.appendChild(btn);
+    });
+}
+
+// Run on load
+document.addEventListener('DOMContentLoaded', attachPasswordEyes);
+
+// Also run when modals open (they add password fields to the DOM later)
+// We'll call this manually from show functions where needed
 // ============================================================
 // CONFIRMATION DIALOGS
 // ============================================================
