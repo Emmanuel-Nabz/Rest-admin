@@ -2769,18 +2769,32 @@ function deleteOrder(index) {
 }
 
 function clearAllOrders() {
-    if (!confirm('Delete ALL orders? This clears them from the server too.')) return;
-    if (allOrders.length === 0) { showNotification('No orders to clear'); return; }
+    if (allOrders.length === 0) {
+        showNotification('No orders to clear');
+        return;
+    }
 
-    var promises = allOrders.map(function(o) {
-        return authFetch(API + '/orders/' + o.id, { method: 'DELETE' }).catch(function(){});
-    });
-    Promise.all(promises).then(function() {
-        showNotification('All orders cleared');
-        loadOrders();
+    var count = allOrders.length;
+
+    showConfirm({
+        title: 'Delete ALL orders?',
+        message: 'You are about to permanently delete <strong>' + count + ' order' + (count > 1 ? 's' : '') + '</strong> from the server.<br><br><span style="color: var(--danger); font-weight: 600;">This cannot be undone.</span>',
+        iconClass: 'fa-trash-alt',
+        confirmText: 'Delete All',
+        cancelText: 'Keep Orders',
+        requireTyping: 'DELETE'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+
+        var promises = allOrders.map(function(o) {
+            return authFetch(API + '/orders/' + o.id, { method: 'DELETE' }).catch(function(){});
+        });
+        Promise.all(promises).then(function() {
+            showNotification('All orders cleared');
+            loadOrders();
+        });
     });
 }
-
 // ============================================================
 // EXPORT HELPERS + JSON BACKUP / RESTORE
 // ============================================================
