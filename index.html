@@ -1333,48 +1333,23 @@
 <!-- ===== LOGIN PAGE ===== -->
 <div id="loginPage">
     <div class="login-container">
-        <div id="loginView">
-            <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
-            <p class="subtitle">Restaurant Admin Login</p>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="loginUsername" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter password">
-            </div>
-            <button class="login-btn" onclick="login()">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
-            <div id="loginError" class="error-msg"></div>
-            <div class="switch-link">
-                <a href="#" onclick="showRegister(); return false;">Create an account</a>
-            </div>
-        </div>
-
-        <div id="registerView" style="display:none;">
-            <h1><i class="fas fa-user-plus"></i>Create Admin</h1>
-            <p class="subtitle">Set up your admin account</p>
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" id="registerUsername" placeholder="Choose a username">
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" id="registerPassword" placeholder="Min 6 characters">
-            </div>
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" id="registerPassword2" placeholder="Repeat password">
-            </div>
-            <button class="login-btn" onclick="register()">Create Account</button>
-            <div id="registerError" class="error-msg"></div>
-            <div class="switch-link">
-                <a href="#" onclick="showLogin(); return false;">← Back to login</a>
-            </div>
-        </div>
+<div id="loginView">
+    <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
+    <p class="subtitle">Restaurant Admin Login</p>
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUsername" placeholder="Enter username">
     </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter password">
+    </div>
+    <button class="login-btn" onclick="login()">
+        <i class="fas fa-sign-in-alt"></i> Login
+    </button>
+    <div id="loginError" class="error-msg"></div>
+</div>
+      
 </div>
 
 <!-- ===== DASHBOARD ===== -->
@@ -2054,57 +2029,7 @@ function login() {
     });
 }
 
-function register() {
-    var username = document.getElementById('registerUsername').value.trim();
-    var password = document.getElementById('registerPassword').value;
-    var password2 = document.getElementById('registerPassword2').value;
-    var errorEl = document.getElementById('registerError');
 
-    if (!username || !password || !password2) {
-        errorEl.textContent = '❌ Fill all fields';
-        return;
-    }
-    if (password !== password2) {
-        errorEl.textContent = '❌ Passwords do not match';
-        return;
-    }
-    if (password.length < 6) {
-        errorEl.textContent = '❌ Password must be at least 6 characters';
-        return;
-    }
-
-    fetch(API + '/admin/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, password: password })
-    })
-    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Registration failed');
-            return;
-        }
-        errorEl.style.color = '#10b981';
-        errorEl.textContent = '✅ Account created! Redirecting...';
-        setTimeout(showLogin, 1500);
-    })
-    .catch(function(err) {
-        console.error('Register error:', err);
-        errorEl.textContent = '❌ Network error';
-    });
-}
-
-function showRegister() {
-    document.getElementById('loginView').style.display = 'none';
-    document.getElementById('registerView').style.display = 'block';
-}
-
-function showLogin() {
-    document.getElementById('registerView').style.display = 'none';
-    document.getElementById('loginView').style.display = 'block';
-    document.getElementById('registerError').style.color = 'var(--danger)';
-    document.getElementById('registerError').textContent = '';
-}
 
 function doLogout() {
     showConfirm({
