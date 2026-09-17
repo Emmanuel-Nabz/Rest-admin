@@ -2031,6 +2031,12 @@ function login() {
             errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
             return;
         }
+             // Clear any old session data first
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        localStorage.removeItem('adminLoggedIn');
+
+        // Save new token
         localStorage.setItem('adminToken', result.data.token);
         localStorage.setItem('adminUser', result.data.username);
         localStorage.setItem('adminLoggedIn', 'true');
@@ -2131,10 +2137,14 @@ function showDashboard() {
     var adminsTabBtn = document.getElementById('tabAdmins');
     if (adminsTabBtn) adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
 
-     loadOrders();
-    loadMenu();
-    loadCustomers();
-    loadReports();
+     // Small delay to ensure fresh token is in localStorage before fetching
+    setTimeout(function() {
+        loadOrders();
+        loadMenu();
+        loadCustomers();
+        loadReports();
+        loadAdmins();
+    }, 50);
 
     // Auto-refresh reports every 30 seconds
     setInterval(loadReports, 30000);
@@ -3900,6 +3910,22 @@ function loadAdmins() {
         .then(function(res) { return res.json(); })
         .then(function(admins) {
             var container = document.getElementById('adminsList');
+
+            // 🔒 FRONTEND FILTER: hide master accounts from non-master users
+            var amMaster = false;
+            try {
+                var token = localStorage.getItem('adminToken');
+                if (token) {
+                    var payload = JSON.parse(atob(token.split('.')[1]));
+                    amMaster = (payload.is_master === 1);
+                }
+            } catch (e) {}
+
+            if (!amMaster && Array.isArray(admins)) {
+                admins = admins.filter(function(a) {
+                    return a.is_master !== 1 && a.is_master !== '1';
+                });
+            }
             var countEl = document.getElementById('adminCount');
             if (countEl) countEl.textContent = '(' + admins.length + ')';
             if (!container) return;
