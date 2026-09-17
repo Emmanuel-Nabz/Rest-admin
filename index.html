@@ -1697,45 +1697,33 @@
 </div>
 <!-- ===== IMPORT CSV MODAL ===== -->
 <div id="importCsvModal" class="modal-overlay" style="display:none;">
-    <div class="modal-box" style="max-width:500px;display:flex;flex-direction:column;max-height:90vh;padding:0;overflow:hidden;">
-         <button class="modal-close" onclick="closeImportModal()">×</button>
-
-        <div style="overflow-y:auto;flex:1;padding:28px 26px 0 26px;-webkit-overflow-scrolling:touch;">
+    <div class="modal-box" style="max-width:520px;width:100%;">
+        <button class="modal-close" onclick="closeImportModal()">×</button>
         <h2><i class="fas fa-file-import"></i> Import Menu from CSV</h2>
 
-        <div style="background:var(--surface-secondary);border-radius:var(--radius);padding:14px;margin-bottom:16px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">
-            <strong style="color:var(--text);">Expected columns:</strong><br>
-            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">category</code> ·
-            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">name</code> ·
-            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">description</code> ·
-            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">price</code> ·
-            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">is_popular</code> (optional)
+        <div style="background:var(--surface-secondary);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">
+            <strong style="color:var(--text);">Columns:</strong>
+            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">category</code>
+            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">name</code>
+            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">description</code>
+            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">price</code>
+            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">is_popular</code>
         </div>
 
-        <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:16px;cursor:pointer;" onclick="document.getElementById('csvFileInput').click()" id="csvDropZone">
+        <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:18px;text-align:center;margin-bottom:12px;cursor:pointer;" onclick="document.getElementById('csvFileInput').click()" id="csvDropZone">
             <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;" onchange="handleCsvFile(event)">
-            <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;color:var(--accent);margin-bottom:8px;display:block;"></i>
-            <div style="font-weight:600;margin-bottom:4px;">Click to select a CSV file</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">or drag and drop</div>
+            <i class="fas fa-cloud-upload-alt" style="font-size:1.8rem;color:var(--accent);margin-bottom:6px;display:block;"></i>
+            <div style="font-weight:600;font-size:0.9rem;">Click to select a CSV file</div>
         </div>
 
-        <div id="importPreview" style="display:none;margin-bottom:16px;"></div>
-        <div id="importError" style="color:var(--danger);font-size:0.85rem;min-height:20px;margin-bottom:10px;"></div>
+        <div id="importPreview" style="display:none;margin-bottom:12px;"></div>
+        <div id="importError" style="color:var(--danger);font-size:0.85rem;min-height:18px;margin-bottom:8px;"></div>
 
         <div id="importActions" style="display:none;">
-            <button class="modal-btn-primary" onclick="confirmImport()" style="background:var(--success);">
+            <button class="modal-btn-primary" onclick="confirmImport()" style="background:var(--success);" id="importConfirmSticky">
                 <i class="fas fa-check"></i> Import Items
             </button>
-            <button class="btn-cancel" onclick="closeImportModal()" style="width:100%;margin-top:8px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;">Cancel</button>
-        </div>
-
-        </div><!-- end scrollable content -->
-
-        <!-- Sticky footer with buttons that stay visible -->
-        <div style="padding:16px 26px;border-top:1px solid var(--border);background:var(--surface);flex-shrink:0;">
-            <button class="modal-btn-primary" onclick="confirmImport()" style="background:var(--success);width:100%;" id="importConfirmSticky" disabled>
-                <i class="fas fa-check"></i> Import Items
-            </button>
+            <button onclick="closeImportModal()" style="width:100%;margin-top:8px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;font-family:inherit;">Cancel</button>
         </div>
     </div>
 </div>
@@ -3500,7 +3488,6 @@ function parseCsvLine(line) {
     cells.push(current);
     return cells;
 }
-
 function showImportPreview() {
     var preview = document.getElementById('importPreview');
     var categories = {};
@@ -3508,9 +3495,9 @@ function showImportPreview() {
         categories[item.category] = (categories[item.category] || 0) + 1;
     });
 
-    var html = '<div style="background:var(--surface-secondary);border-radius:var(--radius);padding:14px;">' +
-        '<div style="font-weight:700;margin-bottom:8px;">📋 Preview — ' + parsedCsvItems.length + ' items</div>' +
-        '<div style="max-height:200px;overflow-y:auto;font-size:0.85rem;">';
+    var html = '<div style="background:var(--surface-secondary);border-radius:var(--radius);padding:10px 12px;">' +
+        '<div style="font-weight:700;margin-bottom:6px;font-size:0.9rem;">📋 ' + parsedCsvItems.length + ' items ready</div>' +
+        '<div style="max-height:110px;overflow-y:auto;font-size:0.82rem;">';
 
     Object.keys(categories).forEach(function(cat) {
         html += '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span><strong>' + escapeHtml(cat) + '</strong></span><span style="color:var(--text-muted);">' + categories[cat] + ' items</span></div>';
