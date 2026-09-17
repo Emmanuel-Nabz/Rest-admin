@@ -1531,10 +1531,14 @@
 
                 <!-- ===== TAB 2: MENU ===== -->
                 <div id="tabMenuContent" class="tab-content">
-                    <div class="orders-header">
-                        <h2><i class="fas fa-book-open"></i> Menu Management</h2>
-                        <button class="btn" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
-                    </div>
+                   <div class="orders-header">
+    <h2><i class="fas fa-book-open"></i> Menu Management</h2>
+    <div class="actions">
+        <button class="btn" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
+        <button class="btn btn-success" onclick="openImportModal()"><i class="fas fa-file-import"></i> Import CSV</button>
+        <button class="btn btn-danger" onclick="downloadMenuTemplate()"><i class="fas fa-download"></i> Template</button>
+    </div>
+</div>
 
                     <div class="menu-form" id="menuForm">
                         <h3 id="menuFormTitle">Add New Item</h3>
@@ -1689,6 +1693,39 @@
         </div>
         <div id="pwdError" style="color: var(--danger); font-size:0.9rem; min-height:20px; margin-bottom:10px;"></div>
         <button class="modal-btn-primary" onclick="submitChangePassword()">Update Password</button>
+    </div>
+</div>
+<!-- ===== IMPORT CSV MODAL ===== -->
+<div id="importCsvModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box" style="max-width:500px;">
+        <button class="modal-close" onclick="closeImportModal()">×</button>
+        <h2><i class="fas fa-file-import"></i> Import Menu from CSV</h2>
+
+        <div style="background:var(--surface-secondary);border-radius:var(--radius);padding:14px;margin-bottom:16px;font-size:0.88rem;color:var(--text-secondary);line-height:1.6;">
+            <strong style="color:var(--text);">Expected columns:</strong><br>
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">category</code> ·
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">name</code> ·
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">description</code> ·
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">price</code> ·
+            <code style="background:var(--surface);padding:2px 6px;border-radius:4px;">is_popular</code> (optional)
+        </div>
+
+        <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:24px;text-align:center;margin-bottom:16px;cursor:pointer;" onclick="document.getElementById('csvFileInput').click()" id="csvDropZone">
+            <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;" onchange="handleCsvFile(event)">
+            <i class="fas fa-cloud-upload-alt" style="font-size:2.5rem;color:var(--accent);margin-bottom:8px;display:block;"></i>
+            <div style="font-weight:600;margin-bottom:4px;">Click to select a CSV file</div>
+            <div style="font-size:0.82rem;color:var(--text-muted);">or drag and drop</div>
+        </div>
+
+        <div id="importPreview" style="display:none;margin-bottom:16px;"></div>
+        <div id="importError" style="color:var(--danger);font-size:0.85rem;min-height:20px;margin-bottom:10px;"></div>
+
+        <div id="importActions" style="display:none;">
+            <button class="modal-btn-primary" onclick="confirmImport()" style="background:var(--success);">
+                <i class="fas fa-check"></i> Import Items
+            </button>
+            <button class="btn-cancel" onclick="closeImportModal()" style="width:100%;margin-top:8px;padding:12px;border-radius:var(--radius);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-weight:600;">Cancel</button>
+        </div>
     </div>
 </div>
 
@@ -3323,7 +3360,232 @@ function deleteMenuItem(id) {
             alert('Failed to delete item');
         });
 }
+// ============================================================
+// CSV IMPORT
+// ============================================================
+var parsedCsvItems = [];
 
+function openImportModal() {
+    document.getElementById('importCsvModal').style.display = 'flex';
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('importPreview').style.display = 'none';
+    document.getElementById('importActions').style.display = 'none';
+    document.getElementById('importError').textContent = '';
+    parsedCsvItems = [];
+}
+
+function closeImportModal() {
+    document.getElementById('importCsvModal').style.display = 'none';
+    parsedCsvItems = [];
+}
+
+function handleCsvFile(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+        document.getElementById('importError').textContent = '❌ File too large (max 5 MB)';
+        return;
+    }
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            var text = e.target.result;
+            parsedCsvItems = parseCsv(text);
+
+            if (parsedCsvItems.length === 0) {
+                document.getElementById('importError').textContent = '❌ No valid items found in CSV';
+                document.getElementById('importPreview').style.display = 'none';
+                document.getElementById('importActions').style.display = 'none';
+                return;
+            }
+
+            showImportPreview();
+            document.getElementById('importError').textContent = '';
+        } catch (err) {
+            console.error('CSV parse error:', err);
+            document.getElementById('importError').textContent = '❌ Could not parse file: ' + err.message;
+        }
+    };
+    reader.readAsText(file);
+}
+
+function parseCsv(text) {
+    var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
+    if (lines.length < 2) return [];
+
+    // Parse header
+    var headers = parseCsvLine(lines[0]).map(function(h) {
+        return h.toLowerCase().trim().replace(/^["']|["']$/g, '');
+    });
+
+    var idxCategory = headers.indexOf('category');
+    var idxName = headers.indexOf('name');
+    var idxDesc = headers.indexOf('description');
+    var idxPrice = headers.indexOf('price');
+    var idxPopular = headers.indexOf('is_popular');
+
+    if (idxName === -1 || idxPrice === -1) {
+        throw new Error('CSV must have "name" and "price" columns');
+    }
+
+    var items = [];
+    for (var i = 1; i < lines.length; i++) {
+        var cells = parseCsvLine(lines[i]);
+        if (cells.length < 2) continue;
+
+        var name = (cells[idxName] || '').trim();
+        var price = parseFloat((cells[idxPrice] || '').replace(/[^\d.\-]/g, ''));
+
+        if (!name || isNaN(price)) continue;
+
+        items.push({
+            category: idxCategory !== -1 ? (cells[idxCategory] || 'Other').trim() : 'Other',
+            name: name,
+            description: idxDesc !== -1 ? (cells[idxDesc] || '').trim() : '',
+            price: price,
+            is_popular: idxPopular !== -1 ? (cells[idxPopular] || '0').trim() === '1' || (cells[idxPopular] || '').toLowerCase() === 'true' : false
+        });
+    }
+    return items;
+}
+
+function parseCsvLine(line) {
+    var cells = [];
+    var current = '';
+    var inQuotes = false;
+
+    for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+
+        if (inQuotes) {
+            if (ch === '"' && line[i + 1] === '"') {
+                current += '"';
+                i++;
+            } else if (ch === '"') {
+                inQuotes = false;
+            } else {
+                current += ch;
+            }
+        } else {
+            if (ch === '"') {
+                inQuotes = true;
+            } else if (ch === ',') {
+                cells.push(current);
+                current = '';
+            } else {
+                current += ch;
+            }
+        }
+    }
+    cells.push(current);
+    return cells;
+}
+
+function showImportPreview() {
+    var preview = document.getElementById('importPreview');
+    var categories = {};
+    parsedCsvItems.forEach(function(item) {
+        categories[item.category] = (categories[item.category] || 0) + 1;
+    });
+
+    var html = '<div style="background:var(--surface-secondary);border-radius:var(--radius);padding:14px;">' +
+        '<div style="font-weight:700;margin-bottom:8px;">📋 Preview — ' + parsedCsvItems.length + ' items</div>' +
+        '<div style="max-height:200px;overflow-y:auto;font-size:0.85rem;">';
+
+    Object.keys(categories).forEach(function(cat) {
+        html += '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span><strong>' + escapeHtml(cat) + '</strong></span><span style="color:var(--text-muted);">' + categories[cat] + ' items</span></div>';
+    });
+
+    html += '</div></div>';
+    preview.innerHTML = html;
+    preview.style.display = 'block';
+    document.getElementById('importActions').style.display = 'block';
+}
+
+function confirmImport() {
+    if (parsedCsvItems.length === 0) return;
+
+    var btn = document.querySelector('#importActions .modal-btn-primary');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing…';
+
+    authFetch(API + '/menu/bulk', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: parsedCsvItems })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
+
+        if (!result.ok) {
+            document.getElementById('importError').textContent = '❌ ' + (result.data.error || 'Import failed');
+            return;
+        }
+
+        showNotification('✅ Imported ' + result.data.inserted + ' menu items');
+        closeImportModal();
+        loadMenu();
+    })
+    .catch(function(err) {
+        console.error('Import error:', err);
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
+        document.getElementById('importError').textContent = '❌ Network error — try again';
+    });
+}
+
+function downloadMenuTemplate() {
+    var template = 'category,name,description,price,is_popular\n' +
+        'Burgers,Classic Beef Burger,Grilled beef patty with lettuce tomato,3.50,1\n' +
+        'Burgers,Chicken Burger,Crispy chicken fillet with mayo,3.00,0\n' +
+        'Pizzas,Margherita Pizza,Fresh mozzarella and basil,4.00,0\n' +
+        'Drinks,Coca-Cola,Chilled soft drink,0.80,0\n' +
+        'Desserts,Chocolate Cake,Rich chocolate slice,2.50,0\n';
+
+    var blob = new Blob(['\uFEFF' + template], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'nabztech-menu-template.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showNotification('📥 Template downloaded');
+}
+
+// Drag-and-drop support
+document.addEventListener('DOMContentLoaded', function() {
+    var dropZone = document.getElementById('csvDropZone');
+    if (!dropZone) return;
+
+    ['dragenter', 'dragover'].forEach(function(evt) {
+        dropZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            dropZone.style.background = 'var(--accent-soft)';
+            dropZone.style.borderColor = 'var(--accent)';
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(function(evt) {
+        dropZone.addEventListener(evt, function(e) {
+            e.preventDefault();
+            dropZone.style.background = '';
+            dropZone.style.borderColor = 'var(--border)';
+        });
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        var files = e.dataTransfer.files;
+        if (files.length > 0) {
+            document.getElementById('csvFileInput').files = files;
+            handleCsvFile({ target: { files: files } });
+        }
+    });
+});
 // ============================================================
 // CUSTOMERS
 // ============================================================
