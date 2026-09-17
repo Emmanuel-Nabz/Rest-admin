@@ -3589,22 +3589,30 @@ function createAdmin() {
 }
 
 function deleteAdmin(id, username) {
-    if (!confirm('Delete admin "' + username + '"?\n\nThey will lose access immediately.')) return;
+    showConfirm({
+        title: 'Remove this admin?',
+        message: '<strong>' + escapeHtml(username) + '</strong> will lose access to the dashboard immediately.',
+        iconClass: 'fa-user-slash',
+        confirmText: 'Remove Admin',
+        cancelText: 'Cancel'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
 
-    authFetch(API + '/admins/' + id, { method: 'DELETE' })
-        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-        .then(function(result) {
-            if (!result.ok) {
-                alert('❌ ' + (result.data.error || 'Failed to delete'));
-                return;
-            }
-            showNotification('Admin "' + username + '" deleted');
-            loadAdmins();
-        })
-        .catch(function(err) {
-            console.error('Delete admin error:', err);
-            alert('Network error');
-        });
+        authFetch(API + '/admins/' + id, { method: 'DELETE' })
+            .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+            .then(function(result) {
+                if (!result.ok) {
+                    alert('❌ ' + (result.data.error || 'Failed to delete'));
+                    return;
+                }
+                showNotification('Admin "' + username + '" deleted');
+                loadAdmins();
+            })
+            .catch(function(err) {
+                console.error('Delete admin error:', err);
+                alert('Network error');
+            });
+    });
 }
 
 // ============================================================
