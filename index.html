@@ -2754,20 +2754,28 @@ function doUpdateOrderStatus(order, newStatus) {
 function deleteOrder(index) {
     var order = allOrders[index];
     if (!order) return;
-    if (!confirm('Delete this order?')) return;
 
-    authFetch(API + '/orders/' + order.id, { method: 'DELETE' })
-        .then(function(res) { return res.json(); })
-        .then(function() {
-            showNotification('Order deleted');
-            loadOrders();
-        })
-        .catch(function(error) {
-            console.error('❌ Delete error:', error);
-            alert('Failed to delete');
-        });
+    showConfirm({
+        title: 'Delete this order?',
+        message: 'Order <span class="order-ref">#' + order.id + '</span> will be permanently removed from the server.',
+        iconClass: 'fa-trash-alt',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+
+        authFetch(API + '/orders/' + order.id, { method: 'DELETE' })
+            .then(function(res) { return res.json(); })
+            .then(function() {
+                showNotification('Order deleted');
+                loadOrders();
+            })
+            .catch(function(error) {
+                console.error('❌ Delete error:', error);
+                alert('Failed to delete');
+            });
+    });
 }
-
 function clearAllOrders() {
     if (allOrders.length === 0) {
         showNotification('No orders to clear');
