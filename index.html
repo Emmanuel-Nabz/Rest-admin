@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard — Nabz-Tech Eats</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <link rel="manifest" href="manifest.json">
+   
    <style>
         /* ===== CSS Variables: Light & Dark Themes ===== */
         :root {
@@ -1635,36 +1635,58 @@
                         <button class="btn" onclick="loadAdmins()"><i class="fas fa-sync"></i> Refresh</button>
                     </div>
 
-                    <div class="menu-form">
-                        <h3><i class="fas fa-user-plus"></i> Add New Admin</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Username</label>
-                                <input type="text" id="newAdminUsername" placeholder="e.g. ali">
-                            </div>
-                            <div class="form-group">
-                                <label>Password</label>
-                                <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Role</label>
-                                <select id="newAdminRole">
-                                    <option value="staff">Staff (manage orders)</option>
-                                    <option value="driver">Driver (delivery only)</option>
-                                    <option value="owner">Owner (full access)</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="display:flex; align-items:flex-end;">
-                                <button class="btn-save" onclick="createAdmin()">
-                                    <i class="fas fa-user-plus"></i> Create Admin
-                                </button>
-                            </div>
-                        </div>
-                        <div id="adminFormError" style="color: var(--danger); margin-top:10px; font-size:0.9rem; min-height:20px;"></div>
-                    </div>
+                   <div class="menu-form">
+    <h3><i class="fas fa-user-plus"></i> Add New Admin</h3>
+    <div class="form-row">
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="newAdminUsername" placeholder="e.g. ali">
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>Role</label>
+            <select id="newAdminRole">
+                <option value="staff">Staff (manage orders)</option>
+                <option value="driver">Driver (delivery only)</option>
+                <option value="owner">Owner (full access)</option>
+            </select>
+        </div>
+        <div class="form-group" style="display:flex; align-items:flex-end;">
+            <button class="btn-save" onclick="createAdmin()">
+                <i class="fas fa-user-plus"></i> Create Admin
+            </button>
+        </div>
+    </div>
 
+    <!-- Trial account toggle -->
+    <div class="form-row">
+        <div class="form-group form-row-full">
+            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--accent-soft);border-radius:8px;border:1px dashed var(--accent);">
+                <input type="checkbox" id="newAdminIsTrial" onchange="toggleTrialDays()" style="width:auto;margin:0;cursor:pointer;">
+                <span style="font-weight:600;color:var(--accent);">⏳ Trial account</span>
+                <span style="font-weight:400;color:var(--text-secondary);font-size:0.85em;">(auto-expires after N days)</span>
+            </label>
+        </div>
+    </div>
+
+    <!-- Trial duration (hidden by default) -->
+    <div class="form-row" id="trialDaysRow" style="display:none;">
+        <div class="form-group form-row-full">
+            <label>Trial duration (days)</label>
+            <input type="number" id="newAdminTrialDays" value="30" min="1" max="365">
+            <div style="font-size:0.82em;color:var(--text-muted);margin-top:6px;">
+                After this many days, the account will be blocked until upgraded to a paid account.
+            </div>
+        </div>
+    </div>
+
+    <div id="adminFormError" style="color: var(--danger); margin-top:10px; font-size:0.9rem; min-height:20px;"></div>
+</div>
                     <div class="menu-list" id="adminsList">
                         <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading admins...</p>
                     </div>
@@ -3891,11 +3913,35 @@ function loadAdmins() {
             var html = '<table class="data-table">' +
                 '<thead><tr><th>#</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
 
-            admins.forEach(function(a, i) {
+             admins.forEach(function(a, i) {
                 var roleClass = 'role-staff';
                 var roleLabel = 'Staff';
                 if (a.role === 'owner') { roleClass = 'role-owner'; roleLabel = 'Owner'; }
                 else if (a.role === 'driver') { roleClass = 'role-driver'; roleLabel = 'Driver'; }
+
+                // Trial badge
+                var trialBadge = '';
+                if (a.is_trial === 1 || a.is_trial === '1') {
+                    var trialText = 'Trial';
+                    var trialStyle = 'background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;';
+
+                    if (a.trial_ends_at) {
+                        var endsAt = new Date(a.trial_ends_at);
+                        var now = new Date();
+                        var daysLeft = Math.ceil((endsAt - now) / (1000 * 60 * 60 * 24));
+
+                        if (daysLeft < 0) {
+                            trialText = 'Expired';
+                            trialStyle = 'background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;';
+                        } else if (daysLeft <= 3) {
+                            trialText = daysLeft + 'd left';
+                            trialStyle = 'background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;';
+                        } else {
+                            trialText = daysLeft + 'd trial';
+                        }
+                    }
+                    trialBadge = ' <span style="' + trialStyle + '">' + trialText + '</span>';
+                }
 
                 var isMe = a.id === myId;
                 var deleteBtn = isMe
@@ -3904,7 +3950,7 @@ function loadAdmins() {
 
                 html += '<tr>' +
                     '<td>' + (i + 1) + '</td>' +
-                    '<td style="font-weight:600;">' + escapeHtml(a.username) + '</td>' +
+                    '<td style="font-weight:600;">' + escapeHtml(a.username) + trialBadge + '</td>' +
                     '<td><span class="role-badge ' + roleClass + '">' + roleLabel + '</span></td>' +
                     '<td style="color:var(--text-muted);font-size:0.9rem;">' + (a.created_at || '-') + '</td>' +
                     '<td>' + deleteBtn + '</td>' +
@@ -3919,10 +3965,20 @@ function loadAdmins() {
         });
 }
 
+// ============================================================
+// TRIAL TOGGLE
+// ============================================================
+function toggleTrialDays() {
+    var isTrial = document.getElementById('newAdminIsTrial').checked;
+    document.getElementById('trialDaysRow').style.display = isTrial ? '' : 'none';
+}
+
 function createAdmin() {
     var username = document.getElementById('newAdminUsername').value.trim();
     var password = document.getElementById('newAdminPassword').value;
     var role = document.getElementById('newAdminRole').value;
+    var isTrial = document.getElementById('newAdminIsTrial').checked;
+    var trialDays = parseInt(document.getElementById('newAdminTrialDays').value) || 30;
     var errorEl = document.getElementById('adminFormError');
 
     errorEl.style.color = 'var(--danger)';
@@ -3931,11 +3987,23 @@ function createAdmin() {
     if (!username) { errorEl.textContent = 'Enter a username'; return; }
     if (username.length < 3) { errorEl.textContent = 'Username must be at least 3 characters'; return; }
     if (!password || password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters'; return; }
+    if (isTrial && (trialDays < 1 || trialDays > 365)) {
+        errorEl.textContent = 'Trial days must be between 1 and 365';
+        return;
+    }
+
+    var payload = {
+        username: username,
+        password: password,
+        role: role,
+        is_trial: isTrial ? 1 : 0
+    };
+    if (isTrial) payload.trial_days = trialDays;
 
     authFetch(API + '/admins', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: username, password: password, role: role })
+        body: JSON.stringify(payload)
     })
     .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
@@ -3944,10 +4012,14 @@ function createAdmin() {
             return;
         }
         errorEl.style.color = 'var(--success)';
-        errorEl.textContent = '✅ Admin "' + username + '" created!';
+        errorEl.textContent = '✅ Admin "' + username + '" created!' +
+            (isTrial ? ' (trial: ' + trialDays + ' days)' : '');
         document.getElementById('newAdminUsername').value = '';
         document.getElementById('newAdminPassword').value = '';
         document.getElementById('newAdminRole').value = 'staff';
+        document.getElementById('newAdminIsTrial').checked = false;
+        document.getElementById('newAdminTrialDays').value = 30;
+        toggleTrialDays();
         loadAdmins();
         setTimeout(function() { errorEl.textContent = ''; }, 3000);
     })
