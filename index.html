@@ -3369,26 +3369,37 @@ function doDeleteCustomer(id) {
 }
 
 function confirmAndDeleteCustomer(customer) {
-    if (!confirm('Delete customer "' + customer.name + '"?\n\nThis cannot be undone. Their past orders will remain.')) return;
+    showConfirm({
+        title: 'Delete this customer?',
+        message: '<strong>' + escapeHtml(customer.name) + '</strong> (' + escapeHtml(customer.phone) + ') will be permanently removed.<br><br>Their past orders will remain.',
+        iconClass: 'fa-user-times',
+        confirmText: 'Delete Customer',
+        cancelText: 'Cancel'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
 
-    authFetch(API + '/customers/' + customer.id, { method: 'DELETE' })
-        .then(function(res) {
-            return res.text().then(function(text) {
-                var data;
-                try { data = JSON.parse(text); }
-                catch (e) { data = { error: text || 'Empty response' }; }
-                return { ok: res.ok, status: res.status, data: data };
+        authFetch(API + '/customers/' + customer.id, { method: 'DELETE' })
+            .then(function(res) {
+                return res.text().then(function(text) {
+                    var data;
+                    try { data = JSON.parse(text); }
+                    catch (e) { data = { error: text || 'Empty response' }; }
+                    return { ok: res.ok, status: res.status, data: data };
+                });
+            })
+            .then(function(result) {
+                if (!result.ok) {
+                    alert('❌ ' + (result.data.error || ('Error ' + result.status)));
+                    return;
+                }
+                showNotification('Customer deleted');
+                loadCustomers();
+            })
+            .catch(function(err) {
+                console.error('Delete customer error:', err);
+                alert('Network error: ' + err.message);
             });
-        })
-        .then(function(result) {
-            if (!result.ok) { alert('❌ ' + (result.data.error || ('Error ' + result.status))); return; }
-            showNotification('Customer deleted');
-            loadCustomers();
-        })
-        .catch(function(err) {
-            console.error('Delete customer error:', err);
-            alert('Network error: ' + err.message);
-        });
+    });
 }
 // ============================================================
 // DRIVER REPORTS
