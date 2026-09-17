@@ -1075,6 +1075,10 @@
     font-size: 1.8em;
     color: var(--danger);
 }
+.confirm-modal-icon.neutral {
+    background: rgba(107, 114, 128, 0.15);
+    color: var(--text-secondary);
+}
 
 .confirm-modal-box h3 {
     font-size: 1.15rem;
@@ -2103,16 +2107,26 @@ function showLogin() {
 }
 
 function doLogout() {
-    if (!confirm('Logout?')) return;
-    localStorage.removeItem('adminToken');
-    localStorage.removeItem('adminUser');
-    localStorage.removeItem('adminLoggedIn');
-    if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
-    document.getElementById('dashboardPage').style.display = 'none';
-    document.getElementById('loginPage').style.display = 'flex';
-    document.getElementById('loginPassword').value = '';
-}
+    showConfirm({
+        title: 'Log out?',
+        message: 'You will be signed out of the admin dashboard.',
+              iconClass: 'fa-sign-out-alt',
+        iconVariant: 'neutral',
+        confirmText: 'Log Out',
+        cancelText: 'Stay Signed In'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
 
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        localStorage.removeItem('adminLoggedIn');
+        if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
+
+        document.getElementById('dashboardPage').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('loginPassword').value = '';
+    });
+}
 function showDashboard() {
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('dashboardPage').style.display = 'block';
@@ -2591,7 +2605,7 @@ function showConfirm(options) {
 
         overlay.innerHTML =
             '<div class="confirm-modal-box">' +
-                '<div class="confirm-modal-icon">' +
+                              '<div class="confirm-modal-icon' + (options.iconVariant === 'neutral' ? ' neutral' : '') + '">' +
                     '<i class="fas ' + iconClass + '"></i>' +
                 '</div>' +
                 '<h3>' + (options.title || 'Are you sure?') + '</h3>' +
