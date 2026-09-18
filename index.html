@@ -1360,13 +1360,80 @@ function unlockAudio() {
 ['click', 'keydown', 'touchstart'].forEach(function(evt) {
     document.addEventListener(evt, unlockAudio, { passive: true });
 });
-function playBeep() {
+// ============================================================
+// SOUND LIBRARY — different tones for different events
+// ============================================================
+function playSound(type) {
     var ctx = getAudioCtx();
-    if (!ctx) return;
+    if (!ctx) {
+        playFallbackBeep();
+        return;
+    }
+
     if (ctx.state === 'suspended') {
-        ctx.resume().then(function() { actuallyPlayBeep(ctx); }).catch(function(){});
+        ctx.resume().then(function() {
+            actuallyPlaySound(ctx, type);
+        }).catch(function() {
+            playFallbackBeep();
+        });
     } else {
-        actuallyPlayBeep(ctx);
+        actuallyPlaySound(ctx, type);
+    }
+}
+
+function actuallyPlaySound(ctx, type) {
+    try {
+        var now = ctx.currentTime;
+
+        // Sound recipes — each is an array of { freq, start, dur, vol }
+        var sounds = {
+            // 🆕 New order — friendly rising "ding-dong"
+            newOrder: [
+                { freq: 880,  start: 0.00, dur: 0.15, vol: 0.3 },
+                { freq: 1320, start: 0.18, dur: 0.20, vol: 0.3 }
+            ],
+            // ⚠️ Driver report — urgent three-tone descending
+            driverReport: [
+                { freq: 660, start: 0.00, dur: 0.15, vol: 0.35 },
+                { freq: 520, start: 0.18, dur: 0.15, vol: 0.35 },
+                { freq: 400, start: 0.36, dur: 0.30, vol: 0.35 }
+            ],
+            // ❌ Order cancelled — low serious tone
+            cancelled: [
+                { freq: 300, start: 0.00, dur: 0.40, vol: 0.3 }
+            ],
+            // ✅ Delivered — cheerful high ding
+            delivered: [
+                { freq: 1500, start: 0.00, dur: 0.25, vol: 0.25 }
+            ],
+            // 💰 Cash order — two quick high beeps
+            cash: [
+                { freq: 1800, start: 0.00, dur: 0.08, vol: 0.3 },
+                { freq: 1800, start: 0.12, dur: 0.08, vol: 0.3 }
+            ]
+        };
+
+        var notes = sounds[type] || sounds.newOrder;
+
+        notes.forEach(function(note) {
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = note.freq;
+            var s = now + note.start;
+            var e = s + note.dur;
+            gain.gain.setValueAtTime(0, s);
+            gain.gain.linearRampToValueAtTime(note.vol, s + 0.01);
+            gain.gain.linearRampToValueAtTime(0, e);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(s);
+            osc.stop(e);
+        });
+
+        console.log('🔔 Sound played:', type);
+    } catch (e) {
+        console.error('❌ Sound failed:', e);
     }
 }
 function actuallyPlayBeep(ctx) {
@@ -1802,7 +1869,7 @@ function loadOrders() {
 
             if (lastOrderCount > 0 && allOrders.length > lastOrderCount) {
                 var newCount = allOrders.length - lastOrderCount;
-                playBeep();
+                playSound('newOrder');
                 showNotification(newCount === 1 ? 'New order received!' : newCount + ' new orders received!');
                 var latest = allOrders[0];
                 sendBrowserNotification(
@@ -2029,6 +2096,8 @@ function doUpdateOrderStatus(order, newStatus) {
     .then(function(res) { return res.json(); })
     .then(function() {
         showNotification('Order #' + order.id + ' → ' + newStatus);
+        if (newStatus === 'Cancelled') playSound('cancelled');
+        if (newStatus === 'Delivered') playSound('delivered');
         loadOrders();
     })
     .catch(function(error) { alert('Failed to update status'); });
@@ -2653,6 +2722,13 @@ function loadReports() {
         .then(function(res) { return res.json(); })
         .then(function(reports) {
             reports = Array.isArray(reports) ? reports : [];
+                        // Play sound for new reports
+            var prevReportCount = window._lastReportCount;
+            if (prevReportCount !== undefined && reports.length > prevReportCount) {
+                playSound('driverReport');
+                showNotification('⚠️ New driver report!');
+            }
+            window._lastReportCount = reports.length;
             var container = document.getElementById('reportsContainer');
             var countEl = document.getElementById('reportCount');
             var badgeEl = document.getElementById('reportsBadge');
