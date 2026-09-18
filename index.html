@@ -446,15 +446,61 @@
         #exportMenu .menu-item-success { color: var(--success); font-weight: 600; }
         #exportMenu .menu-item-info { color: var(--info); font-weight: 600; }
 
-        /* ORDER CARD */
-        .order-card {
-            background: var(--surface);
-            border-radius: var(--radius);
-            padding: 18px 20px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border);
-            border-left: 4px solid var(--accent);
-        }
+        /* ORDER CARD — two-column layout */
+.order-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+.order-card .order-header,
+.order-card .order-actions,
+.order-card .order-total {
+    grid-column: 1 / -1;
+}
+.order-card .order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+.order-card .order-id { font-weight: 700; color: var(--text); font-size: 1rem; }
+.order-card .order-status {
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 14px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+}
+.order-card .order-details {
+    margin: 6px 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.order-card .order-details i { width: 18px; color: var(--text-muted); text-align: center; font-size: 0.9rem; }
+.order-card .order-total { font-weight: 700; color: var(--success); font-size: 1.15rem; margin-top: 0; }
+.order-card .order-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0; }
+.order-card .btn { padding: 7px 16px; font-size: 0.88rem; border-radius: var(--radius-sm); }
+
+/* Mobile — stack back to single column */
+@media (max-width: 768px) {
+    .order-card { grid-template-columns: 1fr; }
+}
+       
         .order-card .order-header {
             display: flex;
             justify-content: space-between;
@@ -624,29 +670,28 @@
         body.dark .role-staff { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
 
         /* PASSWORD EYE */
-        .pw-wrap { position: relative; display: block; }
-        .pw-wrap input { padding-right: 42px !important; }
-        .pw-toggle {
-            position: absolute;
-            top: 50%;
-            right: 12px;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px;
-            font-size: 1rem;
-            color: var(--text-muted);
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .pw-toggle:hover { color: var(--accent); background: var(--surface-secondary); }
-        .pw-toggle.showing { color: var(--accent); }
-
+.pw-wrap { position: relative; display: block; }
+.pw-wrap input { padding-right: 42px !important; }
+.pw-toggle {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    font-size: 1rem;
+    color: var(--text-muted);
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pw-toggle:hover { color: var(--accent); background: var(--surface-secondary); }
+.pw-toggle.showing { color: var(--accent); }
         /* CONFIRM MODAL */
         .confirm-modal {
             position: fixed;
@@ -1617,6 +1662,9 @@ function openChangePassword() {
     document.getElementById('newPwd').value = '';
     document.getElementById('newPwd2').value = '';
     document.getElementById('pwdError').textContent = '';
+    
+    // Attach eye toggles
+    attachPasswordEyes();
 }
 function closeChangePassword() {
     document.getElementById('changePasswordModal').style.display = 'none';
@@ -1878,40 +1926,51 @@ function renderOrders(orders) {
                 '<span style="color: var(--danger); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-times-circle"></i> Cancelled</span>' +
                 '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
         }
+html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
 
-        html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
-            '<div class="order-header">' +
-                '<span class="order-id">Order #' + order.id + '</span>' +
-                '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
-            '</div>' +
-            '<div class="order-details"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
-            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
-            (order.driver_name ?
-                '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
-                : '') +
-            (order.items && order.items.length > 0 ?
-                '<div style="margin: 10px 0 4px;">' +
-                    '<button onclick="toggleItems(' + order.id + ')" ' +
-                        'style="background:none;border:none;color:var(--info);cursor:pointer;font-size:0.85rem;padding:4px 0;font-family:inherit;">' +
-                        '<i class="fas fa-chevron-down" id="itemsChevron' + order.id + '" style="transition:transform 0.2s;"></i> ' +
-                        'View ' + order.items.length + ' item' + (order.items.length > 1 ? 's' : '') +
-                    '</button>' +
-                    '<div id="itemsBox' + order.id + '" style="display:none; margin-top:8px; padding:10px 12px; background:var(--surface-secondary); border-radius:6px; font-size:0.88rem;">' +
-                        order.items.map(function(it) {
-                            return '<div style="display:flex;justify-content:space-between;padding:3px 0;">' +
-                                '<span>' + escapeHtml(it.quantity) + '× ' + escapeHtml(it.item_name) + '</span>' +
-                                '<span style="color:var(--text-secondary);">BD ' + (parseFloat(it.price) * it.quantity).toFixed(2) + '</span>' +
-                            '</div>';
-                        }).join('') +
-                    '</div>' +
-                '</div>'
-                : '') +
-            '<div class="order-total">BD ' + order.total.toFixed(2) + '</div>' +
-            '<div class="order-actions">' + actionButtons + '</div>' +
-        '</div>';
+    // HEADER (spans full width)
+    '<div class="order-header">' +
+        '<span class="order-id">Order #' + order.id + '</span>' +
+        '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
+    '</div>' +
+
+    // LEFT COLUMN: customer info
+    '<div class="order-info">' +
+        '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
+        '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
+        '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
+        '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
+        (order.driver_name ?
+            '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
+            : '') +
+        '<div class="order-details" style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
+    '</div>' +
+
+    // RIGHT COLUMN: items summary
+    '<div class="order-summary" style="background:var(--surface-secondary);border-radius:var(--radius);padding:12px 14px;">' +
+        '<div style="font-weight:600;font-size:0.85rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">' +
+            '<i class="fas fa-utensils"></i> Order Items' +
+        '</div>' +
+        (order.items && order.items.length > 0 ?
+            order.items.map(function(it) {
+                var lineTotal = parseFloat(it.price) * it.quantity;
+                return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);font-size:0.9rem;">' +
+                    '<span><strong style="color:var(--accent);">' + escapeHtml(it.quantity) + '×</strong> ' + escapeHtml(it.item_name) + '</span>' +
+                    '<span style="color:var(--text-secondary);white-space:nowrap;">BD ' + lineTotal.toFixed(2) + '</span>' +
+                '</div>';
+            }).join('') +
+            '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
+                '<span>Total</span>' +
+                '<span>BD ' + order.total.toFixed(2) + '</span>' +
+            '</div>'
+            : '<div style="color:var(--text-muted);font-size:0.9rem;padding:6px 0;">No items recorded</div>'
+        ) +
+    '</div>' +
+
+    // ACTIONS (spans full width)
+    '<div class="order-actions">' + actionButtons + '</div>' +
+
+'</div>';
     });
     container.innerHTML = html;
 }
@@ -2817,7 +2876,41 @@ function submitAssignDriver() {
     })
     .catch(function(err) { errorEl.textContent = 'Network error'; });
 }
+// ============================================================
+// PASSWORD EYE TOGGLE
+// ============================================================
+function attachPasswordEyes() {
+    var passwordInputs = document.querySelectorAll('input[type="password"]');
+    passwordInputs.forEach(function(input) {
+        if (input.dataset.pwWrapped === '1') return;
+        input.dataset.pwWrapped = '1';
 
+        var wrap = document.createElement('div');
+        wrap.className = 'pw-wrap';
+        input.parentNode.insertBefore(wrap, input);
+        wrap.appendChild(input);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'pw-toggle';
+        btn.title = 'Show password';
+        btn.innerHTML = '<i class="fas fa-eye"></i>';
+
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            btn.classList.toggle('showing', isPassword);
+            btn.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
+            btn.title = isPassword ? 'Hide password' : 'Show password';
+        });
+
+        wrap.appendChild(btn);
+    });
+}
+
+// Run on load and after modals open
+document.addEventListener('DOMContentLoaded', attachPasswordEyes);
 // ============================================================
 // NOTIFICATION TOAST
 // ============================================================
