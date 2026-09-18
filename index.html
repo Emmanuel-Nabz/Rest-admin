@@ -1333,25 +1333,23 @@
 <!-- ===== LOGIN PAGE ===== -->
 <div id="loginPage">
     <div class="login-container">
-<div id="loginView">
-    <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
-    <p class="subtitle">Restaurant Admin Login</p>
-    <div class="form-group">
-        <label>Username</label>
-        <input type="text" id="loginUsername" placeholder="Enter username">
+        <div id="loginView">
+            <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
+            <p class="subtitle">Restaurant Admin Login</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="loginUsername" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" placeholder="Enter password">
+            </div>
+            <button class="login-btn" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+            <div id="loginError" class="error-msg"></div>
     </div>
-    <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="loginPassword" placeholder="Enter password">
-    </div>
-    <button class="login-btn" onclick="login()">
-        <i class="fas fa-sign-in-alt"></i> Login
-    </button>
-    <div id="loginError" class="error-msg"></div>
 </div>
-      
-</div>
-
 <!-- ===== DASHBOARD ===== -->
 <div id="dashboardPage">
     <div class="layout">
