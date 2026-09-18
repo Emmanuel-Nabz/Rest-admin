@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard — Nabz-Tech Eats</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   
-   <style>
-        /* ===== CSS Variables: Light & Dark Themes ===== */
+    <style>
         :root {
             --bg: #f5f6f8;
             --surface: #ffffff;
@@ -31,10 +29,6 @@
             --radius-sm: 6px;
             --radius: 8px;
             --radius-lg: 12px;
-            --font-size-base: 15px;
-            --font-size-lg: 16px;
-            --font-size-xl: 18px;
-            --font-size-2xl: 22px;
         }
 
         body.dark {
@@ -53,10 +47,6 @@
             --danger: #f87171;
             --info: #60a5fa;
             --purple: #a78bfa;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-            --shadow: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-            --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -65,13 +55,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
-            font-size: var(--font-size-base);
+            font-size: 15px;
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             transition: background 0.25s, color 0.25s;
         }
 
-        /* ===== LOGIN ===== */
+        /* LOGIN */
         #loginPage {
             display: flex;
             align-items: center;
@@ -79,12 +69,8 @@
             min-height: 100vh;
             padding: 20px;
             background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-            transition: background 0.25s;
         }
-
-        body.dark #loginPage {
-            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
-        }
+        body.dark #loginPage { background: linear-gradient(135deg, #0f172a 0%, #020617 100%); }
 
         .login-container {
             background: var(--surface);
@@ -95,27 +81,20 @@
             max-width: 420px;
             text-align: center;
             border: 1px solid var(--border);
-            transition: background 0.25s, border-color 0.25s;
         }
-
         .login-container h1 {
-            font-size: var(--font-size-2xl);
+            font-size: 22px;
             font-weight: 700;
             color: var(--text);
             margin-bottom: 6px;
-            letter-spacing: -0.02em;
         }
-
         .login-container h1 i { color: var(--accent); margin-right: 8px; }
-
         .login-container .subtitle {
             color: var(--text-secondary);
             margin-bottom: 28px;
             font-size: 1rem;
         }
-
         .form-group { margin-bottom: 18px; text-align: left; }
-
         .form-group label {
             display: block;
             font-weight: 500;
@@ -123,7 +102,6 @@
             margin-bottom: 7px;
             font-size: 0.95rem;
         }
-
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -134,10 +112,8 @@
             font-size: 1rem;
             background: var(--surface-secondary);
             color: var(--text);
-            transition: border-color 0.15s, box-shadow 0.15s, background 0.25s;
             font-family: inherit;
         }
-
         .form-group input:focus,
         .form-group select:focus,
         .form-group textarea:focus {
@@ -145,7 +121,6 @@
             outline: none;
             box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.18);
         }
-
         .login-btn {
             width: 100%;
             padding: 12px;
@@ -156,14 +131,9 @@
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background 0.15s, transform 0.1s;
             font-family: inherit;
         }
-
         .login-btn:hover { background: var(--accent-hover); }
-        .login-btn:active { transform: scale(0.99); }
-        .login-btn i { margin-right: 6px; }
-
         .error-msg {
             color: var(--danger);
             font-size: 0.9rem;
@@ -171,26 +141,11 @@
             margin-top: 12px;
         }
 
-        .switch-link { text-align: center; margin-top: 18px; }
-
-        .switch-link a {
-            color: var(--accent);
-            font-size: 0.9rem;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .switch-link a:hover { text-decoration: underline; }
-
-        /* ===== DASHBOARD LAYOUT ===== */
+        /* DASHBOARD */
         #dashboardPage { display: none; }
+        .layout { display: flex; min-height: 100vh; }
 
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== SIDEBAR ===== */
+        /* SIDEBAR */
         .sidebar {
             width: 250px;
             background: var(--surface);
@@ -198,39 +153,23 @@
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 0;
-            bottom: 0;
-            left: 0;
+            top: 0; bottom: 0; left: 0;
             z-index: 100;
-            transition: transform 0.25s ease, background 0.25s, border-color 0.25s;
         }
-
         .sidebar-header {
             padding: 22px 20px 18px;
             border-bottom: 1px solid var(--border);
         }
-
         .sidebar-header h1 {
             font-size: 1.15rem;
             font-weight: 700;
             color: var(--text);
-            letter-spacing: -0.01em;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-
-        .sidebar-header h1 i {
-            color: var(--accent);
-            font-size: 1.4rem;
-        }
-
-        .sidebar-nav {
-            flex: 1;
-            padding: 14px 10px;
-            overflow-y: auto;
-        }
-
+        .sidebar-header h1 i { color: var(--accent); font-size: 1.4rem; }
+        .sidebar-nav { flex: 1; padding: 14px 10px; overflow-y: auto; }
         .nav-item {
             display: flex;
             align-items: center;
@@ -241,7 +180,6 @@
             font-weight: 500;
             font-size: 1rem;
             cursor: pointer;
-            transition: background 0.12s, color 0.12s;
             border: none;
             background: none;
             width: 100%;
@@ -249,33 +187,20 @@
             margin-bottom: 3px;
             font-family: inherit;
         }
-
         .nav-item:hover { background: var(--surface-secondary); color: var(--text); }
+        .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+        .nav-item i { width: 22px; text-align: center; font-size: 1.15rem; }
 
-        .nav-item.active {
-            background: var(--accent-soft);
-            color: var(--accent);
-            font-weight: 600;
+        #reportsBadge { animation: badgePulse 1.5s infinite; }
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
         }
 
-        .nav-item i {
-            width: 22px;
-            text-align: center;
-            font-size: 1.15rem;
-        }
-#reportsBadge {
-    animation: badgePulse 1.5s infinite;
-}
-
-@keyframes badgePulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.15); }
-}
         .sidebar-footer {
             padding: 16px 14px;
             border-top: 1px solid var(--border);
         }
-
         .user-chip {
             display: flex;
             align-items: center;
@@ -284,9 +209,7 @@
             border-radius: var(--radius);
             background: var(--surface-secondary);
             margin-bottom: 10px;
-            transition: background 0.25s;
         }
-
         .user-chip .avatar {
             width: 36px;
             height: 36px;
@@ -298,27 +221,17 @@
             justify-content: center;
             font-weight: 600;
             font-size: 1rem;
-            flex-shrink: 0;
         }
-
-        .user-chip .user-info-mini {
-            flex: 1;
-            min-width: 0;
-        }
-
+        .user-chip .user-info-mini { flex: 1; min-width: 0; }
         .user-chip .user-name {
             font-weight: 600;
             font-size: 0.95rem;
             color: var(--text);
-            white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            white-space: nowrap;
         }
-
-        .user-chip .user-role {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
+        .user-chip .user-role { font-size: 0.8rem; color: var(--text-secondary); }
 
         .sidebar-btn {
             display: flex;
@@ -334,23 +247,14 @@
             cursor: pointer;
             width: 100%;
             margin-bottom: 7px;
-            transition: background 0.12s, border-color 0.25s;
             font-family: inherit;
         }
-
         .sidebar-btn:hover { background: var(--surface-secondary); }
-
         .sidebar-btn.logout { color: var(--danger); }
-
         .sidebar-btn.logout:hover { background: rgba(239, 68, 68, 0.1); }
 
-        /* ===== MAIN ===== */
-        .main {
-            flex: 1;
-            margin-left: 250px;
-            min-width: 0;
-        }
-
+        /* MAIN */
+        .main { flex: 1; margin-left: 250px; min-width: 0; }
         .main-header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
@@ -362,25 +266,11 @@
             position: sticky;
             top: 0;
             z-index: 50;
-            transition: background 0.25s, border-color 0.25s;
         }
-
-        .main-header h2 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.01em;
-        }
-
-        .main-header .subtitle {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-top: 3px;
-        }
-
+        .main-header h2 { font-size: 1.35rem; font-weight: 700; color: var(--text); }
+        .main-header .subtitle { font-size: 0.9rem; color: var(--text-secondary); margin-top: 3px; }
         .main-content { padding: 28px 32px 60px; }
 
-        /* ===== THEME TOGGLE BUTTON ===== */
         .theme-toggle-btn {
             display: flex;
             align-items: center;
@@ -393,22 +283,11 @@
             cursor: pointer;
             font-size: 0.9rem;
             font-weight: 500;
-            transition: background 0.15s, border-color 0.25s, color 0.25s;
             font-family: inherit;
-            white-space: nowrap;
         }
+        .theme-toggle-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
-        .theme-toggle-btn:hover {
-            background: var(--accent-soft);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .theme-toggle-btn i {
-            font-size: 1.05rem;
-        }
-
-        /* ===== TRIAL BANNER ===== */
+        /* TRIAL BANNER */
         #trialBanner {
             display: none;
             background: linear-gradient(135deg, var(--accent-soft) 0%, #fde8c8 100%);
@@ -421,40 +300,15 @@
             justify-content: space-between;
             gap: 14px;
             flex-wrap: wrap;
-            transition: background 0.25s;
         }
-
         body.dark #trialBanner {
             background: linear-gradient(135deg, #2d1f0e 0%, #3d2a12 100%);
             border-color: #5a3f1a;
         }
-
-        #trialBanner .trial-text {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-size: 1rem;
-        }
-
-        #trialBanner .trial-text > i {
-            color: var(--accent);
-            font-size: 1.6rem;
-        }
-
-        #trialBanner .trial-text strong {
-            font-weight: 600;
-            display: block;
-            color: var(--text);
-        }
-
-        #trialBanner .trial-text .sub {
-            font-weight: 400;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            display: block;
-            margin-top: 2px;
-        }
-
+        #trialBanner .trial-text { display: flex; align-items: center; gap: 14px; font-size: 1rem; }
+        #trialBanner .trial-text > i { color: var(--accent); font-size: 1.6rem; }
+        #trialBanner .trial-text strong { font-weight: 600; display: block; color: var(--text); }
+        #trialBanner .trial-text .sub { font-weight: 400; font-size: 0.9rem; color: var(--text-secondary); display: block; margin-top: 2px; }
         #trialBanner .upgrade-btn {
             background: var(--accent);
             color: #fff;
@@ -464,35 +318,26 @@
             font-weight: 600;
             font-size: 0.9rem;
             cursor: pointer;
-            white-space: nowrap;
             font-family: inherit;
-            transition: background 0.15s;
         }
-
         #trialBanner .upgrade-btn:hover { background: var(--accent-hover); }
 
-        /* ===== TABS CONTENT ===== */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* ===== STATS ===== */
+        /* STATS */
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
             gap: 16px;
             margin-bottom: 28px;
         }
-
         .stat-card {
             background: var(--surface);
             padding: 20px 22px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
-            transition: box-shadow 0.15s, background 0.25s, border-color 0.25s;
         }
-
-        .stat-card:hover { box-shadow: var(--shadow-md); }
-
         .stat-card .label {
             color: var(--text-secondary);
             font-size: 0.85rem;
@@ -501,19 +346,11 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
-
-        .stat-card .number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text);
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-        }
-
+        .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1.1; }
         .stat-card .number.accent { color: var(--accent); }
         .stat-card .number.green { color: var(--success); }
 
-        /* ===== FILTERS ===== */
+        /* FILTERS */
         .filters {
             display: flex;
             flex-wrap: wrap;
@@ -521,7 +358,6 @@
             margin-bottom: 22px;
             align-items: center;
         }
-
         .filters input,
         .filters select {
             padding: 10px 14px;
@@ -533,9 +369,7 @@
             background: var(--surface);
             color: var(--text);
             font-family: inherit;
-            transition: border-color 0.15s, box-shadow 0.15s, background 0.25s;
         }
-
         .filters input:focus,
         .filters select:focus {
             border-color: var(--accent);
@@ -543,7 +377,7 @@
             box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.18);
         }
 
-        /* ===== ORDERS HEADER ===== */
+        /* ORDERS HEADER */
         .orders-header {
             display: flex;
             justify-content: space-between;
@@ -552,7 +386,6 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-
         .orders-header h2 {
             font-size: 1.1rem;
             font-weight: 600;
@@ -561,9 +394,6 @@
             align-items: center;
             gap: 8px;
         }
-
-        .orders-header h2 i { color: var(--text-secondary); }
-
         .orders-header .actions {
             display: flex;
             gap: 8px;
@@ -571,7 +401,6 @@
             position: relative;
             align-items: center;
         }
-
         .btn {
             padding: 9px 16px;
             border: 1px solid var(--border);
@@ -584,23 +413,17 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background 0.12s, border-color 0.12s, color 0.25s;
             font-family: inherit;
             white-space: nowrap;
         }
-
         .btn:hover { background: var(--surface-secondary); }
-
         .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-        .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
-
+        .btn-primary:hover { background: var(--accent-hover); }
         .btn-success { background: var(--success); color: #fff; border-color: var(--success); }
         .btn-success:hover { background: #059669; }
-
         .btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
         .btn-danger:hover { background: #dc2626; }
 
-        /* Export dropdown */
         #exportMenu {
             display: none;
             position: absolute;
@@ -615,36 +438,15 @@
             z-index: 500;
             overflow: hidden;
         }
-
-        #exportMenu > div {
-            padding: 10px 14px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background 0.12s;
-        }
-
-        #exportMenu > div:hover {
-            background: var(--surface-secondary);
-        }
-
-        #exportMenu .menu-divider {
-            height: 1px;
-            background: var(--border);
-            padding: 0;
-            cursor: default;
-        }
+        #exportMenu > div { padding: 10px 14px; cursor: pointer; font-size: 0.9rem; }
+        #exportMenu > div:hover { background: var(--surface-secondary); }
+        #exportMenu .menu-divider { height: 1px; background: var(--border); padding: 0; cursor: default; }
         #exportMenu .menu-divider:hover { background: var(--border); }
-
         #exportMenu .menu-item-accent { color: var(--accent); font-weight: 600; }
-        #exportMenu .menu-item-accent:hover { background: var(--accent-soft); }
-
         #exportMenu .menu-item-success { color: var(--success); font-weight: 600; }
-        #exportMenu .menu-item-success:hover { background: rgba(16,185,129,0.1); }
-
         #exportMenu .menu-item-info { color: var(--info); font-weight: 600; }
-        #exportMenu .menu-item-info:hover { background: rgba(59,130,246,0.1); }
 
-        /* ===== ORDER CARD ===== */
+        /* ORDER CARD */
         .order-card {
             background: var(--surface);
             border-radius: var(--radius);
@@ -652,11 +454,7 @@
             margin-bottom: 12px;
             border: 1px solid var(--border);
             border-left: 4px solid var(--accent);
-            transition: box-shadow 0.15s, background 0.25s, border-color 0.25s;
         }
-
-        .order-card:hover { box-shadow: var(--shadow-md); }
-
         .order-card .order-header {
             display: flex;
             justify-content: space-between;
@@ -665,13 +463,7 @@
             gap: 8px;
             margin-bottom: 10px;
         }
-
-        .order-card .order-id {
-            font-weight: 700;
-            color: var(--text);
-            font-size: 1rem;
-        }
-
+        .order-card .order-id { font-weight: 700; color: var(--text); font-size: 1rem; }
         .order-card .order-status {
             font-size: 0.8rem;
             padding: 4px 12px;
@@ -680,7 +472,6 @@
             letter-spacing: 0.03em;
             text-transform: uppercase;
         }
-
         .order-card .order-details {
             margin: 6px 0;
             color: var(--text-secondary);
@@ -689,73 +480,12 @@
             align-items: center;
             gap: 8px;
         }
+        .order-card .order-details i { width: 18px; color: var(--text-muted); text-align: center; font-size: 0.9rem; }
+        .order-card .order-total { font-weight: 700; color: var(--success); font-size: 1.1rem; margin-top: 10px; }
+        .order-card .order-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+        .order-card .btn { padding: 7px 16px; font-size: 0.88rem; border-radius: var(--radius-sm); }
 
-        .order-card .order-details i {
-            width: 18px;
-            color: var(--text-muted);
-            text-align: center;
-            font-size: 0.9rem;
-        }
-
-        .order-card .order-total {
-            font-weight: 700;
-            color: var(--success);
-            font-size: 1.1rem;
-            margin-top: 10px;
-        }
-
-        .order-card .order-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 14px;
-            flex-wrap: wrap;
-        }
-
-        .order-card .btn {
-            padding: 7px 16px;
-            font-size: 0.88rem;
-            border-radius: var(--radius-sm);
-        }
-        /* ===== ORDER CARD — two-column layout ===== */
-.order-card {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    align-items: start;
-}
-
-.order-card .order-header,
-.order-card .order-actions {
-    grid-column: 1 / -1;
-}
-
-.order-card .order-info {
-    min-width: 0;
-}
-
-.order-card .order-summary {
-    background: var(--surface-secondary);
-    border-radius: var(--radius);
-    padding: 12px 14px;
-    min-width: 0;
-}
-
-.order-card .order-summary .items-title {
-    font-weight: 600;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-}
-
-@media (max-width: 768px) {
-    .order-card {
-        grid-template-columns: 1fr;
-    }
-}
-
-        /* ===== EMPTY STATE ===== */
+        /* EMPTY */
         .empty {
             text-align: center;
             color: var(--text-muted);
@@ -763,20 +493,11 @@
             background: var(--surface);
             border: 1px dashed var(--border);
             border-radius: var(--radius);
-            transition: background 0.25s, border-color 0.25s;
         }
-
-        .empty i {
-            font-size: 2.8rem;
-            margin-bottom: 14px;
-            display: block;
-            color: var(--text-muted);
-            opacity: 0.5;
-        }
-
+        .empty i { font-size: 2.8rem; margin-bottom: 14px; display: block; opacity: 0.5; }
         .empty p { font-size: 0.95rem; }
 
-        /* ===== NOTIFICATION ===== */
+        /* NOTIFICATION */
         .notification {
             position: fixed;
             top: 20px;
@@ -789,49 +510,26 @@
             z-index: 9999;
             font-weight: 500;
             font-size: 0.95rem;
-            animation: slideIn 0.25s ease;
-            border: 1px solid var(--border);
         }
-
-        body.dark .notification {
-            background: var(--surface);
-            color: var(--text);
-            border-color: var(--accent);
-        }
-
+        body.dark .notification { background: var(--surface); color: var(--text); border: 1px solid var(--accent); }
         .notification i { margin-right: 8px; color: var(--success); }
 
-        @keyframes slideIn {
-            from { transform: translateX(20px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* ===== MENU MANAGEMENT ===== */
+        /* MENU FORM */
         .menu-form {
             background: var(--surface);
             padding: 22px;
             border-radius: var(--radius);
             border: 1px solid var(--border);
             margin-bottom: 24px;
-            transition: background 0.25s, border-color 0.25s;
         }
-
-        .menu-form h3 {
-            color: var(--text);
-            margin-bottom: 18px;
-            font-size: 1.05rem;
-            font-weight: 600;
-        }
-
+        .menu-form h3 { color: var(--text); margin-bottom: 18px; font-size: 1.05rem; font-weight: 600; }
         .menu-form .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
             margin-bottom: 16px;
         }
-
         .menu-form .form-row-full { grid-column: 1 / -1; }
-
         .menu-form .btn-save {
             background: var(--accent);
             color: #fff;
@@ -842,11 +540,8 @@
             cursor: pointer;
             font-size: 0.95rem;
             font-family: inherit;
-            transition: background 0.15s;
         }
-
         .menu-form .btn-save:hover { background: var(--accent-hover); }
-
         .menu-form .btn-cancel {
             background: transparent;
             color: var(--text-secondary);
@@ -858,33 +553,19 @@
             font-size: 0.95rem;
             margin-left: 8px;
             font-family: inherit;
-            transition: background 0.15s, border-color 0.25s;
         }
-
         .menu-form .btn-cancel:hover { background: var(--surface-secondary); }
 
-        #imagePreviewContainer {
-            display: none;
-            text-align: center;
-            margin-top: 10px;
-        }
+        #imagePreviewContainer { display: none; text-align: center; margin-top: 10px; }
+        #imagePreview { max-width: 180px; max-height: 180px; border-radius: var(--radius); border: 1px solid var(--border); }
 
-        #imagePreview {
-            max-width: 180px;
-            max-height: 180px;
-            border-radius: var(--radius);
-            border: 1px solid var(--border);
-        }
-
-        /* ===== MENU LIST ===== */
+        /* MENU LIST */
         .menu-list {
             background: var(--surface);
             border-radius: var(--radius);
             padding: 6px 22px;
             border: 1px solid var(--border);
-            transition: background 0.25s, border-color 0.25s;
         }
-
         .menu-item-row {
             display: flex;
             justify-content: space-between;
@@ -894,38 +575,13 @@
             flex-wrap: wrap;
             gap: 12px;
         }
-
         .menu-item-row:last-child { border-bottom: none; }
-
-        .menu-item-row .item-info {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex: 1;
-        }
-
+        .menu-item-row .item-info { display: flex; align-items: center; gap: 14px; flex: 1; }
         .menu-item-row .item-info .item-icon { font-size: 1.8rem; }
-
-        .menu-item-row .item-info .item-details .item-name {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 1rem;
-        }
-
-        .menu-item-row .item-info .item-details .item-desc {
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-        }
-
-        .menu-item-row .item-price {
-            font-weight: 700;
-            color: var(--success);
-            min-width: 80px;
-            font-size: 1rem;
-        }
-
+        .menu-item-row .item-info .item-details .item-name { font-weight: 600; color: var(--text); font-size: 1rem; }
+        .menu-item-row .item-info .item-details .item-desc { font-size: 0.88rem; color: var(--text-secondary); }
+        .menu-item-row .item-price { font-weight: 700; color: var(--success); min-width: 80px; font-size: 1rem; }
         .menu-item-row .item-actions { display: flex; gap: 6px; }
-
         .menu-item-row .item-actions button {
             padding: 7px 12px;
             border: none;
@@ -934,30 +590,13 @@
             font-size: 0.88rem;
             background: var(--surface-secondary);
             color: var(--text-secondary);
-            transition: background 0.12s, color 0.12s;
         }
+        .menu-item-row .item-actions .btn-edit:hover { background: rgba(59, 130, 246, 0.15); color: var(--info); }
+        .menu-item-row .item-actions .btn-delete-item:hover { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 
-        .menu-item-row .item-actions .btn-edit:hover {
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--info);
-        }
-
-        .menu-item-row .item-actions .btn-delete-item:hover {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-        }
-
-        /* ===== TABLES ===== */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.95rem;
-        }
-
-        .data-table thead tr {
-            border-bottom: 1px solid var(--border);
-        }
-
+        /* TABLES */
+        .data-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        .data-table thead tr { border-bottom: 1px solid var(--border); }
         .data-table th {
             padding: 14px 10px;
             text-align: left;
@@ -967,13 +606,7 @@
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
-
-        .data-table td {
-            padding: 14px 10px;
-            border-bottom: 1px solid var(--border);
-            color: var(--text);
-        }
-
+        .data-table td { padding: 14px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
         .data-table tr:last-child td { border-bottom: none; }
 
         .role-badge {
@@ -983,201 +616,124 @@
             font-size: 0.8rem;
             font-weight: 600;
         }
-
-        .role-owner  { background: rgba(230, 126, 34, 0.18); color: #b45309; }
+        .role-owner { background: rgba(230, 126, 34, 0.18); color: #b45309; }
         .role-driver { background: rgba(139, 92, 246, 0.18); color: #6d28d9; }
-        .role-staff  { background: rgba(107, 114, 128, 0.15); color: #6b7280; }
-
-        body.dark .role-owner  { background: rgba(249, 115, 22, 0.22); color: #fdba74; }
+        .role-staff { background: rgba(107, 114, 128, 0.15); color: #6b7280; }
+        body.dark .role-owner { background: rgba(249, 115, 22, 0.22); color: #fdba74; }
         body.dark .role-driver { background: rgba(167, 139, 250, 0.22); color: #c4b5fd; }
-        body.dark .role-staff  { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
-        /* ===== PASSWORD EYE TOGGLE ===== */
-.pw-wrap {
-    position: relative;
-    display: block;
-}
-.pw-wrap input {
-    padding-right: 42px !important;
-}
-.pw-toggle {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    font-size: 1rem;
-    color: var(--text-muted);
-    transition: color 0.15s;
-    line-height: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-}
-.pw-toggle:hover {
-    color: var(--accent);
-    background: var(--surface-secondary);
-}
-.pw-toggle.showing {
-    color: var(--accent);
-}
+        body.dark .role-staff { background: rgba(148, 163, 184, 0.18); color: #cbd5e1; }
 
-/* ===== CONFIRMATION MODAL ===== */
-.confirm-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(17, 24, 39, 0.7);
-    backdrop-filter: blur(4px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10001;
-    padding: 16px;
-    animation: confirmFadeIn 0.2s ease;
-}
+        /* PASSWORD EYE */
+        .pw-wrap { position: relative; display: block; }
+        .pw-wrap input { padding-right: 42px !important; }
+        .pw-toggle {
+            position: absolute;
+            top: 50%;
+            right: 12px;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 1rem;
+            color: var(--text-muted);
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pw-toggle:hover { color: var(--accent); background: var(--surface-secondary); }
+        .pw-toggle.showing { color: var(--accent); }
 
-@keyframes confirmFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+        /* CONFIRM MODAL */
+        .confirm-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10001;
+            padding: 16px;
+        }
+        .confirm-modal-box {
+            background: var(--surface);
+            border-radius: var(--radius-lg);
+            padding: 28px 26px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border);
+        }
+        .confirm-modal-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: rgba(239, 68, 68, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.8em;
+            color: var(--danger);
+        }
+        .confirm-modal-icon.neutral { background: rgba(107, 114, 128, 0.15); color: var(--text-secondary); }
+        .confirm-modal-box h3 { font-size: 1.15rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+        .confirm-modal-box p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 22px; }
+        .confirm-modal-box .order-ref {
+            display: inline-block;
+            background: var(--surface-secondary);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: monospace;
+            margin: 0 2px;
+        }
+        .confirm-modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .confirm-modal-buttons button {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+        .confirm-cancel { background: var(--surface-secondary); color: var(--text); border: 1px solid var(--border) !important; }
+        .confirm-cancel:hover { background: var(--border); }
+        .confirm-danger { background: var(--danger); color: #fff; }
+        .confirm-danger:hover { background: #dc2626; }
+        .confirm-danger:disabled { background: #9ca3af; cursor: not-allowed; opacity: 0.6; }
+        .confirm-input-wrap { margin-bottom: 18px; }
+        .confirm-input-wrap input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            text-align: center;
+            font-family: monospace;
+            letter-spacing: 0.15em;
+            background: var(--surface);
+            color: var(--text);
+            text-transform: uppercase;
+        }
+        .confirm-input-wrap input:focus {
+            outline: none;
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+        }
+        .confirm-input-hint { font-size: 0.82rem; color: var(--text-muted); margin-top: 8px; }
 
-.confirm-modal-box {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
-    padding: 28px 26px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border);
-    animation: confirmModalIn 0.2s ease;
-}
-
-@keyframes confirmModalIn {
-    from { transform: scale(0.95); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.confirm-modal-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: rgba(239, 68, 68, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 16px;
-    font-size: 1.8em;
-    color: var(--danger);
-}
-.confirm-modal-icon.neutral {
-    background: rgba(107, 114, 128, 0.15);
-    color: var(--text-secondary);
-}
-
-.confirm-modal-box h3 {
-    font-size: 1.15rem;
-    font-weight: 700;
-    color: var(--text);
-    margin-bottom: 10px;
-}
-
-.confirm-modal-box p {
-    color: var(--text-secondary);
-    font-size: 0.92rem;
-    line-height: 1.6;
-    margin-bottom: 22px;
-}
-
-.confirm-modal-box .order-ref {
-    display: inline-block;
-    background: var(--surface-secondary);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-weight: 700;
-    color: var(--text);
-    font-family: monospace;
-    margin: 0 2px;
-}
-
-.confirm-modal-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-
-.confirm-modal-buttons button {
-    padding: 12px 16px;
-    border-radius: var(--radius);
-    font-weight: 600;
-    font-size: 0.95rem;
-    cursor: pointer;
-    border: none;
-    font-family: inherit;
-    transition: background 0.15s, transform 0.1s;
-}
-.confirm-modal-buttons button:active {
-    transform: scale(0.98);
-}
-
-.confirm-cancel {
-    background: var(--surface-secondary);
-    color: var(--text);
-    border: 1px solid var(--border) !important;
-}
-.confirm-cancel:hover {
-    background: var(--border);
-}
-
-.confirm-danger {
-    background: var(--danger);
-    color: #fff;
-}
-.confirm-danger:hover {
-    background: #dc2626;
-}
-.confirm-danger:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-    opacity: 0.6;
-}
-
-.confirm-input-wrap {
-    margin-bottom: 18px;
-}
-.confirm-input-wrap input {
-    width: 100%;
-    padding: 12px 14px;
-    border: 2px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 1rem;
-    text-align: center;
-    font-family: monospace;
-    letter-spacing: 0.15em;
-    background: var(--surface);
-    color: var(--text);
-    text-transform: uppercase;
-}
-.confirm-input-wrap input:focus {
-    outline: none;
-    border-color: var(--danger);
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
-}
-.confirm-input-hint {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-top: 8px;
-}
-
-        /* ===== MODALS ===== */
+        /* MODALS */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             background: rgba(17, 24, 39, 0.5);
             backdrop-filter: blur(3px);
             display: flex;
@@ -1186,7 +742,6 @@
             z-index: 10000;
             padding: 16px;
         }
-
         .modal-box {
             background: var(--surface);
             border-radius: var(--radius-lg);
@@ -1195,25 +750,9 @@
             width: 100%;
             position: relative;
             box-shadow: var(--shadow-lg);
-            animation: modalIn 0.2s ease;
             border: 1px solid var(--border);
-            transition: background 0.25s, border-color 0.25s;
         }
-
-        @keyframes modalIn {
-            from { transform: scale(0.96); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .modal-box h2 {
-            color: var(--text);
-            margin-bottom: 20px;
-            font-size: 1.15rem;
-            font-weight: 700;
-            text-align: center;
-            letter-spacing: -0.01em;
-        }
-
+        .modal-box h2 { color: var(--text); margin-bottom: 20px; font-size: 1.15rem; font-weight: 700; text-align: center; }
         .modal-close {
             position: absolute;
             top: 12px;
@@ -1225,11 +764,8 @@
             cursor: pointer;
             line-height: 1;
             padding: 4px;
-            transition: color 0.15s;
         }
-
         .modal-close:hover { color: var(--text); }
-
         .modal-btn-primary {
             width: 100%;
             padding: 12px;
@@ -1241,12 +777,10 @@
             cursor: pointer;
             font-size: 0.95rem;
             font-family: inherit;
-            transition: background 0.15s;
         }
-
         .modal-btn-primary:hover { background: var(--accent-hover); }
 
-        /* ===== FLOATING HOME BTN ===== */
+        /* FLOATING HOME */
         #floatingHomeBtn {
             position: fixed;
             bottom: 24px;
@@ -1264,12 +798,10 @@
             display: none;
             align-items: center;
             justify-content: center;
-            transition: background 0.15s, transform 0.15s;
         }
+        #floatingHomeBtn:hover { background: var(--accent); }
 
-        #floatingHomeBtn:hover { background: var(--accent); transform: scale(1.08); }
-
-        /* ===== MOBILE ===== */
+        /* MOBILE */
         .mobile-menu-btn {
             display: none;
             background: none;
@@ -1279,50 +811,31 @@
             cursor: pointer;
             padding: 4px 8px;
         }
-
         .sidebar-backdrop {
             display: none;
             position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            inset: 0;
             background: rgba(17, 24, 39, 0.5);
             z-index: 90;
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
+            .sidebar { transform: translateX(-100%); }
             .sidebar.open { transform: translateX(0); }
-
             .sidebar-backdrop.open { display: block; }
-
             .main { margin-left: 0; }
-
             .mobile-menu-btn { display: block; }
-
             .main-header { padding: 16px 18px; }
-
             .main-content { padding: 18px 18px 60px; }
-
             .stats { grid-template-columns: 1fr 1fr; gap: 12px; }
-
             .stat-card { padding: 16px; }
-
             .stat-card .number { font-size: 1.6rem; }
-
             .menu-form .form-row { grid-template-columns: 1fr; }
-
             .filters { flex-direction: column; align-items: stretch; }
-
             .orders-header { flex-direction: column; align-items: stretch; }
-
             #trialBanner { flex-direction: column; text-align: center; }
-
             #floatingHomeBtn { bottom: 16px; right: 16px; }
-
             .data-table th, .data-table td { padding: 10px 6px; font-size: 0.9rem; }
-
             .theme-toggle-btn span { display: none; }
             .theme-toggle-btn { padding: 9px 12px; }
         }
@@ -1330,7 +843,7 @@
 </head>
 <body>
 
-<!-- ===== LOGIN PAGE ===== -->
+<!-- LOGIN -->
 <div id="loginPage">
     <div class="login-container">
         <div id="loginView">
@@ -1338,76 +851,67 @@
             <p class="subtitle">Restaurant Admin Login</p>
             <div class="form-group">
                 <label>Username</label>
-                <input type="text" id="loginUsername" placeholder="Enter username">
+                <input type="text" id="loginUsername" placeholder="Enter username" autocomplete="username">
             </div>
             <div class="form-group">
                 <label>Password</label>
-                <input type="password" id="loginPassword" placeholder="Enter password">
+                <input type="password" id="loginPassword" placeholder="Enter password" autocomplete="current-password">
             </div>
             <button class="login-btn" onclick="login()">
                 <i class="fas fa-sign-in-alt"></i> Login
             </button>
             <div id="loginError" class="error-msg"></div>
+        </div>
     </div>
 </div>
-<!-- ===== DASHBOARD ===== -->
+
+<!-- DASHBOARD -->
 <div id="dashboardPage">
     <div class="layout">
 
-      <!-- ===== SIDEBAR ===== -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
-    </div>
-
-    <nav class="sidebar-nav">
-        <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
-            <i class="fas fa-receipt"></i>
-            <span>Orders</span>
-        </button>
-
-        <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
-            <i class="fas fa-book-open"></i>
-            <span>Menu</span>
-        </button>
-
-        <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
-            <i class="fas fa-users"></i>
-            <span>Customers</span>
-        </button>
-
-        <button class="nav-item" onclick="switchTab('reports')" id="tabReports">
-            <i class="fas fa-exclamation-triangle"></i>
-            <span>Reports <span id="reportsBadge" style="background: var(--danger); color: white; padding: 1px 7px; border-radius: 10px; font-size: 0.75em; margin-left: 6px; display: none;">0</span></span>
-        </button>
-
-        <button class="nav-item" onclick="switchTab('admins')" id="tabAdmins" style="display:none;">
-            <i class="fas fa-user-shield"></i>
-            <span>Admins</span>
-        </button>
-    </nav>
-
-    <div class="sidebar-footer">
-        <div class="user-chip">
-            <div class="avatar" id="userAvatar">A</div>
-            <div class="user-info-mini">
-                <div class="user-name" id="currentUser">admin</div>
-                <div class="user-role" id="roleBadge">Staff</div>
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
             </div>
-        </div>
-        <button class="sidebar-btn" onclick="openChangePassword()">
-            <i class="fas fa-key"></i>
-            <span>Change Password</span>
-        </button>
-        <button class="sidebar-btn logout" onclick="doLogout()">
-            <i class="fas fa-sign-out-alt"></i>
-            <span>Logout</span>
-        </button>
-    </div>
-</aside>
 
-<div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
-        <!-- ===== MAIN ===== -->
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
+                    <i class="fas fa-receipt"></i><span>Orders</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
+                    <i class="fas fa-book-open"></i><span>Menu</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
+                    <i class="fas fa-users"></i><span>Customers</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('reports')" id="tabReports">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>Reports <span id="reportsBadge" style="background: var(--danger); color: white; padding: 1px 7px; border-radius: 10px; font-size: 0.75em; margin-left: 6px; display: none;">0</span></span>
+                </button>
+                <button class="nav-item" onclick="switchTab('admins')" id="tabAdmins" style="display:none;">
+                    <i class="fas fa-user-shield"></i><span>Admins</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-chip">
+                    <div class="avatar" id="userAvatar">A</div>
+                    <div class="user-info-mini">
+                        <div class="user-name" id="currentUser">admin</div>
+                        <div class="user-role" id="roleBadge">Staff</div>
+                    </div>
+                </div>
+                <button class="sidebar-btn" onclick="openChangePassword()">
+                    <i class="fas fa-key"></i><span>Change Password</span>
+                </button>
+                <button class="sidebar-btn logout" onclick="doLogout()">
+                    <i class="fas fa-sign-out-alt"></i><span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
         <main class="main">
             <header class="main-header">
                 <div style="display:flex;align-items:center;gap:12px;">
@@ -1419,7 +923,7 @@
                         <div class="subtitle" id="pageSubtitle">Manage incoming orders and drivers</div>
                     </div>
                 </div>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn" title="Toggle dark mode">
+                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
                     <i class="fas fa-moon" id="themeIcon"></i>
                     <span id="themeLabel">Dark Mode</span>
                 </button>
@@ -1427,7 +931,6 @@
 
             <div class="main-content">
 
-                <!-- TRIAL BANNER -->
                 <div id="trialBanner">
                     <div class="trial-text">
                         <i class="fas fa-hourglass-half"></i>
@@ -1441,7 +944,7 @@
                     </button>
                 </div>
 
-                <!-- ===== TAB 1: ORDERS ===== -->
+                <!-- ORDERS TAB -->
                 <div id="tabOrdersContent" class="tab-content active">
                     <div class="stats">
                         <div class="stat-card">
@@ -1463,7 +966,7 @@
                     </div>
 
                     <div class="filters">
-                      <input type="text" id="searchInput" placeholder="Search Name, Phone, Driver, Address, or Order #..." oninput="applyFilters()">
+                        <input type="text" id="searchInput" placeholder="Search Name, Phone, Driver, Address, or Order #..." oninput="applyFilters()">
                         <select id="quickDateFilter" onchange="onQuickDateChange()">
                             <option value="all">All time</option>
                             <option value="today">Today</option>
@@ -1507,16 +1010,16 @@
                     </div>
                 </div>
 
-                <!-- ===== TAB 2: MENU ===== -->
+                <!-- MENU TAB -->
                 <div id="tabMenuContent" class="tab-content">
-                   <div class="orders-header">
-    <h2><i class="fas fa-book-open"></i> Menu Management</h2>
-    <div class="actions">
-        <button class="btn" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
-        <button class="btn btn-success" onclick="openImportModal()"><i class="fas fa-file-import"></i> Import CSV</button>
-        <button class="btn btn-danger" onclick="downloadMenuTemplate()"><i class="fas fa-download"></i> Template</button>
-    </div>
-</div>
+                    <div class="orders-header">
+                        <h2><i class="fas fa-book-open"></i> Menu Management</h2>
+                        <div class="actions">
+                            <button class="btn" onclick="loadMenu()"><i class="fas fa-sync"></i> Refresh</button>
+                            <button class="btn btn-success" onclick="openImportModal()"><i class="fas fa-file-import"></i> Import CSV</button>
+                            <button class="btn btn-danger" onclick="downloadMenuTemplate()"><i class="fas fa-download"></i> Template</button>
+                        </div>
+                    </div>
 
                     <div class="menu-form" id="menuForm">
                         <h3 id="menuFormTitle">Add New Item</h3>
@@ -1555,15 +1058,13 @@
                             </div>
                         </div>
                         <div class="form-row">
-    <div class="form-group form-row-full">
-        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;background:var(--accent-soft);border-radius:8px;border:1px dashed var(--accent);">
-            <input type="checkbox" id="menuIsPopular" style="width:auto;margin:0;cursor:pointer;">
-            <span style="font-weight:600;color:var(--accent);">
-                🔥 Mark as Best Seller <span style="font-weight:400;color:var(--text-secondary);font-size:0.85em;">(shows a badge on the customer app)</span>
-            </span>
-        </label>
-    </div>
-</div>
+                            <div class="form-group form-row-full">
+                                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;background:var(--accent-soft);border-radius:8px;border:1px dashed var(--accent);">
+                                    <input type="checkbox" id="menuIsPopular" style="width:auto;margin:0;cursor:pointer;">
+                                    <span style="font-weight:600;color:var(--accent);">🔥 Mark as Best Seller <span style="font-weight:400;color:var(--text-secondary);font-size:0.85em;">(shows a badge on the customer app)</span></span>
+                                </label>
+                            </div>
+                        </div>
                         <div class="form-row">
                             <div class="form-group form-row-full">
                                 <div id="imagePreviewContainer">
@@ -1583,7 +1084,7 @@
                     </div>
                 </div>
 
-                <!-- ===== TAB 3: CUSTOMERS ===== -->
+                <!-- CUSTOMERS TAB -->
                 <div id="tabCustomersContent" class="tab-content">
                     <div class="orders-header">
                         <h2><i class="fas fa-users"></i> Customers <span id="customerCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
@@ -1594,76 +1095,72 @@
                     </div>
                 </div>
 
-                <!-- ===== TAB 4: ADMINS ===== -->
-                 <!-- ===== TAB 5: DRIVER REPORTS ===== -->
-<div id="tabReportsContent" class="tab-content">
-    <div class="orders-header">
-        <h2><i class="fas fa-exclamation-triangle"></i> Driver Reports <span id="reportCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
-        <button class="btn" onclick="loadReports()"><i class="fas fa-sync"></i> Refresh</button>
-    </div>
+                <!-- REPORTS TAB -->
+                <div id="tabReportsContent" class="tab-content">
+                    <div class="orders-header">
+                        <h2><i class="fas fa-exclamation-triangle"></i> Driver Reports <span id="reportCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
+                        <button class="btn" onclick="loadReports()"><i class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div id="reportsContainer" class="menu-list">
+                        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading reports...</p>
+                    </div>
+                </div>
 
-    <div id="reportsContainer" class="menu-list">
-        <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading reports...</p>
-    </div>
-</div>
+                <!-- ADMINS TAB -->
                 <div id="tabAdminsContent" class="tab-content">
                     <div class="orders-header">
                         <h2><i class="fas fa-user-shield"></i> Admin Accounts <span id="adminCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
                         <button class="btn" onclick="loadAdmins()"><i class="fas fa-sync"></i> Refresh</button>
                     </div>
 
-                   <div class="menu-form">
-    <h3><i class="fas fa-user-plus"></i> Add New Admin</h3>
-    <div class="form-row">
-        <div class="form-group">
-            <label>Username</label>
-            <input type="text" id="newAdminUsername" placeholder="e.g. ali">
-        </div>
-        <div class="form-group">
-            <label>Password</label>
-            <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
-        </div>
-    </div>
-    <div class="form-row">
-        <div class="form-group">
-            <label>Role</label>
-            <select id="newAdminRole">
-                <option value="staff">Staff (manage orders)</option>
-                <option value="driver">Driver (delivery only)</option>
-                <option value="owner">Owner (full access)</option>
-            </select>
-        </div>
-        <div class="form-group" style="display:flex; align-items:flex-end;">
-            <button class="btn-save" onclick="createAdmin()">
-                <i class="fas fa-user-plus"></i> Create Admin
-            </button>
-        </div>
-    </div>
+                    <div class="menu-form">
+                        <h3><i class="fas fa-user-plus"></i> Add New Admin</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" id="newAdminUsername" placeholder="e.g. ali">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="text" id="newAdminPassword" placeholder="Min 6 characters">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Role</label>
+                                <select id="newAdminRole">
+                                    <option value="staff">Staff (manage orders)</option>
+                                    <option value="driver">Driver (delivery only)</option>
+                                    <option value="owner">Owner (full access)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="display:flex; align-items:flex-end;">
+                                <button class="btn-save" onclick="createAdmin()">
+                                    <i class="fas fa-user-plus"></i> Create Admin
+                                </button>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group form-row-full">
+                                <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--accent-soft);border-radius:8px;border:1px dashed var(--accent);">
+                                    <input type="checkbox" id="newAdminIsTrial" onchange="toggleTrialDays()" style="width:auto;margin:0;cursor:pointer;">
+                                    <span style="font-weight:600;color:var(--accent);">⏳ Trial account</span>
+                                    <span style="font-weight:400;color:var(--text-secondary);font-size:0.85em;">(auto-expires after N days)</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-row" id="trialDaysRow" style="display:none;">
+                            <div class="form-group form-row-full">
+                                <label>Trial duration (days)</label>
+                                <input type="number" id="newAdminTrialDays" value="30" min="1" max="365">
+                                <div style="font-size:0.82em;color:var(--text-muted);margin-top:6px;">
+                                    After this many days, the account will be blocked until upgraded.
+                                </div>
+                            </div>
+                        </div>
+                        <div id="adminFormError" style="color: var(--danger); margin-top:10px; font-size:0.9rem; min-height:20px;"></div>
+                    </div>
 
-    <!-- Trial account toggle -->
-    <div class="form-row">
-        <div class="form-group form-row-full">
-            <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:12px;background:var(--accent-soft);border-radius:8px;border:1px dashed var(--accent);">
-                <input type="checkbox" id="newAdminIsTrial" onchange="toggleTrialDays()" style="width:auto;margin:0;cursor:pointer;">
-                <span style="font-weight:600;color:var(--accent);">⏳ Trial account</span>
-                <span style="font-weight:400;color:var(--text-secondary);font-size:0.85em;">(auto-expires after N days)</span>
-            </label>
-        </div>
-    </div>
-
-    <!-- Trial duration (hidden by default) -->
-    <div class="form-row" id="trialDaysRow" style="display:none;">
-        <div class="form-group form-row-full">
-            <label>Trial duration (days)</label>
-            <input type="number" id="newAdminTrialDays" value="30" min="1" max="365">
-            <div style="font-size:0.82em;color:var(--text-muted);margin-top:6px;">
-                After this many days, the account will be blocked until upgraded to a paid account.
-            </div>
-        </div>
-    </div>
-
-    <div id="adminFormError" style="color: var(--danger); margin-top:10px; font-size:0.9rem; min-height:20px;"></div>
-</div>
                     <div class="menu-list" id="adminsList">
                         <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading admins...</p>
                     </div>
@@ -1674,7 +1171,7 @@
     </div>
 </div>
 
-<!-- ===== CHANGE PASSWORD MODAL ===== -->
+<!-- CHANGE PASSWORD MODAL -->
 <div id="changePasswordModal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
         <button class="modal-close" onclick="closeChangePassword()">×</button>
@@ -1695,7 +1192,8 @@
         <button class="modal-btn-primary" onclick="submitChangePassword()">Update Password</button>
     </div>
 </div>
-<!-- ===== IMPORT CSV MODAL ===== -->
+
+<!-- IMPORT CSV MODAL -->
 <div id="importCsvModal" class="modal-overlay" style="display:none;">
     <div class="modal-box" style="max-width:520px;width:100%;">
         <button class="modal-close" onclick="closeImportModal()">×</button>
@@ -1703,11 +1201,7 @@
 
         <div style="background:var(--surface-secondary);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">
             <strong style="color:var(--text);">Columns:</strong>
-            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">category</code>
-            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">name</code>
-            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">description</code>
-            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">price</code>
-            <code style="background:var(--surface);padding:1px 5px;border-radius:3px;font-size:0.9em;">is_popular</code>
+            <code>category</code> <code>name</code> <code>description</code> <code>price</code> <code>is_popular</code>
         </div>
 
         <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:18px;text-align:center;margin-bottom:12px;cursor:pointer;" onclick="document.getElementById('csvFileInput').click()" id="csvDropZone">
@@ -1728,7 +1222,7 @@
     </div>
 </div>
 
-<!-- ===== ASSIGN DRIVER MODAL ===== -->
+<!-- ASSIGN DRIVER MODAL -->
 <div id="assignDriverModal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
         <button class="modal-close" onclick="closeAssignDriverModal()">×</button>
@@ -1746,19 +1240,12 @@
     </div>
 </div>
 
-<!-- ===== FLOATING HOME BUTTON ===== -->
-<button id="floatingHomeBtn" onclick="scrollToTop()" title="Back to top">
-    <i class="fas fa-arrow-up"></i>
-</button>
+<button id="floatingHomeBtn" onclick="scrollToTop()"><i class="fas fa-arrow-up"></i></button>
 
 <input type="file" id="importJsonFile" accept=".json,application/json" style="display:none;" onchange="importJSONBackup(event)">
 
 <script>
-// ============================================================
-// CONFIG
-// ============================================================
 var API = 'https://api.nabztech.com/api';
-var loggedIn = false;
 var allOrders = [];
 var allMenuItems = [];
 var lastOrderCount = 0;
@@ -1766,7 +1253,7 @@ var ordersInterval = null;
 var currentAssigningOrderId = null;
 
 // ============================================================
-// THEME MANAGEMENT
+// THEME
 // ============================================================
 function applyTheme(theme) {
     if (theme === 'dark') {
@@ -1779,62 +1266,42 @@ function applyTheme(theme) {
         updateThemeToggleUI('light');
     }
 }
-
 function toggleTheme() {
     var isDark = document.body.classList.contains('dark');
     applyTheme(isDark ? 'light' : 'dark');
 }
-
 function updateThemeToggleUI(theme) {
     var icon = document.getElementById('themeIcon');
     var label = document.getElementById('themeLabel');
     if (!icon || !label) return;
-    if (theme === 'dark') {
-        icon.className = 'fas fa-sun';
-        label.textContent = 'Light Mode';
-    } else {
-        icon.className = 'fas fa-moon';
-        label.textContent = 'Dark Mode';
-    }
+    if (theme === 'dark') { icon.className = 'fas fa-sun'; label.textContent = 'Light Mode'; }
+    else { icon.className = 'fas fa-moon'; label.textContent = 'Dark Mode'; }
 }
-
 function initTheme() {
     var saved = localStorage.getItem('adminTheme');
-    if (saved === 'dark') applyTheme('dark');
-    else applyTheme('light');
+    applyTheme(saved === 'dark' ? 'dark' : 'light');
 }
-
 initTheme();
 
 // ============================================================
-// AUDIO — correct unlock pattern
+// AUDIO
 // ============================================================
 var audioCtx = null;
-var audioUnlocked = false;
-
 function getAudioCtx() {
     if (!audioCtx) {
         try {
             var Ctx = window.AudioContext || window.webkitAudioContext;
             if (!Ctx) return null;
             audioCtx = new Ctx();
-            console.log('🎵 AudioContext created, state:', audioCtx.state);
-        } catch (e) {
-            console.error('❌ AudioContext failed:', e);
-            return null;
-        }
+        } catch (e) { return null; }
     }
     return audioCtx;
 }
-
-// Called on user click — this is the ONLY place the browser allows creation
 function unlockAudio() {
     var ctx = getAudioCtx();
     if (!ctx) return;
-
     if (ctx.state === 'suspended') {
         ctx.resume().then(function() {
-            // Play a tiny silent blip to fully unlock
             var osc = ctx.createOscillator();
             var gain = ctx.createGain();
             gain.gain.value = 0.0001;
@@ -1842,70 +1309,31 @@ function unlockAudio() {
             gain.connect(ctx.destination);
             osc.start(0);
             osc.stop(ctx.currentTime + 0.02);
-            audioUnlocked = true;
-            console.log('🔊 Audio UNLOCKED — state:', ctx.state);
-        }).catch(function(err) {
-            console.warn('unlock resume failed:', err);
-        });
-    } else if (ctx.state === 'running') {
-        audioUnlocked = true;
+        }).catch(function(){});
     }
 }
-
-// Bind to multiple event types — first click unlocks, but keep listening
-// in case the context gets suspended again (some browsers do this)
-['click', 'keydown', 'touchstart', 'pointerdown'].forEach(function(evt) {
+['click', 'keydown', 'touchstart'].forEach(function(evt) {
     document.addEventListener(evt, unlockAudio, { passive: true });
 });
-
-// Also try on window focus — helps when returning to the tab
-window.addEventListener('focus', function() {
-    if (audioCtx && audioCtx.state === 'suspended') {
-        audioCtx.resume().then(function() {
-            console.log('🔄 Resumed on focus');
-        });
-    }
-});
-
-// ============================================================
-// THE IMPORTANT PART: playBeep always tries to resume first
-// ============================================================
 function playBeep() {
     var ctx = getAudioCtx();
-    if (!ctx) {
-        console.warn('🔕 No AudioContext');
-        return;
-    }
-
-    // If suspended, try to resume THEN play
+    if (!ctx) return;
     if (ctx.state === 'suspended') {
-        console.log('⚠️ AudioContext suspended — attempting resume…');
-        ctx.resume().then(function() {
-            console.log('✅ Resumed. Playing beep…');
-            actuallyPlayBeep(ctx);
-        }).catch(function(err) {
-            console.warn('❌ Could not resume — user needs to click the page once:', err);
-        });
+        ctx.resume().then(function() { actuallyPlayBeep(ctx); }).catch(function(){});
     } else {
         actuallyPlayBeep(ctx);
     }
 }
-
 function actuallyPlayBeep(ctx) {
     try {
         var now = ctx.currentTime;
-
-        // Two-tone "ding-dong" style beep
-        [
-            { freq: 880,  start: 0.00, dur: 0.15 },
-            { freq: 1320, start: 0.18, dur: 0.20 }
-        ].forEach(function(note) {
+        [880, 1320].forEach(function(freq, i) {
             var osc = ctx.createOscillator();
             var gain = ctx.createGain();
             osc.type = 'sine';
-            osc.frequency.value = note.freq;
-            var s = now + note.start;
-            var e = s + note.dur;
+            osc.frequency.value = freq;
+            var s = now + (i * 0.18);
+            var e = s + 0.2;
             gain.gain.setValueAtTime(0, s);
             gain.gain.linearRampToValueAtTime(0.3, s + 0.01);
             gain.gain.linearRampToValueAtTime(0, e);
@@ -1914,28 +1342,16 @@ function actuallyPlayBeep(ctx) {
             osc.start(s);
             osc.stop(e);
         });
-        console.log('🔔 Beep played');
-    } catch (e) {
-        console.error('❌ Beep failed:', e);
-    }
+    } catch (e) {}
 }
 
 // ============================================================
-// XSS PROTECTION
+// HELPERS
 // ============================================================
 function escapeHtml(str) {
     if (str === null || str === undefined) return '';
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
-
-// ============================================================
-// AUTH HELPERS
-// ============================================================
 function authFetch(url, options) {
     options = options || {};
     options.headers = options.headers || {};
@@ -1943,7 +1359,6 @@ function authFetch(url, options) {
     if (token) options.headers['Authorization'] = 'Bearer ' + token;
     return fetch(url, options);
 }
-
 function currentUserRole() {
     try {
         var token = localStorage.getItem('adminToken');
@@ -1952,37 +1367,35 @@ function currentUserRole() {
         return payload.role || 'staff';
     } catch (e) { return null; }
 }
-
 function currentUserId() {
     try {
         var token = localStorage.getItem('adminToken');
         if (!token) return null;
-        var payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.id;
+        return JSON.parse(atob(token.split('.')[1])).id;
     } catch (e) { return null; }
 }
-
-// ============================================================
-// FLOATING HOME BUTTON
-// ============================================================
-function scrollToTop() {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+function isMasterUser() {
+    try {
+        var token = localStorage.getItem('adminToken');
+        if (!token) return false;
+        var payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.is_master === 1;
+    } catch (e) { return false; }
 }
 
-window.addEventListener('scroll', function() {
-    var btn = document.getElementById('floatingHomeBtn');
-    if (!btn) return;
-    if (window.scrollY > 300) btn.style.display = 'flex';
-    else btn.style.display = 'none';
-});
-
 // ============================================================
-// SIDEBAR
+// SIDEBAR + SCROLL
 // ============================================================
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('sidebarBackdrop').classList.toggle('open');
 }
+function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+window.addEventListener('scroll', function() {
+    var btn = document.getElementById('floatingHomeBtn');
+    if (!btn) return;
+    btn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+});
 
 // ============================================================
 // LOGIN
@@ -2008,12 +1421,9 @@ function login() {
             errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
             return;
         }
-             // Clear any old session data first
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
         localStorage.removeItem('adminLoggedIn');
-
-        // Save new token
         localStorage.setItem('adminToken', result.data.token);
         localStorage.setItem('adminUser', result.data.username);
         localStorage.setItem('adminLoggedIn', 'true');
@@ -2027,488 +1437,11 @@ function login() {
     });
 }
 
-
-
-function doLogout() {
-    showConfirm({
-        title: 'Log out?',
-        message: 'You will be signed out of the admin dashboard.',
-              iconClass: 'fa-sign-out-alt',
-        iconVariant: 'neutral',
-        confirmText: 'Log Out',
-        cancelText: 'Stay Signed In'
-    }).then(function(confirmed) {
-        if (!confirmed) return;
-
-        localStorage.removeItem('adminToken');
-        localStorage.removeItem('adminUser');
-        localStorage.removeItem('adminLoggedIn');
-        if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
-
-        document.getElementById('dashboardPage').style.display = 'none';
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('loginPassword').value = '';
-    });
-}
-function showDashboard() {
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('dashboardPage').style.display = 'block';
-
-    var user = localStorage.getItem('adminUser') || 'admin';
-    var role = currentUserRole();
-
-    document.getElementById('currentUser').textContent = user;
-    document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
-
-    var badgeText = 'Staff';
-    if (role === 'owner') badgeText = 'Owner';
-    else if (role === 'driver') badgeText = 'Driver';
-    document.getElementById('roleBadge').textContent = badgeText;
-
-    showTrialBanner();
-
-    if ('Notification' in window && Notification.permission === 'default') {
-        setTimeout(requestNotificationPermission, 3000);
-    }
-
-    var adminsTabBtn = document.getElementById('tabAdmins');
-    if (adminsTabBtn) adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
-
-     // Small delay to ensure fresh token is in localStorage before fetching
-    setTimeout(function() {
-        loadOrders();
-        loadMenu();
-        loadCustomers();
-        loadReports();
-        loadAdmins();
-    }, 50);
-
-    // Auto-refresh reports every 30 seconds
-    setInterval(loadReports, 30000);
-
-    if (ordersInterval) clearInterval(ordersInterval);
-    ordersInterval = setInterval(loadOrders, 30000);
-}
-
-function checkSession() {
-    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
-        loggedIn = true;
-        showDashboard();
-    }
-}
-
-window.addEventListener('DOMContentLoaded', function() {
-    initTheme();
-    checkSession();
-});
-
-// ============================================================
-// TRIAL BANNER
-// ============================================================
-function showTrialBanner() {
-    var token = localStorage.getItem('adminToken');
-    if (!token) return;
-
-    var isTrial = false;
-    try {
-        var payload = JSON.parse(atob(token.split('.')[1]));
-        isTrial = payload.is_trial === 1 || payload.is_trial === '1';
-    } catch (e) { return; }
-
-    var banner = document.getElementById('trialBanner');
-    if (!banner) return;
-
-    banner.style.display = isTrial ? 'flex' : 'none';
-}
-
-function showTrialUpgradeInfo() {
-    var overlay = document.createElement('div');
-    overlay.className = 'modal-overlay';
-    overlay.id = 'trialInfoOverlay';
-
-    overlay.innerHTML =
-        '<div class="modal-box" style="text-align:center;">' +
-            '<button class="modal-close" onclick="closeTrialInfo()">×</button>' +
-            '<div style="font-size:2.8rem;margin-bottom:10px;">🧪</div>' +
-            '<h2 style="margin-bottom:12px;">Trial Account</h2>' +
-            '<p style="color:var(--text-secondary);font-size:0.95rem;line-height:1.6;margin-bottom:20px;">' +
-                'You are currently on a <strong>free trial</strong> of the Nabz-Tech Eats ordering system.' +
-            '</p>' +
-            '<div style="background:var(--accent-soft);border-radius:var(--radius);padding:18px;text-align:left;margin-bottom:20px;">' +
-                '<p style="color:var(--text-secondary);font-size:0.9rem;line-height:1.8;margin:0;">' +
-                    '✅ All features are available during your trial<br>' +
-                    '✅ Orders, drivers, and customers work fully<br>' +
-                    '✅ No commission on any orders<br><br>' +
-                    'To keep using the system after your trial ends, contact us to upgrade to a permanent account.' +
-                '</p>' +
-            '</div>' +
-            '<p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:16px;">' +
-                'Contact: <strong style="color:var(--text);">+973-3331-0359</strong>' +
-            '</p>' +
-            '<button class="modal-btn-primary" onclick="closeTrialInfo()">Got it</button>' +
-        '</div>';
-
-    document.body.appendChild(overlay);
-}
-
-function closeTrialInfo() {
-    var el = document.getElementById('trialInfoOverlay');
-    if (el) el.remove();
-}
-
-// ============================================================
-// CHANGE PASSWORD
-// ============================================================
-function openChangePassword() {
-    document.getElementById('changePasswordModal').style.display = 'flex';
-    document.getElementById('currentPwd').value = '';
-    document.getElementById('newPwd').value = '';
-    document.getElementById('newPwd2').value = '';
-    document.getElementById('pwdError').textContent = '';
-
-    // Attach eye toggles to the password fields in this modal
-    attachPasswordEyes();
-}
-
-function closeChangePassword() {
-    document.getElementById('changePasswordModal').style.display = 'none';
-}
-
-function submitChangePassword() {
-    var current = document.getElementById('currentPwd').value;
-    var newPwd = document.getElementById('newPwd').value;
-    var newPwd2 = document.getElementById('newPwd2').value;
-    var errorEl = document.getElementById('pwdError');
-
-    errorEl.style.color = 'var(--danger)';
-    errorEl.textContent = '';
-
-    if (!current) { errorEl.textContent = 'Enter your current password'; return; }
-    if (!newPwd || newPwd.length < 6) { errorEl.textContent = 'New password must be at least 6 characters'; return; }
-    if (newPwd !== newPwd2) { errorEl.textContent = 'New passwords do not match'; return; }
-    if (newPwd === current) { errorEl.textContent = 'New password must be different'; return; }
-
-    authFetch(API + '/admin/password', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
-    })
-    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
-            return;
-        }
-        errorEl.style.color = 'var(--success)';
-        errorEl.textContent = '✅ Password updated!';
-        setTimeout(function() {
-            closeChangePassword();
-            showNotification('Password changed successfully');
-        }, 1200);
-    })
-    .catch(function(err) {
-        console.error('Password change error:', err);
-        errorEl.textContent = '❌ Network error';
-    });
-}
-
-// ============================================================
-// DRIVER ASSIGNMENT
-// ============================================================
-function openAssignDriverModal(orderId) {
-    currentAssigningOrderId = orderId;
-
-    var order = allOrders.find(function(o) { return o.id === orderId; });
-    var currentDriverId = order && order.driver_id ? order.driver_id : null;
-
-    var modal = document.getElementById('assignDriverModal');
-    var select = document.getElementById('assignDriverSelect');
-    var errorEl = document.getElementById('assignDriverError');
-    var titleEl = modal.querySelector('h2');
-    var submitBtn = modal.querySelector('button[onclick*="submitAssignDriver"]');
-
-    if (currentDriverId) {
-        titleEl.innerHTML = '<i class="fas fa-sync"></i> Reassign Driver';
-        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-motorcycle"></i> Reassign to New Driver';
-    } else {
-        titleEl.innerHTML = '<i class="fas fa-motorcycle"></i> Assign a Driver';
-        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-motorcycle"></i> Send Out with Driver';
-    }
-
-    errorEl.textContent = '';
-    select.innerHTML = '<option value="">Loading...</option>';
-    modal.style.display = 'flex';
-
-    authFetch(API + '/drivers')
-        .then(function(res) { return res.json(); })
-        .then(function(drivers) {
-            if (!drivers || drivers.length === 0) {
-                select.innerHTML = '<option value="">No drivers yet</option>';
-                errorEl.textContent = 'Create a driver in the Admins tab first';
-                return;
-            }
-
-            var html = '<option value="">— Select a driver —</option>';
-            drivers.forEach(function(d) {
-                var label = d.username;
-                if (currentDriverId === d.id) label += ' (currently assigned)';
-                html += '<option value="' + d.id + '">' + label + '</option>';
-            });
-            select.innerHTML = html;
-            if (currentDriverId) select.value = currentDriverId;
-        })
-        .catch(function(err) {
-            console.error('Load drivers error:', err);
-            errorEl.textContent = 'Could not load drivers';
-        });
-}
-
-function closeAssignDriverModal() {
-    document.getElementById('assignDriverModal').style.display = 'none';
-    currentAssigningOrderId = null;
-}
-
-function submitAssignDriver() {
-    var driverId = document.getElementById('assignDriverSelect').value;
-    var errorEl = document.getElementById('assignDriverError');
-
-    if (!driverId) {
-        errorEl.textContent = 'Please select a driver';
-        return;
-    }
-
-    authFetch(API + '/orders/' + currentAssigningOrderId + '/assign', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ driver_id: parseInt(driverId) })
-    })
-    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-    .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
-            return;
-        }
-        showNotification('Driver assigned — order is On the Way');
-        closeAssignDriverModal();
-        loadOrders();
-    })
-    .catch(function(err) {
-        console.error('Assign error:', err);
-        errorEl.textContent = 'Network error';
-    });
-}
-
-// ============================================================
-// TABS
-// ============================================================
-var TAB_LABELS = {
-    orders:    { title: 'Orders',         subtitle: 'Manage incoming orders and drivers' },
-    menu:      { title: 'Menu',           subtitle: 'Manage your restaurant menu items' },
-    customers: { title: 'Customers',      subtitle: 'View registered customers' },
-    reports:   { title: 'Driver Reports', subtitle: 'Issues reported by drivers' },
-    admins:    { title: 'Admins',         subtitle: 'Manage admin accounts and roles' }
-};
-
-function switchTab(tab) {
-    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
-    document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
-
-    var tabCapitalized = tab.charAt(0).toUpperCase() + tab.slice(1);
-    var contentEl = document.getElementById('tab' + tabCapitalized + 'Content');
-    var btnEl = document.getElementById('tab' + tabCapitalized);
-
-    if (contentEl) contentEl.classList.add('active');
-    if (btnEl) btnEl.classList.add('active');
-
-    var labels = TAB_LABELS[tab] || TAB_LABELS.orders;
-    document.getElementById('pageTitle').textContent = labels.title;
-    document.getElementById('pageSubtitle').textContent = labels.subtitle;
-
-    if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('sidebarBackdrop').classList.remove('open');
-    }
-
-        if (tab === 'menu') loadMenu();
-    if (tab === 'customers') loadCustomers();
-    if (tab === 'reports') loadReports();
-    if (tab === 'admins') loadAdmins();
-}
-
-// ============================================================
-// BROWSER NOTIFICATIONS
-// ============================================================
-var notificationsEnabled = false;
-
-function requestNotificationPermission() {
-    if (!('Notification' in window)) {
-        console.warn('This browser does not support notifications');
-        return;
-    }
-    if (Notification.permission === 'granted') {
-        notificationsEnabled = true;
-        return;
-    }
-    if (Notification.permission === 'denied') {
-        console.warn('Notifications blocked by user');
-        return;
-    }
-    Notification.requestPermission().then(function(perm) {
-        notificationsEnabled = (perm === 'granted');
-        if (notificationsEnabled) showNotification('Notifications enabled ✅');
-    });
-}
-
-function sendBrowserNotification(title, body) {
-    if (!notificationsEnabled || Notification.permission !== 'granted') return;
-    try {
-        var n = new Notification(title, {
-            body: body,
-            icon: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/utensils.svg',
-            badge: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/svgs/solid/utensils.svg',
-            tag: 'new-order',
-            requireInteraction: false
-        });
-        n.onclick = function() {
-            window.focus();
-            n.close();
-        };
-    } catch (err) {
-        console.warn('Notification failed:', err);
-    }
-}
-
-// ============================================================
-// TITLE FLASH
-// ============================================================
-var titleFlashInterval = null;
-var originalTitle = 'Admin Dashboard — Nabz-Tech Eats';
-var pendingOrderCount = 0;
-
-function flashTitle(count) {
-    pendingOrderCount = count;
-    if (titleFlashInterval) clearInterval(titleFlashInterval);
-
-    var shown = false;
-    titleFlashInterval = setInterval(function() {
-        document.title = shown
-            ? '(' + pendingOrderCount + ') New Orders!'
-            : originalTitle;
-        shown = !shown;
-    }, 1000);
-}
-
-function stopTitleFlash() {
-    if (titleFlashInterval) {
-        clearInterval(titleFlashInterval);
-        titleFlashInterval = null;
-    }
-    pendingOrderCount = 0;
-    document.title = originalTitle;
-}
-
-document.addEventListener('visibilitychange', function() {
-    if (!document.hidden) stopTitleFlash();
-});
-window.addEventListener('focus', stopTitleFlash);
-
-// ============================================================
-// BEEP
-// ============================================================
-function playBeep() {
-    var ctx = getAudioCtx();
-    if (!ctx) {
-        playFallbackBeep();
-        return;
-    }
-
-    if (ctx.state === 'suspended') {
-        ctx.resume().then(function() {
-            actuallyPlayBeep(ctx);
-        }).catch(function() {
-            playFallbackBeep();
-        });
-    } else {
-        actuallyPlayBeep(ctx);
-    }
-}
-
-// Fallback: use an <audio> element with a hosted MP3
-var fallbackAudio = null;
-function playFallbackBeep() {
-    try {
-        if (!fallbackAudio) {
-            fallbackAudio = new Audio('https://actions.google.com/sounds/v1/alarms/beep_short.ogg');
-            fallbackAudio.volume = 0.7;
-        }
-        fallbackAudio.currentTime = 0;
-        fallbackAudio.play().catch(function(err) {
-            console.warn('Fallback audio blocked:', err);
-        });
-        console.log('🔔 Fallback beep played');
-    } catch (e) {
-        console.warn('Fallback failed:', e);
-    }
-}
-// ============================================================
-// PASSWORD EYE TOGGLE
-// ============================================================
-// Automatically adds a 👁️ toggle to every password input on the page
-function attachPasswordEyes() {
-    var passwordInputs = document.querySelectorAll('input[type="password"]');
-
-    passwordInputs.forEach(function(input) {
-        // Skip if already wrapped
-        if (input.dataset.pwWrapped === '1') return;
-        input.dataset.pwWrapped = '1';
-
-        // Create wrapper
-        var wrap = document.createElement('div');
-        wrap.className = 'pw-wrap';
-
-        // Insert wrapper before input
-        input.parentNode.insertBefore(wrap, input);
-
-        // Move input inside wrapper
-        wrap.appendChild(input);
-
-        // Create eye button
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'pw-toggle';
-        btn.title = 'Show password';
-        btn.innerHTML = '<i class="fas fa-eye"></i>';
-
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            var isPassword = input.type === 'password';
-
-            input.type = isPassword ? 'text' : 'password';
-
-            btn.classList.toggle('showing', isPassword);
-            btn.innerHTML = isPassword ? '<i class="fas fa-eye-slash"></i>' : '<i class="fas fa-eye"></i>';
-            btn.title = isPassword ? 'Hide password' : 'Show password';
-        });
-
-        wrap.appendChild(btn);
-    });
-}
-
-// Run on load
-document.addEventListener('DOMContentLoaded', attachPasswordEyes);
-
-// Also run when modals open (they add password fields to the DOM later)
-// We'll call this manually from show functions where needed
-// ============================================================
-// CONFIRMATION DIALOGS
-// ============================================================
 function showConfirm(options) {
     return new Promise(function(resolve) {
         var overlay = document.createElement('div');
         overlay.className = 'confirm-modal';
-        overlay.id = 'confirmModalOverlay';
 
-        var iconClass = options.iconClass || 'fa-exclamation-triangle';
         var requireTyping = options.requireTyping || null;
 
         var buttonsHtml =
@@ -2528,8 +1461,8 @@ function showConfirm(options) {
 
         overlay.innerHTML =
             '<div class="confirm-modal-box">' +
-                              '<div class="confirm-modal-icon' + (options.iconVariant === 'neutral' ? ' neutral' : '') + '">' +
-                    '<i class="fas ' + iconClass + '"></i>' +
+                '<div class="confirm-modal-icon' + (options.iconVariant === 'neutral' ? ' neutral' : '') + '">' +
+                    '<i class="fas ' + (options.iconClass || 'fa-exclamation-triangle') + '"></i>' +
                 '</div>' +
                 '<h3>' + (options.title || 'Are you sure?') + '</h3>' +
                 '<p>' + (options.message || '') + '</p>' +
@@ -2550,11 +1483,9 @@ function showConfirm(options) {
 
         cancelBtn.onclick = function() { close(false); };
         okBtn.onclick = function() { close(true); };
-
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay) close(false);
         });
-
         document.addEventListener('keydown', function escHandler(e) {
             if (e.key === 'Escape') {
                 document.removeEventListener('keydown', escHandler);
@@ -2565,8 +1496,7 @@ function showConfirm(options) {
         if (requireTyping && typedInput) {
             typedInput.focus();
             typedInput.addEventListener('input', function() {
-                var matches = typedInput.value.trim().toUpperCase() === requireTyping.toUpperCase();
-                okBtn.disabled = !matches;
+                okBtn.disabled = typedInput.value.trim().toUpperCase() !== requireTyping.toUpperCase();
             });
             typedInput.addEventListener('keypress', function(e) {
                 if (e.key === 'Enter' && !okBtn.disabled) close(true);
@@ -2577,6 +1507,228 @@ function showConfirm(options) {
     });
 }
 
+function doLogout() {
+    showConfirm({
+        title: 'Log out?',
+        message: 'You will be signed out of the admin dashboard.',
+        iconClass: 'fa-sign-out-alt',
+        iconVariant: 'neutral',
+        confirmText: 'Log Out',
+        cancelText: 'Stay Signed In'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+        localStorage.removeItem('adminToken');
+        localStorage.removeItem('adminUser');
+        localStorage.removeItem('adminLoggedIn');
+        if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
+        document.getElementById('dashboardPage').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'flex';
+        document.getElementById('loginPassword').value = '';
+    });
+}
+
+function showDashboard() {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('dashboardPage').style.display = 'block';
+
+    var user = localStorage.getItem('adminUser') || 'admin';
+    var role = currentUserRole();
+    var master = isMasterUser();
+
+    document.getElementById('currentUser').textContent = user;
+    document.getElementById('userAvatar').textContent = user.charAt(0).toUpperCase();
+
+    var badgeText = 'Staff';
+    if (role === 'owner') badgeText = 'Owner';
+    else if (role === 'driver') badgeText = 'Driver';
+    if (master) badgeText = 'Owner (Master)';
+    document.getElementById('roleBadge').textContent = badgeText;
+
+    showTrialBanner();
+
+    if ('Notification' in window && Notification.permission === 'default') {
+        setTimeout(requestNotificationPermission, 3000);
+    }
+
+    // Admins tab: only for owners
+    var adminsTabBtn = document.getElementById('tabAdmins');
+    if (adminsTabBtn) adminsTabBtn.style.display = (role === 'owner') ? '' : 'none';
+
+    setTimeout(function() {
+        loadOrders();
+        loadMenu();
+        loadCustomers();
+        loadReports();
+        loadAdmins();
+    }, 50);
+
+    if (ordersInterval) clearInterval(ordersInterval);
+    ordersInterval = setInterval(loadOrders, 30000);
+    setInterval(loadReports, 30000);
+}
+
+function checkSession() {
+    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
+        showDashboard();
+    }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+    initTheme();
+    checkSession();
+});
+
+// ============================================================
+// TRIAL BANNER
+// ============================================================
+function showTrialBanner() {
+    var token = localStorage.getItem('adminToken');
+    if (!token) return;
+    var isTrial = false;
+    try {
+        isTrial = JSON.parse(atob(token.split('.')[1])).is_trial === 1;
+    } catch (e) { return; }
+    var banner = document.getElementById('trialBanner');
+    if (banner) banner.style.display = isTrial ? 'flex' : 'none';
+}
+
+function showTrialUpgradeInfo() {
+    var overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.id = 'trialInfoOverlay';
+    overlay.innerHTML =
+        '<div class="modal-box" style="text-align:center;">' +
+            '<button class="modal-close" onclick="document.getElementById(\'trialInfoOverlay\').remove()">×</button>' +
+            '<div style="font-size:2.8rem;margin-bottom:10px;">🧪</div>' +
+            '<h2>Trial Account</h2>' +
+            '<p style="color:var(--text-secondary);margin-bottom:20px;">You are on a free trial. Contact support to upgrade.</p>' +
+            '<p style="color:var(--text-muted);margin-bottom:16px;">Contact: <strong style="color:var(--text);">+973-3331-0359</strong></p>' +
+            '<button class="modal-btn-primary" onclick="document.getElementById(\'trialInfoOverlay\').remove()">Got it</button>' +
+        '</div>';
+    document.body.appendChild(overlay);
+}
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
+function openChangePassword() {
+    document.getElementById('changePasswordModal').style.display = 'flex';
+    document.getElementById('currentPwd').value = '';
+    document.getElementById('newPwd').value = '';
+    document.getElementById('newPwd2').value = '';
+    document.getElementById('pwdError').textContent = '';
+}
+function closeChangePassword() {
+    document.getElementById('changePasswordModal').style.display = 'none';
+}
+function submitChangePassword() {
+    var current = document.getElementById('currentPwd').value;
+    var newPwd = document.getElementById('newPwd').value;
+    var newPwd2 = document.getElementById('newPwd2').value;
+    var errorEl = document.getElementById('pwdError');
+
+    errorEl.style.color = 'var(--danger)';
+    errorEl.textContent = '';
+
+    if (!current) { errorEl.textContent = 'Enter your current password'; return; }
+    if (!newPwd || newPwd.length < 6) { errorEl.textContent = 'New password must be at least 6 characters'; return; }
+    if (newPwd !== newPwd2) { errorEl.textContent = 'New passwords do not match'; return; }
+
+    authFetch(API + '/admin/password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: current, newPassword: newPwd })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
+            return;
+        }
+        errorEl.style.color = 'var(--success)';
+        errorEl.textContent = '✅ Password updated!';
+        setTimeout(function() {
+            closeChangePassword();
+            showNotification('Password changed successfully');
+        }, 1200);
+    })
+    .catch(function(err) { errorEl.textContent = '❌ Network error'; });
+}
+
+// ============================================================
+// TABS
+// ============================================================
+var TAB_LABELS = {
+    orders:    { title: 'Orders',         subtitle: 'Manage incoming orders and drivers' },
+    menu:      { title: 'Menu',           subtitle: 'Manage your restaurant menu items' },
+    customers: { title: 'Customers',      subtitle: 'View registered customers' },
+    reports:   { title: 'Driver Reports', subtitle: 'Issues reported by drivers' },
+    admins:    { title: 'Admins',         subtitle: 'Manage admin accounts and roles' }
+};
+function switchTab(tab) {
+    document.querySelectorAll('.tab-content').forEach(function(el) { el.classList.remove('active'); });
+    document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+
+    var tabCapitalized = tab.charAt(0).toUpperCase() + tab.slice(1);
+    var contentEl = document.getElementById('tab' + tabCapitalized + 'Content');
+    var btnEl = document.getElementById('tab' + tabCapitalized);
+    if (contentEl) contentEl.classList.add('active');
+    if (btnEl) btnEl.classList.add('active');
+
+    var labels = TAB_LABELS[tab] || TAB_LABELS.orders;
+    document.getElementById('pageTitle').textContent = labels.title;
+    document.getElementById('pageSubtitle').textContent = labels.subtitle;
+
+    if (window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('open');
+        document.getElementById('sidebarBackdrop').classList.remove('open');
+    }
+
+    if (tab === 'menu') loadMenu();
+    if (tab === 'customers') loadCustomers();
+    if (tab === 'reports') loadReports();
+    if (tab === 'admins') loadAdmins();
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+var notificationsEnabled = false;
+function requestNotificationPermission() {
+    if (!('Notification' in window)) return;
+    if (Notification.permission === 'granted') { notificationsEnabled = true; return; }
+    if (Notification.permission === 'denied') return;
+    Notification.requestPermission().then(function(perm) {
+        notificationsEnabled = (perm === 'granted');
+    });
+}
+function sendBrowserNotification(title, body) {
+    if (!notificationsEnabled || Notification.permission !== 'granted') return;
+    try {
+        var n = new Notification(title, { body: body, tag: 'new-order' });
+        n.onclick = function() { window.focus(); n.close(); };
+    } catch (err) {}
+}
+
+var titleFlashInterval = null;
+var originalTitle = 'Admin Dashboard — Nabz-Tech Eats';
+function flashTitle(count) {
+    if (titleFlashInterval) clearInterval(titleFlashInterval);
+    var shown = false;
+    titleFlashInterval = setInterval(function() {
+        document.title = shown ? '(' + count + ') New Orders!' : originalTitle;
+        shown = !shown;
+    }, 1000);
+}
+function stopTitleFlash() {
+    if (titleFlashInterval) { clearInterval(titleFlashInterval); titleFlashInterval = null; }
+    document.title = originalTitle;
+}
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) stopTitleFlash();
+});
+window.addEventListener('focus', stopTitleFlash);
+
 // ============================================================
 // ORDERS
 // ============================================================
@@ -2584,8 +1736,6 @@ function loadOrders() {
     authFetch(API + '/orders')
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            console.log('✅ Orders loaded:', data.length);
-
             allOrders = data.map(function(order) {
                 return {
                     id: order.id,
@@ -2614,7 +1764,6 @@ function loadOrders() {
                 flashTitle(newCount);
             }
             lastOrderCount = allOrders.length;
-
             applyFilters();
         })
         .catch(function(error) {
@@ -2663,12 +1812,12 @@ function applyFilters() {
     }
 
     var filtered = allOrders.filter(function(order) {
-       var matchSearch = !search ||
-    (order.name && order.name.toLowerCase().includes(search)) ||
-    (order.phone && String(order.phone).toLowerCase().includes(search)) ||
-    (order.driver_name && order.driver_name.toLowerCase().includes(search)) ||
-    (order.address && order.address.toLowerCase().includes(search)) ||
-    String(order.id).includes(search);
+        var matchSearch = !search ||
+            (order.name && order.name.toLowerCase().includes(search)) ||
+            (order.phone && String(order.phone).toLowerCase().includes(search)) ||
+            (order.driver_name && order.driver_name.toLowerCase().includes(search)) ||
+            (order.address && order.address.toLowerCase().includes(search)) ||
+            String(order.id).includes(search);
         var matchStatus = statusFilter === 'all' || order.status === statusFilter;
         var matchDate = true;
         if (rangeStart && rangeEnd && order.date) {
@@ -2730,53 +1879,39 @@ function renderOrders(orders) {
                 '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
         }
 
-       html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
-
-    // ---- HEADER (spans full width) ----
-    '<div class="order-header">' +
-        '<span class="order-id">Order #' + order.id + '</span>' +
-        '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
-    '</div>' +
-
-    // ---- LEFT COLUMN: customer info ----
-    '<div class="order-info">' +
-        '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
-        '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
-        '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
-        '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
-        (order.driver_name ?
-            '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
-            : '') +
-        '<div class="order-details" style="font-size:0.82rem;color:var(--text-muted);"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
-    '</div>' +
-
-    // ---- RIGHT COLUMN: items + total ----
-    '<div class="order-summary">' +
-        '<div class="items-title"><i class="fas fa-utensils"></i> Order Items</div>' +
-        (order.items && order.items.length > 0 ?
-            order.items.map(function(it) {
-                var lineTotal = parseFloat(it.price) * it.quantity;
-                return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);font-size:0.9rem;">' +
-                    '<span><strong style="color:var(--accent);">' + escapeHtml(it.quantity) + '×</strong> ' + escapeHtml(it.item_name) + '</span>' +
-                    '<span style="color:var(--text-secondary);white-space:nowrap;">BD ' + lineTotal.toFixed(2) + '</span>' +
-                '</div>';
-            }).join('') +
-            '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
-                '<span>Total</span>' +
-                '<span>BD ' + order.total.toFixed(2) + '</span>' +
-            '</div>'
-            : '<div style="color:var(--text-muted);font-size:0.9rem;padding:6px 0;">No items recorded</div>' +
-              '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
-                '<span>Total</span>' +
-                '<span>BD ' + order.total.toFixed(2) + '</span>' +
-              '</div>'
-        ) +
-    '</div>' +
-
-    // ---- ACTION BUTTONS (spans full width) ----
-    '<div class="order-actions">' + actionButtons + '</div>' +
-
-'</div>';
+        html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
+            '<div class="order-header">' +
+                '<span class="order-id">Order #' + order.id + '</span>' +
+                '<span class="order-status" style="background:' + st.bg + ';color:' + st.color + ';">' + st.icon + '</span>' +
+            '</div>' +
+            '<div class="order-details"><i class="fas fa-calendar"></i> ' + (order.date || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(order.name || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-phone"></i> ' + escapeHtml(order.phone || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-map-marker-alt"></i> ' + escapeHtml(order.address || '-') + '</div>' +
+            '<div class="order-details"><i class="fas fa-credit-card"></i> ' + escapeHtml(order.payment || '-') + '</div>' +
+            (order.driver_name ?
+                '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color:var(--text);">' + escapeHtml(order.driver_name) + '</strong></div>'
+                : '') +
+            (order.items && order.items.length > 0 ?
+                '<div style="margin: 10px 0 4px;">' +
+                    '<button onclick="toggleItems(' + order.id + ')" ' +
+                        'style="background:none;border:none;color:var(--info);cursor:pointer;font-size:0.85rem;padding:4px 0;font-family:inherit;">' +
+                        '<i class="fas fa-chevron-down" id="itemsChevron' + order.id + '" style="transition:transform 0.2s;"></i> ' +
+                        'View ' + order.items.length + ' item' + (order.items.length > 1 ? 's' : '') +
+                    '</button>' +
+                    '<div id="itemsBox' + order.id + '" style="display:none; margin-top:8px; padding:10px 12px; background:var(--surface-secondary); border-radius:6px; font-size:0.88rem;">' +
+                        order.items.map(function(it) {
+                            return '<div style="display:flex;justify-content:space-between;padding:3px 0;">' +
+                                '<span>' + escapeHtml(it.quantity) + '× ' + escapeHtml(it.item_name) + '</span>' +
+                                '<span style="color:var(--text-secondary);">BD ' + (parseFloat(it.price) * it.quantity).toFixed(2) + '</span>' +
+                            '</div>';
+                        }).join('') +
+                    '</div>' +
+                '</div>'
+                : '') +
+            '<div class="order-total">BD ' + order.total.toFixed(2) + '</div>' +
+            '<div class="order-actions">' + actionButtons + '</div>' +
+        '</div>';
     });
     container.innerHTML = html;
 }
@@ -2811,7 +1946,6 @@ function updateOrderStatus(index, newStatus) {
     var order = allOrders[index];
     if (!order) return;
 
-    // Cancel requires confirmation — other statuses go straight through
     if (newStatus === 'Cancelled') {
         showConfirm({
             title: 'Cancel this order?',
@@ -2824,7 +1958,6 @@ function updateOrderStatus(index, newStatus) {
         });
         return;
     }
-
     doUpdateOrderStatus(order, newStatus);
 }
 
@@ -2839,55 +1972,42 @@ function doUpdateOrderStatus(order, newStatus) {
         showNotification('Order #' + order.id + ' → ' + newStatus);
         loadOrders();
     })
-    .catch(function(error) {
-        console.error('❌ Update error:', error);
-        alert('Failed to update status');
-    });
+    .catch(function(error) { alert('Failed to update status'); });
 }
 
 function deleteOrder(index) {
     var order = allOrders[index];
     if (!order) return;
-
     showConfirm({
         title: 'Delete this order?',
-        message: 'Order <span class="order-ref">#' + order.id + '</span> will be permanently removed from the server.',
+        message: 'Order <span class="order-ref">#' + order.id + '</span> will be permanently removed.',
         iconClass: 'fa-trash-alt',
         confirmText: 'Delete',
         cancelText: 'Cancel'
     }).then(function(confirmed) {
         if (!confirmed) return;
-
         authFetch(API + '/orders/' + order.id, { method: 'DELETE' })
             .then(function(res) { return res.json(); })
             .then(function() {
                 showNotification('Order deleted');
                 loadOrders();
             })
-            .catch(function(error) {
-                console.error('❌ Delete error:', error);
-                alert('Failed to delete');
-            });
+            .catch(function(error) { alert('Failed to delete'); });
     });
 }
+
 function clearAllOrders() {
-    if (allOrders.length === 0) {
-        showNotification('No orders to clear');
-        return;
-    }
-
+    if (allOrders.length === 0) { showNotification('No orders to clear'); return; }
     var count = allOrders.length;
-
     showConfirm({
         title: 'Delete ALL orders?',
-        message: 'You are about to permanently delete <strong>' + count + ' order' + (count > 1 ? 's' : '') + '</strong> from the server.<br><br><span style="color: var(--danger); font-weight: 600;">This cannot be undone.</span>',
+        message: 'You are about to permanently delete <strong>' + count + ' order' + (count > 1 ? 's' : '') + '</strong>.<br><br><span style="color: var(--danger); font-weight: 600;">This cannot be undone.</span>',
         iconClass: 'fa-trash-alt',
         confirmText: 'Delete All',
         cancelText: 'Keep Orders',
         requireTyping: 'DELETE'
     }).then(function(confirmed) {
         if (!confirmed) return;
-
         var promises = allOrders.map(function(o) {
             return authFetch(API + '/orders/' + o.id, { method: 'DELETE' }).catch(function(){});
         });
@@ -2897,8 +2017,9 @@ function clearAllOrders() {
         });
     });
 }
+
 // ============================================================
-// EXPORT HELPERS + JSON BACKUP / RESTORE
+// EXPORT / BACKUP
 // ============================================================
 function toggleExportMenu(e) {
     e.stopPropagation();
@@ -2918,7 +2039,6 @@ function downloadCSV(csv, filename) {
     a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
 }
-
 function downloadJSON(jsonString, filename) {
     var blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
@@ -2928,77 +2048,27 @@ function downloadJSON(jsonString, filename) {
     setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
 }
 
-// ---- CSV: Orders (filtered) ----
 function exportCSV() {
-    // Rebuild the filtered list
-    var search = document.getElementById('searchInput').value.toLowerCase();
-    var statusFilter = document.getElementById('statusFilter').value;
-    var quickDate = document.getElementById('quickDateFilter').value;
-    var customDate = document.getElementById('customDate').value;
-
-    var today = new Date();
-    var todayStr = today.toISOString().split('T')[0];
-    var rangeStart = null, rangeEnd = null;
-
-    if (quickDate === 'today') { rangeStart = rangeEnd = todayStr; }
-    else if (quickDate === 'yesterday') {
-        var y = new Date(today); y.setDate(y.getDate() - 1);
-        rangeStart = rangeEnd = y.toISOString().split('T')[0];
-    } else if (quickDate === 'week') {
-        var w = new Date(today); w.setDate(w.getDate() - 6);
-        rangeStart = w.toISOString().split('T')[0]; rangeEnd = todayStr;
-    } else if (quickDate === 'month') {
-        var m = new Date(today.getFullYear(), today.getMonth(), 1);
-        rangeStart = m.toISOString().split('T')[0]; rangeEnd = todayStr;
-    } else if (quickDate === 'custom' && customDate) {
-        rangeStart = rangeEnd = customDate;
-    }
-
-    var rows = allOrders.filter(function(order) {
-       var matchSearch = !search ||
-    (order.name && order.name.toLowerCase().includes(search)) ||
-    (order.phone && String(order.phone).toLowerCase().includes(search)) ||
-    String(order.id).includes(search);
-        var matchStatus = statusFilter === 'all' || order.status === statusFilter;
-        var matchDate = true;
-        if (rangeStart && rangeEnd && order.date) {
-            var od = new Date(order.date).toISOString().split('T')[0];
-            if (od < rangeStart || od > rangeEnd) matchDate = false;
-        }
-        return matchSearch && matchStatus && matchDate;
-    });
-
-    if (rows.length === 0) { alert('No orders match the current filters.'); return; }
-
+    if (allOrders.length === 0) { alert('No orders to export.'); return; }
     var csv = 'Order #,Date,Customer,Phone,Address,Payment,Driver,Total (BD),Status\n';
-    rows.forEach(function(o) {
-        csv += o.id + ',' +
-               '"' + (o.date || '') + '",' +
-               '"' + (o.name || '').replace(/"/g, '""') + '",' +
-               '"' + (o.phone || '') + '",' +
-               '"' + (o.address || '').replace(/"/g, '""') + '",' +
-               '"' + (o.payment || '') + '",' +
-               '"' + (o.driver_name || '') + '",' +
-               o.total.toFixed(2) + ',' +
-               '"' + (o.status || '') + '"\n';
+    allOrders.forEach(function(o) {
+        csv += o.id + ',"' + (o.date || '') + '","' + (o.name || '').replace(/"/g, '""') + '","' + (o.phone || '') + '","' + (o.address || '').replace(/"/g, '""') + '","' + (o.payment || '') + '","' + (o.driver_name || '') + '",' + o.total.toFixed(2) + ',"' + (o.status || '') + '"\n';
     });
     downloadCSV(csv, 'orders-' + new Date().toISOString().split('T')[0] + '.csv');
-    showNotification('Exported ' + rows.length + ' order(s)');
+    showNotification('Exported ' + allOrders.length + ' orders');
 }
 
-// ---- CSV: Customers ----
 function exportCustomersCSV() {
     var customers = window.allCustomers || [];
     if (customers.length === 0) { alert('No customers to export. Open the Customers tab first.'); return; }
     var csv = 'ID,Name,Phone,Address,Registered\n';
     customers.forEach(function(c) {
-        csv += c.id + ',"' + (c.name || '').replace(/"/g, '""') + '","' + (c.phone || '') + '","' + (c.address || '').replace(/"/g, '""') + '","' + (c.created_at || c.created || '') + '"\n';
+        csv += c.id + ',"' + (c.name || '').replace(/"/g, '""') + '","' + (c.phone || '') + '","' + (c.address || '').replace(/"/g, '""') + '","' + (c.created_at || '') + '"\n';
     });
     downloadCSV(csv, 'customers-' + new Date().toISOString().split('T')[0] + '.csv');
-    showNotification('Exported ' + customers.length + ' customer(s)');
+    showNotification('Exported ' + customers.length + ' customers');
 }
 
-// ---- CSV: Menu ----
 function exportMenuCSV() {
     if (allMenuItems.length === 0) { alert('No menu items to export.'); return; }
     var csv = 'ID,Category,Name,Description,Price (BD)\n';
@@ -3006,50 +2076,11 @@ function exportMenuCSV() {
         csv += m.id + ',"' + (m.category || '') + '","' + (m.name || '').replace(/"/g, '""') + '","' + (m.description || '').replace(/"/g, '""') + '",' + parseFloat(m.price).toFixed(2) + '\n';
     });
     downloadCSV(csv, 'menu-' + new Date().toISOString().split('T')[0] + '.csv');
-    showNotification('Exported ' + allMenuItems.length + ' menu item(s)');
+    showNotification('Exported ' + allMenuItems.length + ' menu items');
 }
 
-// ---- CSV: Full backup ----
-function exportFullBackup() {
-    Promise.all([
-        authFetch(API + '/orders').then(function(r){return r.json();}).catch(function(){return [];}),
-        authFetch(API + '/customers').then(function(r){return r.json();}).catch(function(){return [];}),
-        authFetch(API + '/menu').then(function(r){return r.json();}).catch(function(){return [];})
-    ]).then(function(results) {
-        var orders = results[0] || [], customers = results[1] || [], menu = results[2] || [];
-        var lines = [];
-        var stamp = new Date().toISOString().split('T')[0];
-        lines.push('=== ORDERS ===');
-        lines.push('Order #,Date,Customer,Phone,Address,Payment,Driver,Total (BD),Status');
-        orders.forEach(function(o) {
-            lines.push(o.id + ',"' + (o.created_at || '') + '","' + (o.customer_name || '').replace(/"/g, '""') + '","' + (o.customer_phone || '') + '","' + (o.customer_address || '').replace(/"/g, '""') + '","' + (o.payment_method || '') + '","' + (o.driver_name || '') + '",' + parseFloat(o.total || 0).toFixed(2) + ',"' + (o.status || '') + '"');
-        });
-        lines.push('');
-        lines.push('=== CUSTOMERS ===');
-        lines.push('ID,Name,Phone,Address,Registered');
-        customers.forEach(function(c) {
-            lines.push(c.id + ',"' + (c.name || '').replace(/"/g, '""') + '","' + (c.phone || '') + '","' + (c.address || '').replace(/"/g, '""') + '","' + (c.created_at || c.created || '') + '"');
-        });
-        lines.push('');
-        lines.push('=== MENU ===');
-        lines.push('ID,Category,Name,Description,Price (BD)');
-        menu.forEach(function(m) {
-            lines.push(m.id + ',"' + (m.category || '') + '","' + (m.name || '').replace(/"/g, '""') + '","' + (m.description || '').replace(/"/g, '""') + '",' + parseFloat(m.price || 0).toFixed(2));
-        });
-        lines.push('');
-        lines.push('=== BACKUP INFO ===');
-        lines.push('Generated,"' + new Date().toISOString() + '"');
-        lines.push('Orders,"' + orders.length + '"');
-        lines.push('Customers,"' + customers.length + '"');
-        lines.push('Menu items,"' + menu.length + '"');
-        downloadCSV(lines.join('\n'), 'nabztech-backup-' + stamp + '.csv');
-        showNotification('Full CSV backup downloaded');
-    }).catch(function(err) { alert('Backup failed: ' + err.message); });
-}
-
-// ---- JSON: Full backup ----
 function exportJSONBackup() {
-    if (!confirm('📦 Create full JSON backup?\n\nDownloads ALL orders, customers, and menu items in one file.\n\nContinue?')) return;
+    if (!confirm('📦 Create full JSON backup?\n\nThis downloads ALL orders, customers, and menu items.\n\nContinue?')) return;
     showNotification('Fetching all data…');
     Promise.all([
         authFetch(API + '/orders').then(function(r){return r.json();}).catch(function(){return [];}),
@@ -3064,7 +2095,6 @@ function exportJSONBackup() {
                 app: 'Nabz-Tech Eats',
                 format: 'nabztech-backup-v1',
                 exportedAt: new Date().toISOString(),
-                exportedBy: localStorage.getItem('adminUser') || 'unknown',
                 version: 1,
                 counts: { orders: orders.length, customers: customers.length, menu: menu.length }
             },
@@ -3073,11 +2103,10 @@ function exportJSONBackup() {
         var json = JSON.stringify(backup, null, 2);
         var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
         downloadJSON(json, 'nabztech-backup-' + stamp + '.json');
-        showNotification('✅ Backup created (' + orders.length + ' orders, ' + customers.length + ' customers, ' + menu.length + ' items)');
+        showNotification('✅ Backup created');
     }).catch(function(err) { alert('❌ Backup failed: ' + err.message); });
 }
 
-// ---- JSON: Restore ----
 function importJSONBackup(event) {
     var file = event.target.files[0];
     if (!file) return;
@@ -3117,19 +2146,12 @@ function performRestore(orders, customers, menu) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orders: orders, customers: customers, menu: menu })
     })
-    .then(function(res) {
-        return res.text().then(function(text) {
-            var data;
-            try { data = JSON.parse(text); } catch (err) { data = { raw: text }; }
-            return { ok: res.ok, status: res.status, data: data };
-        });
-    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, status: res.status, data: d }; }); })
     .then(function(result) {
         if (!result.ok) {
             var msg = result.data.error || ('HTTP ' + result.status);
-            if (result.status === 404) msg = 'Restore endpoint not found on the server.\n\nAsk your developer to add POST /api/admin/restore.';
-            else if (result.status === 403) msg = 'Only owners can restore backups.';
-            else if (result.status === 413) msg = 'Backup is too large for the server.';
+            if (result.status === 404) msg = 'Restore endpoint not found on the server.';
+            else if (result.status === 403) msg = 'Only the system owner can restore backups.';
             alert('❌ Restore failed:\n\n' + msg);
             return;
         }
@@ -3138,7 +2160,7 @@ function performRestore(orders, customers, menu) {
         showNotification('✅ Restore complete (' + restored + ' records)');
         loadOrders(); loadMenu(); loadCustomers();
     })
-    .catch(function(err) { alert('❌ Network error during restore: ' + err.message); });
+    .catch(function(err) { alert('❌ Network error: ' + err.message); });
 }
 
 // ============================================================
@@ -3148,12 +2170,10 @@ function loadMenu() {
     authFetch(API + '/menu')
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            console.log('✅ Menu loaded:', data.length);
             allMenuItems = Array.isArray(data) ? data : [];
             renderMenu();
         })
         .catch(function(error) {
-            console.error('❌ Menu error:', error);
             allMenuItems = [];
             renderMenu();
         });
@@ -3162,7 +2182,6 @@ function loadMenu() {
 function previewImage(event) {
     var file = event.target.files[0];
     if (!file) return;
-
     var reader = new FileReader();
     reader.onload = function(e) {
         var img = new Image();
@@ -3171,17 +2190,11 @@ function previewImage(event) {
             var ctx = canvas.getContext('2d');
             var maxSize = 600;
             var width = img.width, height = img.height;
-
-            if (width > height) {
-                if (width > maxSize) { height *= maxSize / width; width = maxSize; }
-            } else {
-                if (height > maxSize) { width *= maxSize / height; height = maxSize; }
-            }
-
+            if (width > height) { if (width > maxSize) { height *= maxSize / width; width = maxSize; } }
+            else { if (height > maxSize) { width *= maxSize / height; height = maxSize; } }
             canvas.width = width;
             canvas.height = height;
             ctx.drawImage(img, 0, 0, width, height);
-
             var compressed = canvas.toDataURL('image/jpeg', 0.7);
             document.getElementById('imagePreview').src = compressed;
             document.getElementById('imagePreviewContainer').style.display = 'block';
@@ -3195,12 +2208,10 @@ function previewImage(event) {
 function renderMenu() {
     var container = document.getElementById('menuList');
     if (!container) return;
-
     if (allMenuItems.length === 0) {
         container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
         return;
     }
-
     var catIcons = { 'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦' };
     var html = '';
     allMenuItems.forEach(function(item) {
@@ -3208,8 +2219,7 @@ function renderMenu() {
         var imageHtml = (item.image_url && item.image_url.startsWith('data:image'))
             ? '<img src="' + item.image_url + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">'
             : '<span class="item-icon">' + icon + '</span>';
-
-               html += '<div class="menu-item-row">' +
+        html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
                 '<div class="item-details">' +
                     '<div class="item-name">#' + item.id + ' · ' + escapeHtml(item.name) + '</div>' +
@@ -3233,21 +2243,13 @@ function saveMenuItem() {
     var price = parseFloat(document.getElementById('menuPrice').value);
     var image = document.getElementById('menuImage').value || 'default.jpg';
     var editId = document.getElementById('editItemId').value;
+    var isPopular = document.getElementById('menuIsPopular').checked ? 1 : 0;
 
     if (!name) { alert('Please enter an item name.'); return; }
     if (!desc) { alert('Please enter a description.'); return; }
     if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
 
-      var isPopular = document.getElementById('menuIsPopular').checked ? 1 : 0;
-
-    var itemData = {
-        category: category,
-        name: name,
-        description: desc,
-        price: price,
-        image_url: image,
-        is_popular: isPopular
-    };
+    var itemData = { category: category, name: name, description: desc, price: price, image_url: image, is_popular: isPopular };
     var url = editId ? (API + '/menu/' + editId) : (API + '/menu');
     var method = editId ? 'PUT' : 'POST';
 
@@ -3256,43 +2258,29 @@ function saveMenuItem() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(itemData)
     })
-    .then(function(response) {
-        return response.text().then(function(text) {
-            console.log('📥 Server response:', text);
-            try { return JSON.parse(text); }
-            catch (e) { throw new Error('Server returned: ' + text.substring(0, 100)); }
-        });
-    })
     .then(function() {
         showNotification('Item saved!');
         cancelEdit();
         loadMenu();
     })
-    .catch(function(error) {
-        console.error('❌ Save error:', error);
-        alert('Failed: ' + error.message);
-    });
+    .catch(function(error) { alert('Failed: ' + error.message); });
 }
 
 function editMenuItem(id) {
     var item = allMenuItems.find(function(i) { return i.id === id; });
     if (!item) return;
-
     document.getElementById('menuCategory').value = item.category;
     document.getElementById('menuName').value = item.name;
     document.getElementById('menuDesc').value = item.description || '';
     document.getElementById('menuPrice').value = item.price;
     document.getElementById('menuImage').value = item.image_url || '';
-    document.getElementById('menuIsPopular').checked =
-    (item.is_popular === 1 || item.is_popular === '1' || item.is_popular === true);
-
+    document.getElementById('menuIsPopular').checked = (item.is_popular === 1 || item.is_popular === '1' || item.is_popular === true);
     if (item.image_url && item.image_url.startsWith('data:image')) {
         document.getElementById('imagePreview').src = item.image_url;
         document.getElementById('imagePreviewContainer').style.display = 'block';
     } else {
         document.getElementById('imagePreviewContainer').style.display = 'none';
     }
-
     document.getElementById('editItemId').value = item.id;
     document.getElementById('menuFormTitle').textContent = '✏️ Edit Item';
     document.querySelector('.btn-save').textContent = 'Update Item';
@@ -3316,19 +2304,23 @@ function cancelEdit() {
 function deleteMenuItem(id) {
     var item = allMenuItems.find(function(i) { return i.id === id; });
     if (!item) return;
-    if (!confirm('Delete "' + item.name + '"?')) return;
-
-    authFetch(API + '/menu/' + id, { method: 'DELETE' })
-        .then(function(response) { return response.json(); })
-        .then(function() {
-            showNotification('Item deleted');
-            loadMenu();
-        })
-        .catch(function(error) {
-            console.error('❌ Delete error:', error);
-            alert('Failed to delete item');
-        });
+    showConfirm({
+        title: 'Delete this item?',
+        message: '<strong>' + escapeHtml(item.name) + '</strong> will be permanently removed from the menu.',
+        iconClass: 'fa-trash-alt',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+    }).then(function(confirmed) {
+        if (!confirmed) return;
+        authFetch(API + '/menu/' + id, { method: 'DELETE' })
+            .then(function() {
+                showNotification('Item deleted');
+                loadMenu();
+            })
+            .catch(function(error) { alert('Failed to delete item'); });
+    });
 }
+
 // ============================================================
 // CSV IMPORT
 // ============================================================
@@ -3341,13 +2333,8 @@ function openImportModal() {
     document.getElementById('importActions').style.display = 'none';
     document.getElementById('importError').textContent = '';
     parsedCsvItems = [];
-
-    // Reset sticky button
     var stickyBtn = document.getElementById('importConfirmSticky');
-    if (stickyBtn) {
-        stickyBtn.disabled = true;
-        stickyBtn.innerHTML = '<i class="fas fa-check"></i> Import Items';
-    }
+    if (stickyBtn) { stickyBtn.disabled = true; stickyBtn.innerHTML = '<i class="fas fa-check"></i> Import Items'; }
 }
 
 function closeImportModal() {
@@ -3358,30 +2345,19 @@ function closeImportModal() {
 function handleCsvFile(event) {
     var file = event.target.files[0];
     if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-        document.getElementById('importError').textContent = '❌ File too large (max 5 MB)';
-        return;
-    }
-
+    if (file.size > 5 * 1024 * 1024) { document.getElementById('importError').textContent = '❌ File too large'; return; }
     var reader = new FileReader();
     reader.onload = function(e) {
         try {
-            var text = e.target.result;
-            parsedCsvItems = parseCsv(text);
-
+            parsedCsvItems = parseCsv(e.target.result);
             if (parsedCsvItems.length === 0) {
-                document.getElementById('importError').textContent = '❌ No valid items found in CSV';
-                document.getElementById('importPreview').style.display = 'none';
-                document.getElementById('importActions').style.display = 'none';
+                document.getElementById('importError').textContent = '❌ No valid items found';
                 return;
             }
-
             showImportPreview();
             document.getElementById('importError').textContent = '';
         } catch (err) {
-            console.error('CSV parse error:', err);
-            document.getElementById('importError').textContent = '❌ Could not parse file: ' + err.message;
+            document.getElementById('importError').textContent = '❌ ' + err.message;
         }
     };
     reader.readAsText(file);
@@ -3390,38 +2366,26 @@ function handleCsvFile(event) {
 function parseCsv(text) {
     var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
     if (lines.length < 2) return [];
-
-    // Parse header
-    var headers = parseCsvLine(lines[0]).map(function(h) {
-        return h.toLowerCase().trim().replace(/^["']|["']$/g, '');
-    });
-
+    var headers = parseCsvLine(lines[0]).map(function(h) { return h.toLowerCase().trim().replace(/^["']|["']$/g, ''); });
     var idxCategory = headers.indexOf('category');
     var idxName = headers.indexOf('name');
     var idxDesc = headers.indexOf('description');
     var idxPrice = headers.indexOf('price');
     var idxPopular = headers.indexOf('is_popular');
-
-    if (idxName === -1 || idxPrice === -1) {
-        throw new Error('CSV must have "name" and "price" columns');
-    }
-
+    if (idxName === -1 || idxPrice === -1) throw new Error('CSV must have "name" and "price" columns');
     var items = [];
     for (var i = 1; i < lines.length; i++) {
         var cells = parseCsvLine(lines[i]);
         if (cells.length < 2) continue;
-
         var name = (cells[idxName] || '').trim();
         var price = parseFloat((cells[idxPrice] || '').replace(/[^\d.\-]/g, ''));
-
         if (!name || isNaN(price)) continue;
-
         items.push({
             category: idxCategory !== -1 ? (cells[idxCategory] || 'Other').trim() : 'Other',
             name: name,
             description: idxDesc !== -1 ? (cells[idxDesc] || '').trim() : '',
             price: price,
-            is_popular: idxPopular !== -1 ? (cells[idxPopular] || '0').trim() === '1' || (cells[idxPopular] || '').toLowerCase() === 'true' : false
+            is_popular: idxPopular !== -1 ? (cells[idxPopular] || '0').trim() === '1' : false
         });
     }
     return items;
@@ -3431,53 +2395,35 @@ function parseCsvLine(line) {
     var cells = [];
     var current = '';
     var inQuotes = false;
-
     for (var i = 0; i < line.length; i++) {
         var ch = line[i];
-
         if (inQuotes) {
-            if (ch === '"' && line[i + 1] === '"') {
-                current += '"';
-                i++;
-            } else if (ch === '"') {
-                inQuotes = false;
-            } else {
-                current += ch;
-            }
+            if (ch === '"' && line[i + 1] === '"') { current += '"'; i++; }
+            else if (ch === '"') inQuotes = false;
+            else current += ch;
         } else {
-            if (ch === '"') {
-                inQuotes = true;
-            } else if (ch === ',') {
-                cells.push(current);
-                current = '';
-            } else {
-                current += ch;
-            }
+            if (ch === '"') inQuotes = true;
+            else if (ch === ',') { cells.push(current); current = ''; }
+            else current += ch;
         }
     }
     cells.push(current);
     return cells;
 }
+
 function showImportPreview() {
     var preview = document.getElementById('importPreview');
     var categories = {};
-    parsedCsvItems.forEach(function(item) {
-        categories[item.category] = (categories[item.category] || 0) + 1;
-    });
-
+    parsedCsvItems.forEach(function(item) { categories[item.category] = (categories[item.category] || 0) + 1; });
     var html = '<div style="background:var(--surface-secondary);border-radius:var(--radius);padding:10px 12px;">' +
         '<div style="font-weight:700;margin-bottom:6px;font-size:0.9rem;">📋 ' + parsedCsvItems.length + ' items ready</div>' +
         '<div style="max-height:110px;overflow-y:auto;font-size:0.82rem;">';
-
     Object.keys(categories).forEach(function(cat) {
         html += '<div style="display:flex;justify-content:space-between;padding:4px 0;"><span><strong>' + escapeHtml(cat) + '</strong></span><span style="color:var(--text-muted);">' + categories[cat] + ' items</span></div>';
     });
-
     html += '</div></div>';
     preview.innerHTML = html;
     preview.style.display = 'block';
-
-    // Enable the sticky footer button
     var stickyBtn = document.getElementById('importConfirmSticky');
     if (stickyBtn) {
         stickyBtn.disabled = false;
@@ -3487,11 +2433,9 @@ function showImportPreview() {
 
 function confirmImport() {
     if (parsedCsvItems.length === 0) return;
-
-    var btn = document.querySelector('#importActions .modal-btn-primary');
+    var btn = document.getElementById('importConfirmSticky');
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Importing…';
-
     authFetch(API + '/menu/bulk', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3501,28 +2445,18 @@ function confirmImport() {
     .then(function(result) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
-
         if (!result.ok) {
             document.getElementById('importError').textContent = '❌ ' + (result.data.error || 'Import failed');
             return;
         }
-
-        showNotification('✅ Imported ' + result.data.inserted + ' menu items');
+        showNotification('✅ Imported ' + result.data.inserted + ' items');
         closeImportModal();
         loadMenu();
-
-        // Reset sticky button
-        var stickyBtn = document.getElementById('importConfirmSticky');
-        if (stickyBtn) {
-            stickyBtn.disabled = true;
-            stickyBtn.innerHTML = '<i class="fas fa-check"></i> Import Items';
-        }
     })
     .catch(function(err) {
-        console.error('Import error:', err);
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
-        document.getElementById('importError').textContent = '❌ Network error — try again';
+        document.getElementById('importError').textContent = '❌ Network error';
     });
 }
 
@@ -3533,47 +2467,14 @@ function downloadMenuTemplate() {
         'Pizzas,Margherita Pizza,Fresh mozzarella and basil,4.00,0\n' +
         'Drinks,Coca-Cola,Chilled soft drink,0.80,0\n' +
         'Desserts,Chocolate Cake,Rich chocolate slice,2.50,0\n';
-
     var blob = new Blob(['\uFEFF' + template], { type: 'text/csv;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
-    a.href = url;
-    a.download = 'nabztech-menu-template.csv';
-    a.click();
+    a.href = url; a.download = 'nabztech-menu-template.csv'; a.click();
     URL.revokeObjectURL(url);
-
     showNotification('📥 Template downloaded');
 }
 
-// Drag-and-drop support
-document.addEventListener('DOMContentLoaded', function() {
-    var dropZone = document.getElementById('csvDropZone');
-    if (!dropZone) return;
-
-    ['dragenter', 'dragover'].forEach(function(evt) {
-        dropZone.addEventListener(evt, function(e) {
-            e.preventDefault();
-            dropZone.style.background = 'var(--accent-soft)';
-            dropZone.style.borderColor = 'var(--accent)';
-        });
-    });
-
-    ['dragleave', 'drop'].forEach(function(evt) {
-        dropZone.addEventListener(evt, function(e) {
-            e.preventDefault();
-            dropZone.style.background = '';
-            dropZone.style.borderColor = 'var(--border)';
-        });
-    });
-
-    dropZone.addEventListener('drop', function(e) {
-        var files = e.dataTransfer.files;
-        if (files.length > 0) {
-            document.getElementById('csvFileInput').files = files;
-            handleCsvFile({ target: { files: files } });
-        }
-    });
-});
 // ============================================================
 // CUSTOMERS
 // ============================================================
@@ -3584,52 +2485,41 @@ function loadCustomers() {
             customers = Array.isArray(customers) ? customers : [];
             var container = document.getElementById('customersContainer');
             var countEl = document.getElementById('customerCount');
-
             if (countEl) countEl.textContent = '(' + customers.length + ')';
             if (!container) return;
-
             if (customers.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No customers registered yet</p></div>';
                 return;
             }
-
             window.allCustomers = customers;
-
-            var html = '<table class="data-table">' +
-                '<thead><tr>' +
+            var html = '<table class="data-table"><thead><tr>' +
                 '<th>#</th><th>Name</th><th>Phone</th><th>Address</th><th>Registered</th><th>Actions</th>' +
                 '</tr></thead><tbody>';
-
             customers.forEach(function(c, i) {
                 html += '<tr>' +
                     '<td>' + (i + 1) + '</td>' +
                     '<td style="font-weight:600;">' + escapeHtml(c.name || '-') + '</td>' +
                     '<td><a href="tel:' + escapeHtml(c.phone || '') + '" style="color:var(--info);text-decoration:none;">' + escapeHtml(c.phone || '-') + '</a></td>' +
                     '<td style="color:var(--text-secondary);">' + escapeHtml(c.address || '-') + '</td>' +
-                    '<td style="color:var(--text-muted);font-size:0.9rem;">' + escapeHtml(c.created_at || c.created || '-') + '</td>' +
+                    '<td style="color:var(--text-muted);font-size:0.9rem;">' + escapeHtml(c.created_at || '-') + '</td>' +
                     '<td style="white-space:nowrap;">' +
                         '<button onclick="editCustomer(' + c.id + ')" style="background:none;border:none;color:var(--info);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-edit"></i></button>' +
                         '<button onclick="doDeleteCustomer(' + c.id + ')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>' +
                     '</td>' +
                 '</tr>';
             });
-
             html += '</tbody></table>';
             container.innerHTML = html;
         })
-        .catch(function(error) {
-            console.error('❌ Customers error:', error);
-        });
+        .catch(function(error) {});
 }
 
 function editCustomer(id) {
     var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
     if (!customer) return;
-
     var overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'customerEditOverlay';
-
     overlay.innerHTML =
         '<div class="modal-box">' +
             '<button class="modal-close" onclick="closeCustomerEdit()">×</button>' +
@@ -3640,7 +2530,6 @@ function editCustomer(id) {
             '<div id="editCustError" style="color:var(--danger);font-size:0.9rem;min-height:20px;margin-bottom:10px;"></div>' +
             '<button class="modal-btn-primary" onclick="saveCustomerEdit(' + id + ')">Save Changes</button>' +
         '</div>';
-
     document.body.appendChild(overlay);
 }
 
@@ -3654,54 +2543,25 @@ function saveCustomerEdit(id) {
     var phone = document.getElementById('editCustPhone').value.trim();
     var address = document.getElementById('editCustAddress').value.trim();
     var errorEl = document.getElementById('editCustError');
-
     errorEl.textContent = '';
     if (!name || !phone || !address) { errorEl.textContent = 'All fields are required'; return; }
-
     authFetch(API + '/customers/' + id, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: name, phone: phone, address: address })
     })
-    .then(function(res) {
-        return res.text().then(function(text) {
-            var data;
-            try { data = JSON.parse(text); }
-            catch (e) { data = { error: text || 'Empty response' }; }
-            return { ok: res.ok, status: res.status, data: data };
-        });
-    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || ('Error ' + result.status));
-            return;
-        }
+        if (!result.ok) { errorEl.textContent = '❌ ' + (result.data.error || 'Failed'); return; }
         closeCustomerEdit();
         showNotification('Customer updated');
         loadCustomers();
     })
-    .catch(function(err) {
-        console.error('Edit customer error:', err);
-        errorEl.textContent = 'Network error: ' + err.message;
-    });
+    .catch(function(err) { errorEl.textContent = 'Network error'; });
 }
 
 function doDeleteCustomer(id) {
-    var customers = window.allCustomers;
-    if (!customers || !customers.length) {
-        authFetch(API + '/customers')
-            .then(function(res) { return res.json(); })
-            .then(function(list) {
-                window.allCustomers = list;
-                var customer = list.find(function(c) { return c.id === id; });
-                if (!customer) { alert('Customer not found.'); return; }
-                confirmAndDeleteCustomer(customer);
-            })
-            .catch(function(err) { alert('Could not load customers: ' + err.message); });
-        return;
-    }
-
-    var customer = customers.find(function(c) { return c.id === id; });
+    var customer = (window.allCustomers || []).find(function(c) { return c.id === id; });
     if (!customer) { alert('Customer not found'); return; }
     confirmAndDeleteCustomer(customer);
 }
@@ -3715,30 +2575,17 @@ function confirmAndDeleteCustomer(customer) {
         cancelText: 'Cancel'
     }).then(function(confirmed) {
         if (!confirmed) return;
-
         authFetch(API + '/customers/' + customer.id, { method: 'DELETE' })
-            .then(function(res) {
-                return res.text().then(function(text) {
-                    var data;
-                    try { data = JSON.parse(text); }
-                    catch (e) { data = { error: text || 'Empty response' }; }
-                    return { ok: res.ok, status: res.status, data: data };
-                });
-            })
+            .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
             .then(function(result) {
-                if (!result.ok) {
-                    alert('❌ ' + (result.data.error || ('Error ' + result.status)));
-                    return;
-                }
+                if (!result.ok) { alert('❌ ' + (result.data.error || 'Failed')); return; }
                 showNotification('Customer deleted');
                 loadCustomers();
             })
-            .catch(function(err) {
-                console.error('Delete customer error:', err);
-                alert('Network error: ' + err.message);
-            });
+            .catch(function(err) { alert('Network error'); });
     });
 }
+
 // ============================================================
 // DRIVER REPORTS
 // ============================================================
@@ -3747,170 +2594,95 @@ function loadReports() {
         .then(function(res) { return res.json(); })
         .then(function(reports) {
             reports = Array.isArray(reports) ? reports : [];
-            window.allReports = reports;
-
             var container = document.getElementById('reportsContainer');
             var countEl = document.getElementById('reportCount');
             var badgeEl = document.getElementById('reportsBadge');
-
             if (countEl) countEl.textContent = '(' + reports.length + ')';
-
             if (badgeEl) {
-                if (reports.length > 0) {
-                    badgeEl.textContent = reports.length;
-                    badgeEl.style.display = 'inline-block';
-                } else {
-                    badgeEl.style.display = 'none';
-                }
+                if (reports.length > 0) { badgeEl.textContent = reports.length; badgeEl.style.display = 'inline-block'; }
+                else badgeEl.style.display = 'none';
             }
-
             if (!container) return;
-
             if (reports.length === 0) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-check-circle"></i><p>No open reports — all clear! 🎉</p></div>';
+                container.innerHTML = '<div class="empty"><i class="fas fa-check-circle"></i><p>No open reports</p></div>';
                 return;
             }
-
             var html = '';
             reports.forEach(function(r) {
-                var timeAgo = formatTimeAgo(r.created_at);
-
                 html += '<div class="order-card" style="border-left-color: var(--danger); margin-bottom: 14px;">' +
                     '<div class="order-header">' +
                         '<span class="order-id">Order #' + r.order_id + '</span>' +
                         '<span class="order-status" style="background: rgba(239,68,68,0.15); color: var(--danger);">REPORT #' + r.id + '</span>' +
                     '</div>' +
                     '<div class="order-details"><i class="fas fa-motorcycle"></i> Driver: <strong style="color: var(--text);">' + escapeHtml(r.driver_name || 'unknown') + '</strong></div>' +
-                    '<div class="order-details"><i class="fas fa-clock"></i> ' + timeAgo + '</div>' +
-                    (r.customer_name ?
-                        '<div class="order-details"><i class="fas fa-user"></i> ' + escapeHtml(r.customer_name) + (r.customer_phone ? ' · ' + escapeHtml(r.customer_phone) : '') + '</div>'
-                        : '') +
                     '<div style="margin-top: 12px; padding: 12px 14px; background: rgba(239,68,68,0.08); border-radius: 8px; border-left: 3px solid var(--danger);">' +
-                        '<div style="font-weight:600; font-size: 0.9rem; color: var(--text); margin-bottom: 4px;">⚠️ Issue reported:</div>' +
-                        '<div style="color: var(--text-secondary); font-size: 0.95rem;">' + escapeHtml(r.reason) + '</div>' +
+                        '<div style="font-weight:600; margin-bottom: 4px;">⚠️ Issue:</div>' +
+                        '<div style="color: var(--text-secondary);">' + escapeHtml(r.reason) + '</div>' +
                     '</div>' +
                     '<div class="order-actions">' +
                         '<button class="btn btn-success" onclick="resolveReport(' + r.id + ')"><i class="fas fa-check"></i> Mark Resolved</button>' +
-                        (r.customer_phone ?
-                            '<a class="btn" href="tel:' + (r.customer_phone || '').replace(/[^0-9+]/g, '') + '"><i class="fas fa-phone"></i> Call Customer</a>'
-                            : '') +
                     '</div>' +
                 '</div>';
             });
-
             container.innerHTML = html;
         })
-        .catch(function(error) {
-            console.error('Reports load error:', error);
-            var container = document.getElementById('reportsContainer');
-            if (container) {
-                container.innerHTML = '<div class="empty"><i class="fas fa-exclamation-triangle"></i><p>Could not load reports</p></div>';
-            }
-        });
+        .catch(function(error) {});
 }
 
 function resolveReport(id) {
-    if (!confirm('Mark this report as resolved?')) return;
-
     authFetch(API + '/reports/' + id + '/resolve', { method: 'PUT' })
-        .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
-        .then(function(result) {
-            if (!result.ok) {
-                alert('❌ ' + (result.data.error || 'Failed'));
-                return;
-            }
-            showNotification('Report resolved ✅');
+        .then(function(res) { return res.json(); })
+        .then(function() {
+            showNotification('Report resolved');
             loadReports();
         })
-        .catch(function(err) {
-            console.error('Resolve error:', err);
-            alert('Network error');
-        });
-}
-
-function formatTimeAgo(timestamp) {
-    var then = new Date(timestamp).getTime();
-    var now = Date.now();
-    var seconds = Math.floor((now - then) / 1000);
-
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
-    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hour' + (Math.floor(seconds / 3600) > 1 ? 's' : '') + ' ago';
-    return Math.floor(seconds / 86400) + ' day' + (Math.floor(seconds / 86400) > 1 ? 's' : '') + ' ago';
+        .catch(function(err) { alert('Network error'); });
 }
 
 // ============================================================
-// ADMIN MANAGEMENT
+// ADMINS
 // ============================================================
 function loadAdmins() {
     authFetch(API + '/admins')
         .then(function(res) { return res.json(); })
         .then(function(admins) {
             var container = document.getElementById('adminsList');
-
-            // 🔒 FRONTEND FILTER: hide master accounts from non-master users
-            var amMaster = false;
-            try {
-                var token = localStorage.getItem('adminToken');
-                if (token) {
-                    var payload = JSON.parse(atob(token.split('.')[1]));
-                    amMaster = (payload.is_master === 1);
-                }
-            } catch (e) {}
-
+            var amMaster = isMasterUser();
             if (!amMaster && Array.isArray(admins)) {
-                admins = admins.filter(function(a) {
-                    return a.is_master !== 1 && a.is_master !== '1';
-                });
+                admins = admins.filter(function(a) { return a.is_master !== 1 && a.is_master !== '1'; });
             }
             var countEl = document.getElementById('adminCount');
             if (countEl) countEl.textContent = '(' + admins.length + ')';
             if (!container) return;
-
             if (admins.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No admins found</p></div>';
                 return;
             }
-
             var myId = currentUserId();
-            var html = '<table class="data-table">' +
-                '<thead><tr><th>#</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead><tbody>';
-
-             admins.forEach(function(a, i) {
+            var html = '<table class="data-table"><thead><tr>' +
+                '<th>#</th><th>Username</th><th>Role</th><th>Created</th><th>Actions</th>' +
+                '</tr></thead><tbody>';
+            admins.forEach(function(a, i) {
                 var roleClass = 'role-staff';
                 var roleLabel = 'Staff';
                 if (a.role === 'owner') { roleClass = 'role-owner'; roleLabel = 'Owner'; }
                 else if (a.role === 'driver') { roleClass = 'role-driver'; roleLabel = 'Driver'; }
-
-                // Trial badge
                 var trialBadge = '';
                 if (a.is_trial === 1 || a.is_trial === '1') {
                     var trialText = 'Trial';
                     var trialStyle = 'background:rgba(245,158,11,0.15);color:#f59e0b;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;';
-
                     if (a.trial_ends_at) {
                         var endsAt = new Date(a.trial_ends_at);
-                        var now = new Date();
-                        var daysLeft = Math.ceil((endsAt - now) / (1000 * 60 * 60 * 24));
-
-                        if (daysLeft < 0) {
-                            trialText = 'Expired';
-                            trialStyle = 'background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;';
-                        } else if (daysLeft <= 3) {
-                            trialText = daysLeft + 'd left';
-                            trialStyle = 'background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;';
-                        } else {
-                            trialText = daysLeft + 'd trial';
-                        }
+                        var daysLeft = Math.ceil((endsAt - new Date()) / (1000 * 60 * 60 * 24));
+                        if (daysLeft < 0) { trialText = 'Expired'; trialStyle = 'background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;'; }
+                        else if (daysLeft <= 3) { trialText = daysLeft + 'd left'; trialStyle = 'background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.75em;font-weight:600;'; }
+                        else { trialText = daysLeft + 'd trial'; }
                     }
                     trialBadge = ' <span style="' + trialStyle + '">' + trialText + '</span>';
                 }
-
                 var isMe = a.id === myId;
-                var deleteBtn = isMe
-                    ? '<span style="color:var(--text-muted);font-size:0.9rem;">(you)</span>'
+                var deleteBtn = isMe ? '<span style="color:var(--text-muted);font-size:0.9rem;">(you)</span>'
                     : '<button onclick="deleteAdmin(' + a.id + ', \'' + a.username.replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>';
-
                 html += '<tr>' +
                     '<td>' + (i + 1) + '</td>' +
                     '<td style="font-weight:600;">' + escapeHtml(a.username) + trialBadge + '</td>' +
@@ -3919,18 +2691,12 @@ function loadAdmins() {
                     '<td>' + deleteBtn + '</td>' +
                 '</tr>';
             });
-
             html += '</tbody></table>';
             container.innerHTML = html;
         })
-        .catch(function(error) {
-            console.error('Admins load error:', error);
-        });
+        .catch(function(error) {});
 }
 
-// ============================================================
-// TRIAL TOGGLE
-// ============================================================
 function toggleTrialDays() {
     var isTrial = document.getElementById('newAdminIsTrial').checked;
     document.getElementById('trialDaysRow').style.display = isTrial ? '' : 'none';
@@ -3943,26 +2709,13 @@ function createAdmin() {
     var isTrial = document.getElementById('newAdminIsTrial').checked;
     var trialDays = parseInt(document.getElementById('newAdminTrialDays').value) || 30;
     var errorEl = document.getElementById('adminFormError');
-
     errorEl.style.color = 'var(--danger)';
     errorEl.textContent = '';
-
     if (!username) { errorEl.textContent = 'Enter a username'; return; }
     if (username.length < 3) { errorEl.textContent = 'Username must be at least 3 characters'; return; }
     if (!password || password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters'; return; }
-    if (isTrial && (trialDays < 1 || trialDays > 365)) {
-        errorEl.textContent = 'Trial days must be between 1 and 365';
-        return;
-    }
-
-    var payload = {
-        username: username,
-        password: password,
-        role: role,
-        is_trial: isTrial ? 1 : 0
-    };
+    var payload = { username: username, password: password, role: role, is_trial: isTrial ? 1 : 0 };
     if (isTrial) payload.trial_days = trialDays;
-
     authFetch(API + '/admins', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -3970,13 +2723,9 @@ function createAdmin() {
     })
     .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
-        if (!result.ok) {
-            errorEl.textContent = '❌ ' + (result.data.error || 'Failed');
-            return;
-        }
+        if (!result.ok) { errorEl.textContent = '❌ ' + (result.data.error || 'Failed'); return; }
         errorEl.style.color = 'var(--success)';
-        errorEl.textContent = '✅ Admin "' + username + '" created!' +
-            (isTrial ? ' (trial: ' + trialDays + ' days)' : '');
+        errorEl.textContent = '✅ Admin "' + username + '" created!' + (isTrial ? ' (trial: ' + trialDays + ' days)' : '');
         document.getElementById('newAdminUsername').value = '';
         document.getElementById('newAdminPassword').value = '';
         document.getElementById('newAdminRole').value = 'staff';
@@ -3986,41 +2735,91 @@ function createAdmin() {
         loadAdmins();
         setTimeout(function() { errorEl.textContent = ''; }, 3000);
     })
-    .catch(function(err) {
-        console.error('Create admin error:', err);
-        errorEl.textContent = 'Network error';
-    });
+    .catch(function(err) { errorEl.textContent = 'Network error'; });
 }
 
 function deleteAdmin(id, username) {
     showConfirm({
         title: 'Remove this admin?',
-        message: '<strong>' + escapeHtml(username) + '</strong> will lose access to the dashboard immediately.',
+        message: '<strong>' + escapeHtml(username) + '</strong> will lose access immediately.',
         iconClass: 'fa-user-slash',
         confirmText: 'Remove Admin',
         cancelText: 'Cancel'
     }).then(function(confirmed) {
         if (!confirmed) return;
-
         authFetch(API + '/admins/' + id, { method: 'DELETE' })
             .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
             .then(function(result) {
-                if (!result.ok) {
-                    alert('❌ ' + (result.data.error || 'Failed to delete'));
-                    return;
-                }
+                if (!result.ok) { alert('❌ ' + (result.data.error || 'Failed')); return; }
                 showNotification('Admin "' + username + '" deleted');
                 loadAdmins();
             })
-            .catch(function(err) {
-                console.error('Delete admin error:', err);
-                alert('Network error');
-            });
+            .catch(function(err) { alert('Network error'); });
     });
 }
 
 // ============================================================
-// NOTIFICATIONS (in-app toast)
+// DRIVER ASSIGNMENT
+// ============================================================
+function openAssignDriverModal(orderId) {
+    currentAssigningOrderId = orderId;
+    var order = allOrders.find(function(o) { return o.id === orderId; });
+    var currentDriverId = order && order.driver_id ? order.driver_id : null;
+    var modal = document.getElementById('assignDriverModal');
+    var select = document.getElementById('assignDriverSelect');
+    var errorEl = document.getElementById('assignDriverError');
+    var titleEl = modal.querySelector('h2');
+    if (currentDriverId) { titleEl.innerHTML = '<i class="fas fa-sync"></i> Reassign Driver'; }
+    else { titleEl.innerHTML = '<i class="fas fa-motorcycle"></i> Assign a Driver'; }
+    errorEl.textContent = '';
+    select.innerHTML = '<option value="">Loading...</option>';
+    modal.style.display = 'flex';
+    authFetch(API + '/drivers')
+        .then(function(res) { return res.json(); })
+        .then(function(drivers) {
+            if (!drivers || drivers.length === 0) {
+                select.innerHTML = '<option value="">No drivers yet</option>';
+                errorEl.textContent = 'Create a driver in the Admins tab first';
+                return;
+            }
+            var html = '<option value="">— Select a driver —</option>';
+            drivers.forEach(function(d) {
+                var label = d.username;
+                if (currentDriverId === d.id) label += ' (currently assigned)';
+                html += '<option value="' + d.id + '">' + label + '</option>';
+            });
+            select.innerHTML = html;
+            if (currentDriverId) select.value = currentDriverId;
+        })
+        .catch(function(err) { errorEl.textContent = 'Could not load drivers'; });
+}
+
+function closeAssignDriverModal() {
+    document.getElementById('assignDriverModal').style.display = 'none';
+    currentAssigningOrderId = null;
+}
+
+function submitAssignDriver() {
+    var driverId = document.getElementById('assignDriverSelect').value;
+    var errorEl = document.getElementById('assignDriverError');
+    if (!driverId) { errorEl.textContent = 'Please select a driver'; return; }
+    authFetch(API + '/orders/' + currentAssigningOrderId + '/assign', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ driver_id: parseInt(driverId) })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) { errorEl.textContent = '❌ ' + (result.data.error || 'Failed'); return; }
+        showNotification('Driver assigned');
+        closeAssignDriverModal();
+        loadOrders();
+    })
+    .catch(function(err) { errorEl.textContent = 'Network error'; });
+}
+
+// ============================================================
+// NOTIFICATION TOAST
 // ============================================================
 function showNotification(message) {
     var existing = document.querySelector('.notification');
