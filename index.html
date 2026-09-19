@@ -1885,6 +1885,7 @@ var TAB_LABELS = {
     orders:    { title: 'Orders',         subtitle: 'Manage incoming orders and drivers' },
     menu:      { title: 'Menu',           subtitle: 'Manage your restaurant menu items' },
     customers: { title: 'Customers',      subtitle: 'View registered customers' },
+    analytics: { title: 'Analytics',      subtitle: 'See how your restaurant is performing' },
     reports:   { title: 'Driver Reports', subtitle: 'Issues reported by drivers' },
     admins:    { title: 'Admins',         subtitle: 'Manage admin accounts and roles' }
 };
@@ -1909,6 +1910,7 @@ function switchTab(tab) {
 
     if (tab === 'menu') loadMenu();
     if (tab === 'customers') loadCustomers();
+    if (tab === 'analytics') loadAnalytics();
     if (tab === 'reports') loadReports();
     if (tab === 'admins') loadAdmins();
 }
@@ -3107,6 +3109,345 @@ function showNotification(message) {
     document.body.appendChild(div);
     setTimeout(function() { div.remove(); }, 3000);
 }
+// ============================================================
+// ANALYTICS
+// ============================================================
+var analyticsCharts = {
+    daily: null,
+    hourly: null
+};
+
+// Build the query string based on the current filter selection
+function getAnalyticsQuery() {
+    var val = document.getElementById('analyticsRange').value;
+
+    if (val === 'custom') {
+        var start = document.getElementById('analyticsStartDate').value;
+        var end = document.getElementById('analyticsEndDate').value;
+        if (!start || !end) return null;   // wait for user to pick both dates
+        return 'start=' + encodeURIComponent(start) + '&end=' + encodeURIComponent(end);
+    }
+
+    if (val === 'today') {
+        var today = new Date().toISOString().slice(0, 10);
+        return 'start=' + today + '&end=' + today;
+    }
+
+    if (val === 'month') {
+        var now = new Date();
+        var first = new Date(now.getFullYear(), now.getMonth(), 1);
+        return 'start=' + first.toISOString().slice(0, 10) + '&end=' + now.toISOString().slice(0, 10);
+    }
+
+    // '7', '30', etc.
+    return 'days=' + val;
+}
+
+function onAnalyticsRangeChange() {
+    var val = document.getElementById('analyticsRange').value;
+    var custom = document.getElementById('analyticsCustomRange');
+
+    if (val === 'custom') {
+        custom.style.display = 'flex';
+        // Pre-fill with sensible defaults if empty
+        var startInput = document.getElementById('analyticsStartDate');
+        var endInput = document.getElementById('analyticsEndDate');
+        if (!startInput.value) {
+            var d = new Date();
+            d.setDate(d.getDate() - 30);
+            startInput.value = d.toISOString().slice(0, 10);
+        }
+        if (!endInput.value) {
+            endInput.value = new Date().toISOString().slice(0, 10);
+        }
+    } else {
+        custom.style.display = 'none';
+    }
+
+    loadAnalytics();
+}
+
+// Master loader
+function loadAnalytics() {
+    var query = getAnalyticsQuery();
+    if (!query) return;   // custom range not ready yet
+
+    // Fire all 5 endpoints in parallel
+    var base = API + '/analytics/';
+    Promise.all([
+        authFetch(base + 'summary?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'daily?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'hourly?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'top-items?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'drivers?' + query).then(function(r){ return r.json(); })
+    ]).then(function(results) {
+        renderAnalyticsStats(results[0]);
+        renderDailyChart(results[1]);
+        renderHourlyChart(results[2]);
+        renderTopItems(results[3]);
+        renderDriversTable(results[4]);
+    }).catch(function(err) {
+        console.error('Analytics load error:', err);
+        showNotification('Failed to load analytics');
+    });
+}
+
+// ---------- Stat cards ----------
+function renderAnalyticsStats(s) {
+    if (!s || s.error) return;
+
+    document.getElementById('an_orders').textContent = s.total_orders;
+    document.getElementById('an_orders_sub').textContent =
+        s.delivered + ' delivered · ' + s.cancelled + ' cancelled';
+
+    document.getElementById('an_revenue').textContent = 'BD ' + s.revenue.toFixed(2);
+    document.getElementById('an_revenue_sub').textContent =
+        'Today: BD ' + s.today_revenue.toFixed(2) + ' · ' + s.today_orders + ' orders';
+
+    document.getElementById('an_avg').textContent = 'BD ' + s.avg_order_value.toFixed(2);
+    document.getElementById('an_avg_sub').textContent = 'Per delivered order';
+
+    document.getElementById('an_active').textContent = s.active_now;
+    document.getElementById('an_active_sub').textContent =
+        s.active + ' in range · ' + s.active_now + ' right now';
+}
+
+// ---------- Daily line chart ----------
+function renderDailyChart(data) {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    var labels = data.map(function(d) {
+        var date = new Date(d.day + 'T00:00:00');
+        return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    });
+    var revenues = data.map(function(d) { return d.revenue; });
+    var orders = data.map(function(d) { return d.orders; });
+
+    var canvas = document.getElementById('chartDaily');
+    if (!canvas) return;
+
+    if (analyticsCharts.daily) analyticsCharts.daily.destroy();
+
+    var isDark = document.body.classList.contains('dark');
+    var gridColor = isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(107, 114, 128, 0.12)';
+    var textColor = isDark ? '#cbd5e1' : '#4b5563';
+
+    analyticsCharts.daily = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Revenue (BD)',
+                    data: revenues,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                    borderWidth: 2.5,
+                    tension: 0.35,
+                    fill: true,
+                    pointRadius: data.length > 20 ? 0 : 3,
+                    pointHoverRadius: 5,
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Orders',
+                    data: orders,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.08)',
+                    borderWidth: 2,
+                    tension: 0.35,
+                    fill: false,
+                    pointRadius: data.length > 20 ? 0 : 3,
+                    pointHoverRadius: 5,
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { color: textColor, boxWidth: 12, padding: 14, font: { size: 12 } }
+                },
+                tooltip: {
+                    backgroundColor: isDark ? '#1e293b' : '#111827',
+                    titleColor: '#fff',
+                    bodyColor: '#e5e7eb',
+                    padding: 10,
+                    callbacks: {
+                        label: function(ctx) {
+                            if (ctx.dataset.label.indexOf('Revenue') !== -1) {
+                                return 'Revenue: BD ' + ctx.parsed.y.toFixed(2);
+                            }
+                            return 'Orders: ' + ctx.parsed.y;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: textColor, font: { size: 11 }, maxRotation: 0, autoSkipPadding: 12 }
+                },
+                y: {
+                    position: 'left',
+                    grid: { color: gridColor },
+                    ticks: {
+                        color: textColor, font: { size: 11 },
+                        callback: function(v) { return 'BD ' + v; }
+                    }
+                },
+                y1: {
+                    position: 'right',
+                    grid: { display: false },
+                    ticks: { color: textColor, font: { size: 11 } }
+                }
+            }
+        }
+    });
+}
+
+// ---------- Hourly bar chart ----------
+function renderHourlyChart(data) {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    var labels = data.map(function(d) { return d.hour + ':00'; });
+    var orders = data.map(function(d) { return d.orders; });
+
+    var canvas = document.getElementById('chartHourly');
+    if (!canvas) return;
+
+    if (analyticsCharts.hourly) analyticsCharts.hourly.destroy();
+
+    var isDark = document.body.classList.contains('dark');
+    var textColor = isDark ? '#cbd5e1' : '#4b5563';
+
+    analyticsCharts.hourly = new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Orders',
+                data: orders,
+                backgroundColor: orders.map(function(v, i) {
+                    // Highlight the busiest hour in orange, rest in blue
+                    var max = Math.max.apply(null, orders);
+                    return (v === max && v > 0) ? 'rgba(230, 126, 34, 0.85)' : 'rgba(59, 130, 246, 0.7)';
+                }),
+                borderRadius: 4,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: isDark ? '#1e293b' : '#111827',
+                    padding: 10,
+                    callbacks: {
+                        title: function(ctx) { return ctx[0].label + ' – ' + (ctx[0].dataIndex + 1) + ':00'; },
+                        label: function(ctx) { return ctx.parsed.y + ' order' + (ctx.parsed.y === 1 ? '' : 's'); }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: {
+                        color: textColor, font: { size: 10 },
+                        autoSkip: false,
+                        callback: function(v, i) { return i % 3 === 0 ? this.getLabelForValue(v) : ''; }
+                    }
+                },
+                y: {
+                    grid: { color: isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(107, 114, 128, 0.12)' },
+                    ticks: { color: textColor, font: { size: 11 }, precision: 0, beginAtZero: true }
+                }
+            }
+        }
+    });
+}
+
+// ---------- Top items list ----------
+function renderTopItems(items) {
+    var container = document.getElementById('topItemsContainer');
+    if (!container) return;
+
+    if (!Array.isArray(items) || items.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:30px 10px;">No orders in this period</p>';
+        return;
+    }
+
+    var html = '';
+    items.forEach(function(item, i) {
+        var rankColor = i === 0 ? '#f59e0b' : i === 1 ? '#9ca3af' : i === 2 ? '#d97706' : 'var(--text-muted)';
+        var medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '#' + (i + 1);
+        html +=
+            '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">' +
+                '<div style="font-weight:700;min-width:32px;text-align:center;color:' + rankColor + ';font-size:0.95rem;">' + medal + '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-weight:600;font-size:0.9rem;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(item.name) + '</div>' +
+                    '<div style="font-size:0.78rem;color:var(--text-muted);margin-top:2px;">' + item.quantity + ' sold</div>' +
+                '</div>' +
+                '<div style="font-weight:700;color:var(--success);font-size:0.92rem;white-space:nowrap;">BD ' + item.revenue.toFixed(2) + '</div>' +
+            '</div>';
+    });
+    container.innerHTML = html;
+}
+
+// ---------- Drivers table ----------
+function renderDriversTable(drivers) {
+    var container = document.getElementById('driversTableContainer');
+    if (!container) return;
+
+    if (!Array.isArray(drivers) || drivers.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:30px 10px;">No drivers yet</p>';
+        return;
+    }
+
+    var html = '<table class="data-table"><thead><tr>' +
+        '<th>Driver</th>' +
+        '<th style="text-align:right;">Deliveries</th>' +
+        '<th style="text-align:right;">Active</th>' +
+        '<th style="text-align:right;">Cash</th>' +
+        '<th style="text-align:right;">Avg Time</th>' +
+        '</tr></thead><tbody>';
+
+    drivers.forEach(function(d) {
+        var avg = d.avg_minutes ? d.avg_minutes + ' min' : '—';
+        html += '<tr>' +
+            '<td style="font-weight:600;">' + escapeHtml(d.driver_name) + '</td>' +
+            '<td style="text-align:right;">' + d.delivered + '</td>' +
+            '<td style="text-align:right;">' + (d.active > 0 ? '<span style="color:var(--info);font-weight:600;">' + d.active + '</span>' : '0') + '</td>' +
+            '<td style="text-align:right;color:var(--success);font-weight:600;">BD ' + d.cash_collected.toFixed(2) + '</td>' +
+            '<td style="text-align:right;color:var(--text-secondary);">' + avg + '</td>' +
+        '</tr>';
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ---------- Theme change: redraw charts with new colors ----------
+var _originalApplyTheme = applyTheme;
+applyTheme = function(theme) {
+    _originalApplyTheme(theme);
+    // Redraw charts if the analytics tab is currently visible
+    var tab = document.getElementById('tabAnalyticsContent');
+    if (tab && tab.classList.contains('active')) {
+        setTimeout(function() {
+            // Only redraw if we already have data
+            if (analyticsCharts.daily || analyticsCharts.hourly) {
+                loadAnalytics();
+            }
+        }, 100);
+    }
+};
 </script>
 </body>
 </html>
