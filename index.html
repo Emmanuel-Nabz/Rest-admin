@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard — Nabz-Tech Eats</title>
+    <title>Admin Dashboard — Nabz-Eats</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
@@ -903,7 +903,7 @@
 <div id="loginPage">
     <div class="login-container">
         <div id="loginView">
-            <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
+            <h1><i class="fas fa-utensils"></i>Nabz-Eats</h1>
             <p class="subtitle">Restaurant Admin Login</p>
             <div class="form-group">
                 <label>Username</label>
@@ -927,7 +927,7 @@
 
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h1><i class="fas fa-utensils"></i>Nabz-Tech Eats</h1>
+                <h1><i class="fas fa-utensils"></i>Nabz-Eats</h1>
             </div>
 
             <nav class="sidebar-nav">
@@ -1948,7 +1948,7 @@ function sendBrowserNotification(title, body) {
 }
 
 var titleFlashInterval = null;
-var originalTitle = 'Admin Dashboard — Nabz-Tech Eats';
+var originalTitle = 'Admin Dashboard — Nabz-Eats';
 function flashTitle(count) {
     if (titleFlashInterval) clearInterval(titleFlashInterval);
     var shown = false;
@@ -2342,7 +2342,7 @@ function exportJSONBackup() {
         var menu = Array.isArray(results[2]) ? results[2] : [];
         var backup = {
             meta: {
-                app: 'Nabz-Tech Eats',
+                app: 'Nabz-Eats',
                 format: 'nabztech-backup-v1',
                 exportedAt: new Date().toISOString(),
                 version: 1,
