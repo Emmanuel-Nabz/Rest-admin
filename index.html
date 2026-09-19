@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard — Nabz-Tech Eats</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         :root {
             --bg: #f5f6f8;
@@ -881,6 +882,16 @@
             #trialBanner { flex-direction: column; text-align: center; }
             #floatingHomeBtn { bottom: 16px; right: 16px; }
             .data-table th, .data-table td { padding: 10px 6px; font-size: 0.9rem; }
+                        #tabAnalyticsContent > div[style*="grid-template-columns:1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+            #analyticsCustomRange {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+            #analyticsCustomRange input[type="date"] {
+                width: 100%;
+            }
             .theme-toggle-btn span { display: none; }
             .theme-toggle-btn { padding: 9px 12px; }
         }
@@ -926,8 +937,11 @@
                 <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
                     <i class="fas fa-book-open"></i><span>Menu</span>
                 </button>
-                <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
+                                <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
                     <i class="fas fa-users"></i><span>Customers</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('analytics')" id="tabAnalytics">
+                    <i class="fas fa-chart-line"></i><span>Analytics</span>
                 </button>
                 <button class="nav-item" onclick="switchTab('reports')" id="tabReports">
                     <i class="fas fa-exclamation-triangle"></i>
@@ -1139,7 +1153,101 @@
                         <p style="color: var(--text-muted); text-align: center; padding: 20px;">Loading customers...</p>
                     </div>
                 </div>
+                                <!-- ANALYTICS TAB -->
+                <div id="tabAnalyticsContent" class="tab-content">
 
+                    <!-- Filter bar -->
+                    <div class="orders-header" style="margin-bottom:18px;">
+                        <h2><i class="fas fa-chart-line"></i> Analytics</h2>
+                        <div class="actions" style="gap:10px;">
+                            <select id="analyticsRange" onchange="onAnalyticsRangeChange()" style="padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;font-size:0.9rem;cursor:pointer;">
+                                <option value="7">Last 7 days</option>
+                                <option value="30" selected>Last 30 days</option>
+                                <option value="today">Today</option>
+                                <option value="month">This month</option>
+                                <option value="custom">Custom range…</option>
+                            </select>
+                            <button class="btn" onclick="loadAnalytics()"><i class="fas fa-sync"></i> Refresh</button>
+                        </div>
+                    </div>
+
+                    <!-- Custom date range picker (hidden by default) -->
+                    <div id="analyticsCustomRange" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:18px;display:none;gap:12px;align-items:center;flex-wrap:wrap;">
+                        <label style="font-weight:500;font-size:0.9rem;">From</label>
+                        <input type="date" id="analyticsStartDate" onchange="loadAnalytics()" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;">
+                        <label style="font-weight:500;font-size:0.9rem;">To</label>
+                        <input type="date" id="analyticsEndDate" onchange="loadAnalytics()" style="padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;">
+                    </div>
+
+                    <!-- 4 stat cards -->
+                    <div class="stats" id="analyticsStats">
+                        <div class="stat-card">
+                            <div class="label">Orders</div>
+                            <div class="number" id="an_orders">—</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_orders_sub">&nbsp;</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Revenue</div>
+                            <div class="number green" id="an_revenue">—</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_revenue_sub">&nbsp;</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Avg Order Value</div>
+                            <div class="number" id="an_avg">—</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_avg_sub">&nbsp;</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="label">Active Right Now</div>
+                            <div class="number accent" id="an_active">—</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_active_sub">&nbsp;</div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue line chart -->
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
+                        <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-chart-line" style="color:var(--success);"></i>
+                            Revenue & Orders
+                        </h3>
+                        <div style="position:relative;height:280px;">
+                            <canvas id="chartDaily"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Two-column: hourly bar chart + top items -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+                        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                            <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-clock" style="color:var(--info);"></i>
+                                Peak Hours
+                            </h3>
+                            <div style="position:relative;height:240px;">
+                                <canvas id="chartHourly"></canvas>
+                            </div>
+                        </div>
+                        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                            <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                                <i class="fas fa-fire" style="color:var(--accent);"></i>
+                                Top Items
+                            </h3>
+                            <div id="topItemsContainer" style="max-height:240px;overflow-y:auto;">
+                                <p style="color:var(--text-muted);text-align:center;padding:20px;">Loading…</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Driver performance table -->
+                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                        <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-motorcycle" style="color:var(--purple);"></i>
+                            Driver Performance
+                        </h3>
+                        <div id="driversTableContainer" style="overflow-x:auto;">
+                            <p style="color:var(--text-muted);text-align:center;padding:20px;">Loading…</p>
+                        </div>
+                    </div>
+
+                </div>
                 <!-- REPORTS TAB -->
                 <div id="tabReportsContent" class="tab-content">
                     <div class="orders-header">
