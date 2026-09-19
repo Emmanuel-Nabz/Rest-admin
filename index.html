@@ -1167,7 +1167,9 @@
                                 <option value="month">This month</option>
                                 <option value="custom">Custom range…</option>
                             </select>
-                            <button class="btn" onclick="loadAnalytics()"><i class="fas fa-sync"></i> Refresh</button>
+<button class="btn" onclick="loadAnalytics()"><i class="fas fa-sync"></i> Refresh</button>
+<button class="btn" onclick="exportAnalyticsCSV()"><i class="fas fa-download"></i> Export CSV</button>
+<button class="btn" onclick="window.print()"><i class="fas fa-print"></i> Print</button>
                         </div>
                     </div>
 
@@ -1737,10 +1739,11 @@ function doLogout() {
         cancelText: 'Stay Signed In'
     }).then(function(confirmed) {
         if (!confirmed) return;
-        localStorage.removeItem('adminToken');
+              localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
         localStorage.removeItem('adminLoggedIn');
         if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
+        if (window.analyticsInterval) { clearInterval(window.analyticsInterval); window.analyticsInterval = null; }
         document.getElementById('dashboardPage').style.display = 'none';
         document.getElementById('loginPage').style.display = 'flex';
         document.getElementById('loginPassword').value = '';
@@ -1785,6 +1788,15 @@ function showDashboard() {
     if (ordersInterval) clearInterval(ordersInterval);
     ordersInterval = setInterval(loadOrders, 8000);
     setInterval(loadReports, 15000);
+
+    // Analytics auto-refresh — only when the Analytics tab is active
+    if (window.analyticsInterval) clearInterval(window.analyticsInterval);
+    window.analyticsInterval = setInterval(function() {
+        var analyticsTab = document.getElementById('tabAnalyticsContent');
+        if (analyticsTab && analyticsTab.classList.contains('active')) {
+            loadAnalytics();
+        }
+    }, 60000);   // every 60 seconds
 }
 
 function checkSession() {
@@ -3109,6 +3121,66 @@ function showNotification(message) {
     document.body.appendChild(div);
     setTimeout(function() { div.remove(); }, 3000);
 }
+
+// ============================================================
+// ANALYTICS EXPORT
+// ============================================================
+function exportAnalyticsCSV() {
+    var query = getAnalyticsQuery();
+    if (!query) { showNotification('Please select a date range first'); return; }
+
+    var base = API + '/analytics/';
+    showNotification('Building export…');
+
+    Promise.all([
+        authFetch(base + 'summary?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'daily?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'top-items?' + query).then(function(r){ return r.json(); }),
+        authFetch(base + 'drivers?' + query).then(function(r){ return r.json(); })
+    ]).then(function(results) {
+        var s = results[0], daily = results[1], items = results[2], drivers = results[3];
+
+        var csv = '';
+        csv += 'NABZ-TECH EATS — ANALYTICS REPORT\n';
+        csv += 'Generated,' + new Date().toLocaleString() + '\n';
+        csv += 'Range,' + (s.range && s.range.isCustom ? 'Custom' : 'Last ' + s.range.days + ' days') + '\n\n';
+
+        csv += 'SUMMARY\n';
+        csv += 'Total Orders,' + s.total_orders + '\n';
+        csv += 'Delivered,' + s.delivered + '\n';
+        csv += 'Cancelled,' + s.cancelled + '\n';
+        csv += 'Revenue (BD),' + s.revenue.toFixed(2) + '\n';
+        csv += 'Avg Order Value (BD),' + s.avg_order_value.toFixed(2) + '\n';
+        csv += 'Active Now,' + s.active_now + '\n\n';
+
+        csv += 'DAILY BREAKDOWN\n';
+        csv += 'Date,Orders,Delivered,Revenue\n';
+        (daily || []).forEach(function(d) {
+            csv += d.day + ',' + d.orders + ',' + d.delivered + ',' + d.revenue.toFixed(2) + '\n';
+        });
+        csv += '\n';
+
+        csv += 'TOP ITEMS\n';
+        csv += 'Item,Quantity Sold,Revenue (BD)\n';
+        (items || []).forEach(function(it) {
+            csv += '"' + it.name.replace(/"/g, '""') + '",' + it.quantity + ',' + it.revenue.toFixed(2) + '\n';
+        });
+        csv += '\n';
+
+        csv += 'DRIVER PERFORMANCE\n';
+        csv += 'Driver,Deliveries,Active,Cash Collected (BD),Avg Minutes\n';
+        (drivers || []).forEach(function(d) {
+            csv += '"' + d.driver_name + '",' + d.delivered + ',' + d.active + ',' + d.cash_collected.toFixed(2) + ',' + (d.avg_minutes || '') + '\n';
+        });
+
+        var stamp = new Date().toISOString().slice(0, 10);
+        downloadCSV(csv, 'nabztech-analytics-' + stamp + '.csv');
+        showNotification('✅ Report exported');
+    }).catch(function(err) {
+        console.error(err);
+        showNotification('Export failed');
+    });
+}
 // ============================================================
 // ANALYTICS
 // ============================================================
@@ -3214,7 +3286,33 @@ function renderAnalyticsStats(s) {
 
 // ---------- Daily line chart ----------
 function renderDailyChart(data) {
-    if (!Array.isArray(data) || data.length === 0) return;
+    var canvas = document.getElementById('chartDaily');
+    if (!canvas) return;
+
+    if (!Array.isArray(data) || data.length === 0) {
+        if (analyticsCharts.daily) { analyticsCharts.daily.destroy(); analyticsCharts.daily = null; }
+        var parent = canvas.parentNode;
+        if (parent) {
+            var oldMsg = parent.querySelector('.chart-empty-msg');
+            if (!oldMsg) {
+                var msg = document.createElement('p');
+                msg.className = 'chart-empty-msg';
+                msg.style.cssText = 'color:var(--text-muted);text-align:center;padding:60px 10px;font-size:0.95rem;';
+                msg.textContent = '📊 No orders in this period yet';
+                parent.appendChild(msg);
+            }
+            canvas.style.display = 'none';
+        }
+        return;
+    }
+
+    // Remove empty message if it exists
+    var parentEl = canvas.parentNode;
+    if (parentEl) {
+        var old = parentEl.querySelector('.chart-empty-msg');
+        if (old) old.remove();
+    }
+    canvas.style.display = '';
 
     var labels = data.map(function(d) {
         var date = new Date(d.day + 'T00:00:00');
@@ -3223,10 +3321,7 @@ function renderDailyChart(data) {
     var revenues = data.map(function(d) { return d.revenue; });
     var orders = data.map(function(d) { return d.orders; });
 
-    var canvas = document.getElementById('chartDaily');
-    if (!canvas) return;
-
-    if (analyticsCharts.daily) analyticsCharts.daily.destroy();
+       if (analyticsCharts.daily) analyticsCharts.daily.destroy();
 
     var isDark = document.body.classList.contains('dark');
     var gridColor = isDark ? 'rgba(148, 163, 184, 0.15)' : 'rgba(107, 114, 128, 0.12)';
@@ -3312,13 +3407,18 @@ function renderDailyChart(data) {
 
 // ---------- Hourly bar chart ----------
 function renderHourlyChart(data) {
-    if (!Array.isArray(data) || data.length === 0) return;
-
-    var labels = data.map(function(d) { return d.hour + ':00'; });
-    var orders = data.map(function(d) { return d.orders; });
-
     var canvas = document.getElementById('chartHourly');
     if (!canvas) return;
+
+    if (!Array.isArray(data) || data.length === 0) {
+        if (analyticsCharts.hourly) { analyticsCharts.hourly.destroy(); analyticsCharts.hourly = null; }
+        canvas.style.display = 'none';
+        return;
+    }
+    canvas.style.display = '';
+
+     var labels = data.map(function(d) { return d.hour + ':00'; });
+    var orders = data.map(function(d) { return d.orders; });
 
     if (analyticsCharts.hourly) analyticsCharts.hourly.destroy();
 
