@@ -1696,7 +1696,7 @@ window.addEventListener('focus', stopTitleFlash);
 // ORDERS
 // ============================================================
 function loadOrders() {
-    authFetch(API + '/orders')
+    authFetch(withRestaurantFilter(API + '/orders'))
         .then(function(response) { return response.json(); })
         .then(function(data) {
             allOrders = (Array.isArray(data) ? data : []).map(function(order) {
@@ -1866,12 +1866,12 @@ function renderOrders(orders) {
                         var lineTotal = parseFloat(it.price) * it.quantity;
                         return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);font-size:0.9rem;">' +
                             '<span><strong style="color:var(--accent);">' + escapeHtml(it.quantity) + '×</strong> ' + escapeHtml(it.item_name) + '</span>' +
-                            '<span style="color:var(--text-secondary);white-space:nowrap;">' + formatMoney(lineTotal) + '</span>' +
+                            '<span style="color:var(--text-secondary);white-space:nowrap;">' + formatMoneyForRow(lineTotal, order) + '</span>' +
                         '</div>';
                     }).join('') +
                     '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
                         '<span>Total</span>' +
-                        '<span>' + formatMoney(order.total) + '</span>' +
+                        '<span>' + formatMoneyForRow(order.total, order) + '</span>' +
                     '</div>'
                     : '<div style="color:var(--text-muted);font-size:0.9rem;padding:6px 0;">No items recorded</div>'
                 ) +
