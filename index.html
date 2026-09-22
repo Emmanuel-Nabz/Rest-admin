@@ -1139,7 +1139,18 @@ function formatMoney(amount) {
     }
     return c + ' ' + n.toFixed(2);
 }
+function formatMoneyForRow(amount, row) {
+    var c = (row && row.restaurant_currency) ? row.restaurant_currency : RESTAURANT.currency;
+    var n = parseFloat(amount) || 0;
 
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF') {
+        return c + ' ' + Math.round(n).toLocaleString('en-US');
+    }
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') {
+        return c + ' ' + n.toFixed(3);
+    }
+    return c + ' ' + n.toFixed(2);
+}
 // ============================================================
 // THEME
 // ============================================================
@@ -2127,12 +2138,15 @@ function renderMenu() {
             : '<span class="item-icon">' + icon + '</span>';
         html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
-                '<div class="item-details">' +
+                              '<div class="item-details">' +
                     '<div class="item-name">#' + item.id + ' · ' + escapeHtml(item.name) + '</div>' +
                     '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
+                    (item.restaurant_name
+                        ? '<div style="font-size:0.72em;color:var(--accent);font-weight:700;margin-top:2px;">🏪 ' + escapeHtml(item.restaurant_name) + '</div>'
+                        : '') +
                 '</div>' +
             '</div>' +
-            '<div class="item-price">' + formatMoney(item.price) + '</div>' +
+                        '<div class="item-price">' + formatMoneyForRow(item.price, item) + '</div>' +
             '<div class="item-actions">' +
                 '<button class="btn-edit" onclick="editMenuItem(' + item.id + ')"><i class="fas fa-edit"></i></button>' +
                 '<button class="btn-delete-item" onclick="deleteMenuItem(' + item.id + ')"><i class="fas fa-trash"></i></button>' +
