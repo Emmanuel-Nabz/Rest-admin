@@ -578,10 +578,16 @@
                         <div class="subtitle" id="pageSubtitle">Manage incoming orders and drivers</div>
                     </div>
                 </div>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
-                    <i class="fas fa-moon" id="themeIcon"></i>
-                    <span id="themeLabel">Dark Mode</span>
-                </button>
+                           <div style="display:flex;align-items:center;gap:10px;">
+                    <select id="restaurantFilter" onchange="onRestaurantFilterChange()"
+                            style="display:none;padding:9px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-family:inherit;font-size:0.9rem;cursor:pointer;">
+                        <option value="">🌐 All Restaurants</option>
+                    </select>
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeToggleBtn">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                        <span id="themeLabel">Dark Mode</span>
+                    </button>
+                </div>
             </header>
 
             <div class="main-content">
@@ -1029,6 +1035,58 @@ function loadRestaurantInfo() {
             return RESTAURANT;
         });
 }
+// ============================================================
+// MASTER MODE: restaurant filter
+// ============================================================
+var CURRENT_FILTER_RESTAURANT = ''; // empty = all restaurants
+
+function loadMasterRestaurantFilter() {
+    if (!isMasterUser()) return;
+
+    authFetch(API + '/admin/restaurants')
+        .then(function(r) { return r.json(); })
+        .then(function(list) {
+            if (!Array.isArray(list)) return;
+            var sel = document.getElementById('restaurantFilter');
+            if (!sel) return;
+
+            // Clear existing options (keep the "All" option)
+            while (sel.options.length > 1) sel.remove(1);
+
+            list.forEach(function(r) {
+                var opt = document.createElement('option');
+                opt.value = r.id;
+                opt.textContent = r.name + ' (' + r.currency + ')';
+                sel.appendChild(opt);
+            });
+
+            sel.style.display = 'inline-block';
+            sel.value = CURRENT_FILTER_RESTAURANT || '';
+        })
+        .catch(function(err) { console.warn('Restaurant filter load failed:', err); });
+}
+
+function onRestaurantFilterChange() {
+    var sel = document.getElementById('restaurantFilter');
+    CURRENT_FILTER_RESTAURANT = sel.value || '';
+
+    loadOrders();
+    loadMenu();
+    loadCustomers();
+    loadReports();
+    loadAdmins();
+    var analyticsTab = document.getElementById('tabAnalyticsContent');
+    if (analyticsTab && analyticsTab.classList.contains('active')) {
+        loadAnalytics();
+    }
+}
+
+// Helper: append ?restaurant=X to any URL when a filter is active
+function withRestaurantFilter(url) {
+    if (!CURRENT_FILTER_RESTAURANT) return url;
+    var sep = url.indexOf('?') === -1 ? '?' : '&';
+    return url + sep + 'restaurant=' + encodeURIComponent(CURRENT_FILTER_RESTAURANT);
+}
 
 function applyRestaurantBranding() {
     document.title = 'Admin Dashboard — ' + RESTAURANT.name;
@@ -1392,13 +1450,16 @@ function showDashboard() {
 
     // Load restaurant context FIRST, then load data.
     // This ensures currency is correct before anything renders.
-    loadRestaurantInfo().then(function() {
+     loadRestaurantInfo().then(function() {
         loadOrders();
         loadMenu();
         loadCustomers();
         loadReports();
         loadAdmins();
     });
+
+    // Show the master's restaurant filter (only for masters)
+    loadMasterRestaurantFilter();
 
     if (ordersInterval) clearInterval(ordersInterval);
     ordersInterval = setInterval(loadOrders, 8000);
