@@ -1514,10 +1514,11 @@ function showDashboard() {
 
     // Show the master's restaurant filter (only for masters)
     loadMasterRestaurantFilter();
-
     if (ordersInterval) clearInterval(ordersInterval);
-    ordersInterval = setInterval(loadOrders, 8000);
-    setInterval(loadReports, 15000);
+    ordersInterval = setInterval(loadOrders, 15000);
+
+    if (window._reportsInterval) clearInterval(window._reportsInterval);
+    window._reportsInterval = setInterval(loadReports, 30000);
 
     if (window.analyticsInterval) clearInterval(window.analyticsInterval);
     window.analyticsInterval = setInterval(function() {
@@ -2126,11 +2127,24 @@ function performRestore(orders, customers, menu) {
 // ============================================================
 // MENU
 // ============================================================
+var _menuCache = { data: null, time: 0, key: '' };
+
 function loadMenu() {
+    var cacheKey = String(CURRENT_FILTER_RESTAURANT || 'all');
+    var now = Date.now();
+
+    // Serve from cache for 60 seconds if same restaurant
+    if (_menuCache.data && _menuCache.key === cacheKey && (now - _menuCache.time) < 60000) {
+        allMenuItems = _menuCache.data;
+        renderMenu();
+        return;
+    }
+
     authFetch(withRestaurantFilter(API + '/admin/menu'))
         .then(function(response) { return response.json(); })
         .then(function(data) {
             allMenuItems = Array.isArray(data) ? data : [];
+            _menuCache = { data: allMenuItems, time: now, key: cacheKey };
             renderMenu();
         })
         .catch(function(error) {
@@ -3251,7 +3265,43 @@ applyTheme = function(theme) {
         }, 100);
     }
 };
+// ============================================================
+// VISIBILITY — pause polling when tab is hidden
+// ============================================================
+document.addEventListener('visibilitychange', function() {
+    var hasToken = !!localStorage.getItem('adminToken');
 
+    if (document.hidden) {
+        if (ordersInterval) {
+            clearInterval(ordersInterval);
+            ordersInterval = null;
+        }
+        if (window.analyticsInterval) {
+            clearInterval(window.analyticsInterval);
+            window.analyticsInterval = null;
+        }
+        if (window._reportsInterval) {
+            clearInterval(window._reportsInterval);
+            window._reportsInterval = null;
+        }
+    } else if (hasToken) {
+        loadOrders();
+        if (!ordersInterval) {
+            ordersInterval = setInterval(loadOrders, 15000);
+        }
+        if (!window._reportsInterval) {
+            window._reportsInterval = setInterval(loadReports, 30000);
+        }
+        if (!window.analyticsInterval) {
+            window.analyticsInterval = setInterval(function() {
+                var analyticsTab = document.getElementById('tabAnalyticsContent');
+                if (analyticsTab && analyticsTab.classList.contains('active')) {
+                    loadAnalytics();
+                }
+            }, 60000);
+        }
+    }
+});
 console.log('🚀 Admin dashboard ready');
 </script>
 </body>
