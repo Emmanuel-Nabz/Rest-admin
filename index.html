@@ -2012,7 +2012,7 @@ function performRestore(orders, customers, menu) {
 // MENU
 // ============================================================
 function loadMenu() {
-    authFetch(API + '/menu')
+    authFetch(withRestaurantFilter(API + '/admin/menu'))
         .then(function(response) { return response.json(); })
         .then(function(data) {
             allMenuItems = Array.isArray(data) ? data : [];
