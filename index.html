@@ -1336,10 +1336,24 @@ function login() {
     })
     .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
-        if (!result.ok) {
+                if (!result.ok) {
             errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
             return;
         }
+
+        // Block drivers from the admin dashboard
+        var payload;
+        try {
+            payload = JSON.parse(atob(result.data.token.split('.')[1]));
+        } catch (e) {
+            errorEl.textContent = '❌ Invalid token received';
+            return;
+        }
+        if (payload.role === 'driver') {
+            errorEl.textContent = '❌ Drivers must use the driver app, not the admin dashboard.';
+            return;
+        }
+
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
         localStorage.removeItem('adminLoggedIn');
