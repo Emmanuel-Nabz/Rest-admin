@@ -1552,11 +1552,27 @@ function showDashboard() {
         }
     }, 60000);
 }
-
 function checkSession() {
-    if (localStorage.getItem('adminLoggedIn') === 'true' && localStorage.getItem('adminToken')) {
-        showDashboard();
-    }
+    var token = localStorage.getItem('adminToken');
+    if (localStorage.getItem('adminLoggedIn') !== 'true' || !token) return;
+
+    // Verify token is still valid by making a lightweight API call
+    authFetch(API + '/admin/restaurant-info')
+        .then(function(res) {
+            if (res.status === 401 || res.status === 403) {
+                // Token expired or restaurant inactive — log out cleanly
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                localStorage.removeItem('adminLoggedIn');
+                console.log('Session invalidated — please log in again.');
+                return;
+            }
+            showDashboard();
+        })
+        .catch(function() {
+            // Offline or network error — show dashboard anyway
+            showDashboard();
+        });
 }
 
 window.addEventListener('DOMContentLoaded', function() {
@@ -1570,11 +1586,45 @@ window.addEventListener('DOMContentLoaded', function() {
 function showTrialBanner() {
     var token = localStorage.getItem('adminToken');
     if (!token) return;
-    var isTrial = false;
-    try { isTrial = JSON.parse(atob(token.split('.')[1])).is_trial === 1; }
+
+    var payload;
+    try { payload = JSON.parse(atob(token.split('.')[1])); }
     catch (e) { return; }
+
     var banner = document.getElementById('trialBanner');
-    if (banner) banner.style.display = isTrial ? 'flex' : 'none';
+    if (!banner) return;
+
+    if (payload.is_trial !== 1) {
+        banner.style.display = 'none';
+        return;
+    }
+
+    banner.style.display = 'flex';
+
+    // Show days remaining
+    if (payload.trial_ends_at) {
+        var endsAt = new Date(payload.trial_ends_at);
+        var daysLeft = Math.ceil((endsAt - new Date()) / (1000 * 60 * 60 * 24));
+        var subEl = banner.querySelector('.sub');
+
+        if (subEl) {
+            // Reset styling first
+            subEl.style.color = '';
+            subEl.style.fontWeight = '';
+
+            if (daysLeft > 3) {
+                subEl.textContent = daysLeft + ' days left in your trial. Contact support to upgrade.';
+            } else if (daysLeft > 0) {
+                subEl.textContent = '⚠️ Only ' + daysLeft + ' day' + (daysLeft === 1 ? '' : 's') + ' left! Contact support now.';
+                subEl.style.color = 'var(--danger)';
+                subEl.style.fontWeight = '600';
+            } else {
+                subEl.textContent = 'Trial has expired. Contact support to continue.';
+                subEl.style.color = 'var(--danger)';
+                subEl.style.fontWeight = '600';
+            }
+        }
+    }
 }
 
 function showTrialUpgradeInfo() {
@@ -2491,7 +2541,7 @@ function downloadMenuTemplate() {
 // CUSTOMERS
 // ============================================================
 function loadCustomers() {
-    authFetch(API + '/customers')
+    authFetch(withRestaurantFilter(API + '/customers'))
         .then(function(response) { return response.json(); })
         .then(function(customers) {
             customers = Array.isArray(customers) ? customers : [];
@@ -2602,7 +2652,7 @@ function confirmAndDeleteCustomer(customer) {
 // DRIVER REPORTS
 // ============================================================
 function loadReports() {
-    authFetch(API + '/reports')
+    authFetch(withRestaurantFilter(API + '/reports'))
         .then(function(res) { return res.json(); })
         .then(function(reports) {
             reports = Array.isArray(reports) ? reports : [];
@@ -2661,7 +2711,7 @@ function resolveReport(id) {
 // ADMINS
 // ============================================================
 function loadAdmins() {
-    authFetch(API + '/admins')
+    authFetch(withRestaurantFilter(API + '/admins'))
         .then(function(res) { return res.json(); })
         .then(function(admins) {
             var container = document.getElementById('adminsList');
