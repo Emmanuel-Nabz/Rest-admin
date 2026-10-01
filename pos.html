@@ -501,6 +501,180 @@ html, body {
     .pos-topbar .meta .currency { display: none; }
     .pos-topbar .meta .printer-status span.label { display: none; }
 }
+/* ============================================================
+   CASH PAYMENT MODAL
+   ============================================================ */
+.cash-modal-box {
+    background: white;
+    border-radius: 20px;
+    padding: 20px 22px 22px;
+    max-width: 420px;
+    width: 100%;
+    max-height: 95vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+.cash-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+}
+.cash-header h2 {
+    font-size: 1.1em;
+    color: #0f172a;
+}
+.cash-close {
+    background: none;
+    border: none;
+    font-size: 1.6em;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    font-family: inherit;
+}
+
+.cash-total-display, .cash-received-display, .cash-change-display {
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+}
+.cash-total-display {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+}
+.cash-received-display {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+.cash-change-display {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+.cash-change-display.negative {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+.cash-label {
+    font-size: 0.82em;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.cash-total-value {
+    font-size: 1.4em;
+    font-weight: 800;
+    color: #0f172a;
+}
+.cash-received-value {
+    font-size: 1.6em;
+    font-weight: 800;
+    color: #2563eb;
+}
+.cash-change-value {
+    font-size: 1.6em;
+    font-weight: 800;
+    color: #16a34a;
+}
+.cash-change-display.negative .cash-change-value {
+    color: #dc2626;
+}
+
+/* Quick amount buttons */
+.cash-quick {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.cash-quick button {
+    padding: 10px 4px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.85em;
+    cursor: pointer;
+    font-family: inherit;
+    color: #0f172a;
+    transition: background 0.15s;
+}
+.cash-quick button:hover {
+    background: #e2e8f0;
+    border-color: #2563eb;
+}
+
+/* Keypad */
+.cash-keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    margin-bottom: 12px;
+}
+.cash-keypad button {
+    padding: 14px 4px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.2em;
+    cursor: pointer;
+    font-family: inherit;
+    color: #0f172a;
+    transition: background 0.1s, transform 0.1s;
+    min-height: 52px;
+}
+.cash-keypad button:hover { background: #f1f5f9; border-color: #cbd5e1; }
+.cash-keypad button:active { transform: scale(0.95); }
+.cash-keypad button.wide { grid-column: span 1; }
+.cash-keypad button.danger {
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+}
+.cash-keypad button.danger:hover { background: #fee2e2; }
+
+/* Actions */
+.cash-actions {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 8px;
+    margin-top: 4px;
+}
+.cash-btn-skip, .cash-btn-confirm {
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95em;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: background 0.15s, transform 0.1s;
+}
+.cash-btn-skip {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+.cash-btn-skip:hover { background: #e2e8f0; }
+.cash-btn-confirm {
+    background: #16a34a;
+    color: white;
+}
+.cash-btn-confirm:hover:not(:disabled) { background: #15803d; }
+.cash-btn-confirm:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+}
 </style>
 </head>
 <body>
@@ -600,6 +774,68 @@ html, body {
             </button>
             <button class="btn-next" id="nextOrderBtn" onclick="posCloseModal()">
                 <i class="fas fa-arrow-right"></i> Next Order
+            </button>
+        </div>
+    </div>
+</div>
+<!-- ============ CASH PAYMENT MODAL ============ -->
+<div class="pos-modal" id="cashModal">
+    <div class="cash-modal-box">
+        <div class="cash-header">
+            <h2>Cash Payment</h2>
+            <button class="cash-close" onclick="closeCashModal()">×</button>
+        </div>
+
+        <div class="cash-total-display">
+            <div class="cash-label">Total Due</div>
+            <div class="cash-total-value" id="cashTotalDue">—</div>
+        </div>
+
+        <div class="cash-received-display">
+            <div class="cash-label">Cash Received</div>
+            <div class="cash-received-value" id="cashReceived">0</div>
+        </div>
+
+        <!-- Quick amount buttons -->
+        <div class="cash-quick" id="cashQuick"></div>
+
+        <!-- Numeric keypad -->
+        <div class="cash-keypad">
+            <button onclick="cashKey('7')">7</button>
+            <button onclick="cashKey('8')">8</button>
+            <button onclick="cashKey('9')">9</button>
+            <button onclick="cashKey('back')" class="wide">
+                <i class="fas fa-backspace"></i>
+            </button>
+
+            <button onclick="cashKey('4')">4</button>
+            <button onclick="cashKey('5')">5</button>
+            <button onclick="cashKey('6')">6</button>
+            <button onclick="cashKey('clear')" class="danger">C</button>
+
+            <button onclick="cashKey('1')">1</button>
+            <button onclick="cashKey('2')">2</button>
+            <button onclick="cashKey('3')">3</button>
+            <button onclick="cashKey('000')" class="wide">000</button>
+
+            <button onclick="cashKey('0')" style="grid-column: span 2;">0</button>
+            <button onclick="cashKey('.')">.</button>
+            <button onclick="cashKey('00')">00</button>
+        </div>
+
+        <!-- Change display -->
+        <div class="cash-change-display" id="cashChangeDisplay">
+            <div class="cash-label">Change</div>
+            <div class="cash-change-value" id="cashChange">—</div>
+        </div>
+
+        <!-- Actions -->
+        <div class="cash-actions">
+            <button class="cash-btn-skip" onclick="confirmCashExact()">
+                <i class="fas fa-equals"></i> Exact
+            </button>
+            <button class="cash-btn-confirm" id="cashConfirmBtn" onclick="confirmCashPayment()" disabled>
+                <i class="fas fa-check"></i> Confirm
             </button>
         </div>
     </div>
@@ -711,7 +947,21 @@ function init() {
 
     // Detect QZ Tray (silent printing) in the background
     detectQzTray();
+qz.websocket.connect({ retries: 0, delay: 0 })
+    .then(function() {
+        QZ_CONNECTED = true;
+        PRINTER_MODE = 'qz';
+        updatePrinterStatus('ready');
+        console.log('🖨️ QZ Tray connected — silent printing enabled');
 
+        // Handle unexpected disconnect
+        qz.websocket.setClosedCallbacks(function() {
+            QZ_CONNECTED = false;
+            PRINTER_MODE = 'browser';
+            updatePrinterStatus('offline');
+            console.log('🖨️ QZ Tray disconnected — falling back to browser print');
+        });
+    })
     // Load restaurant config, then menu
     loadRestaurantConfig()
         .then(loadMenu)
@@ -761,7 +1011,153 @@ function loadMenu() {
         renderGrid();
     });
 }
+// ============================================================
+// CASH PAYMENT STATE
+// ============================================================
+var CASH_RECEIVED = '';       // string being typed
+var CASH_TOTAL = 0;           // number
+var CASH_PAYLOAD = null;      // holds items + tax etc. between payOrder() and confirm
 
+// ============================================================
+// OPEN CASH MODAL
+// ============================================================
+function openCashModal(total, payload) {
+    CASH_TOTAL = total;
+    CASH_RECEIVED = '';
+    CASH_PAYLOAD = payload;
+
+    document.getElementById('cashTotalDue').textContent = formatMoney(total);
+    document.getElementById('cashReceived').textContent = formatMoney(0);
+    document.getElementById('cashChange').textContent = '—';
+    document.getElementById('cashConfirmBtn').disabled = true;
+    document.getElementById('cashChangeDisplay').classList.remove('negative');
+
+    // Build quick amount buttons (rounded notes/coins)
+    buildQuickAmounts(total);
+
+    document.getElementById('cashModal').classList.add('open');
+}
+
+function closeCashModal() {
+    document.getElementById('cashModal').classList.remove('open');
+    CASH_RECEIVED = '';
+    CASH_PAYLOAD = null;
+}
+
+// Quick buttons — common notes for the currency
+function buildQuickAmounts(total) {
+    var wrap = document.getElementById('cashQuick');
+    wrap.innerHTML = '';
+
+    var currency = RESTAURANT.currency || 'BD';
+    var suggestions;
+
+    if (currency === 'UGX') {
+        // Common UGX notes
+        suggestions = [5000, 10000, 20000, 50000];
+    } else if (currency === 'BD') {
+        // Common BD notes — round to nearest 500 fils
+        suggestions = [1, 5, 10, 20];
+    } else {
+        // Generic — next round numbers above the total
+        var base = Math.pow(10, Math.floor(Math.log10(total)));
+        suggestions = [base, base * 2, base * 5, base * 10];
+    }
+
+    // Also include the exact amount as the first option
+    var exact = total;
+    var shown = [exact];
+
+    suggestions.forEach(function(s) {
+        if (s >= total && shown.indexOf(s) === -1) shown.push(s);
+    });
+
+    shown.slice(0, 4).forEach(function(v) {
+        var btn = document.createElement('button');
+        btn.textContent = formatMoney(v);
+        btn.onclick = function() {
+            CASH_RECEIVED = String(v);
+            updateCashDisplay();
+        };
+        wrap.appendChild(btn);
+    });
+}
+
+// ============================================================
+// KEYPAD HANDLER
+// ============================================================
+function cashKey(k) {
+    if (k === 'back') {
+        CASH_RECEIVED = CASH_RECEIVED.slice(0, -1);
+    } else if (k === 'clear') {
+        CASH_RECEIVED = '';
+    } else if (k === '.') {
+        if (CASH_RECEIVED.indexOf('.') === -1) {
+            CASH_RECEIVED = (CASH_RECEIVED || '0') + '.';
+        }
+    } else {
+        // digit or multi-digit (000, 00)
+        // For UGX (no decimals), skip the decimal key entirely
+        if (getCurrencyDecimals() === 0 && k === '.') return;
+        CASH_RECEIVED += k;
+    }
+    updateCashDisplay();
+}
+
+function updateCashDisplay() {
+    var received = parseFloat(CASH_RECEIVED) || 0;
+
+    document.getElementById('cashReceived').textContent = formatMoney(received);
+
+    var change = received - CASH_TOTAL;
+    var changeDisplay = document.getElementById('cashChangeDisplay');
+
+    if (received === 0) {
+        document.getElementById('cashChange').textContent = '—';
+        document.getElementById('cashConfirmBtn').disabled = true;
+        changeDisplay.classList.remove('negative');
+        return;
+    }
+
+    if (change < 0) {
+        document.getElementById('cashChange').textContent = 'Short ' + formatMoney(Math.abs(change));
+        changeDisplay.classList.add('negative');
+        document.getElementById('cashConfirmBtn').disabled = true;
+    } else {
+        document.getElementById('cashChange').textContent = formatMoney(change);
+        changeDisplay.classList.remove('negative');
+        document.getElementById('cashConfirmBtn').disabled = false;
+    }
+}
+
+// ============================================================
+// CONFIRM — with specific cash received
+// ============================================================
+function confirmCashPayment() {
+    if (!CASH_PAYLOAD) return;
+    var received = parseFloat(CASH_RECEIVED) || 0;
+    if (received < CASH_TOTAL) return;
+
+    var payload = CASH_PAYLOAD;
+    payload.cash_received = received;
+    payload.change_given = received - CASH_TOTAL;
+
+    closeCashModal();
+    submitPosOrder(payload);
+}
+
+// ============================================================
+// CONFIRM — exact amount (no change)
+// ============================================================
+function confirmCashExact() {
+    if (!CASH_PAYLOAD) return;
+    var payload = CASH_PAYLOAD;
+    payload.cash_received = CASH_TOTAL;
+    payload.change_given = 0;
+
+    closeCashModal();
+    submitPosOrder(payload);
+}
 // ============================================================
 // QZ TRAY AUTO-DETECT
 // ============================================================
@@ -1028,6 +1424,31 @@ function payOrder(method) {
         }
     }
 
+    var payload = {
+        items: BILL.map(function(l) {
+            return { name: l.name, quantity: l.quantity, price: l.price };
+        }),
+        total: roundToCurrency(total),
+        tax_amount: roundToCurrency(taxAmount),
+        payment_method: method
+    };
+
+    var isCash = method.toLowerCase().indexOf('cash') !== -1;
+
+    if (isCash) {
+        // Cash → open the cash modal (calculator for change)
+        openCashModal(roundToCurrency(total), payload);
+        return;
+    }
+
+    // Non-cash → submit directly
+    submitPosOrder(payload);
+}
+
+// ============================================================
+// SUBMIT — shared by cash + non-cash
+// ============================================================
+function submitPosOrder(payload) {
     var buttons = document.querySelectorAll('.bill-payments .pay-btn');
     buttons.forEach(function(b) { b.disabled = true; });
 
@@ -1037,14 +1458,7 @@ function payOrder(method) {
             'Authorization': 'Bearer ' + getToken(),
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-            items: BILL.map(function(l) {
-                return { name: l.name, quantity: l.quantity, price: l.price };
-            }),
-            total: roundToCurrency(total),
-            tax_amount: roundToCurrency(taxAmount),
-            payment_method: method
-        })
+        body: JSON.stringify(payload)
     })
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
     .then(function(result) {
@@ -1054,14 +1468,19 @@ function payOrder(method) {
             return;
         }
 
+        var taxRate = parseFloat(RESTAURANT.tax_rate) || 0;
+        var subtotal = payload.items.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
+
         LAST_RECEIPT = {
             orderId: result.data.orderId,
-            items: BILL.slice(),
+            items: payload.items.slice(),
             subtotal: subtotal,
-            tax: taxAmount,
+            tax: payload.tax_amount,
             taxRate: taxRate,
-            total: total,
-            method: method,
+            total: payload.total,
+            method: payload.payment_method,
+            cash_received: payload.cash_received || null,
+            change_given: payload.change_given || null,
             cashier: ADMIN.username,
             restaurantName: RESTAURANT.name || 'Receipt',
             currency: RESTAURANT.currency,
@@ -1069,8 +1488,7 @@ function payOrder(method) {
         };
 
         document.getElementById('reprintBtn').disabled = false;
-
-        showPaidModal(total, method);
+        showPaidModal(payload.total, payload.payment_method);
         BILL = [];
         renderBill();
         updatePayButtonsState();
@@ -1081,7 +1499,6 @@ function payOrder(method) {
         updatePayButtonsState();
     });
 }
-
 // ============================================================
 // PAID MODAL
 // ============================================================
@@ -1113,13 +1530,11 @@ function posPrintReceipt() {
 
     console.log('🖨️ Print requested · order', LAST_RECEIPT.orderId, '· mode', PRINTER_MODE);
 
-    // Prefer QZ Tray when connected (silent)
     if (PRINTER_MODE === 'qz' && QZ_CONNECTED && typeof qz !== 'undefined') {
         qzPrintReceipt();
         return;
     }
 
-    // Fallback: browser print dialog
     browserPrintReceipt();
 }
 
@@ -1167,8 +1582,13 @@ function qzPrintReceipt() {
             var data = buildEscPosReceipt(r);
             return qz.print(config, [{ type: 'raw', format: 'plain', data: data }]);
         })
-        .then(function() {
+               .then(function() {
             showToast('✅ Receipt printed', 'success');
+
+            // Pop cash drawer if paid by Cash
+            if (r.method.toLowerCase().indexOf('cash') !== -1) {
+                popCashDrawer();
+            }
         })
         .catch(function(err) {
             console.error('QZ print error:', err);
@@ -1176,21 +1596,35 @@ function qzPrintReceipt() {
             browserPrintReceipt();
         });
 }
-
+function popCashDrawer() {
+    var kick = '\x1B\x70\x00\x19\xFA'; // universal ESC/POS drawer kick
+    qz.printers.find()
+        .then(function(printers) {
+            var name = (RESTAURANT && RESTAURANT.printer_name) || (printers && printers[0]);
+            if (!name) return;
+            var config = qz.configs.create(name);
+            return qz.print(config, [{
+                type: 'raw',
+                format: 'plain',
+                data: kick
+            }]);
+        })
+        .catch(function(err) {
+            console.warn('Cash drawer kick failed:', err);
+        });
+}
 // ESC/POS text receipt — monospace, line-printer friendly
 function buildEscPosReceipt(r) {
-    var W = 42; // typical 80mm printer character width
+    var W = 42;
     var line = '\n';
     var dashes = '------------------------------------------';
 
     function pad(left, right) {
-        left = String(left);
-        right = String(right);
+        left = String(left); right = String(right);
         var space = W - left.length - right.length;
         if (space < 1) space = 1;
         return left + ' '.repeat(space) + right;
     }
-
     function center(text) {
         text = String(text);
         var pad = Math.floor((W - text.length) / 2);
@@ -1218,8 +1652,14 @@ function buildEscPosReceipt(r) {
         out += pad('VAT (' + r.taxRate + '%)', formatPlainMoney(r.tax, r.currency)) + line;
     }
 
-    out += dashes + line;
     out += pad('TOTAL', formatPlainMoney(r.total, r.currency)) + line;
+
+    // Cash-only lines
+    if (r.cash_received != null && r.method.toLowerCase().indexOf('cash') !== -1) {
+        out += pad('Cash received', formatPlainMoney(r.cash_received, r.currency)) + line;
+        out += pad('Change', formatPlainMoney(r.change_given || 0, r.currency)) + line;
+    }
+
     out += dashes + line;
     out += pad('Paid by', r.method) + line;
     out += pad('Cashier', r.cashier) + line;
@@ -1229,7 +1669,6 @@ function buildEscPosReceipt(r) {
 
     return out;
 }
-
 function formatPlainMoney(amount, currency) {
     var n = parseFloat(amount) || 0;
     var c = currency || 'BD';
@@ -1267,6 +1706,18 @@ function browserPrintReceipt() {
                 '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.tax) + '</td>' +
             '</tr>';
     }
+    var cashLine = '';
+if (r.cash_received != null && r.method.toLowerCase().indexOf('cash') !== -1) {
+    cashLine =
+        '<tr>' +
+            '<td style="padding:2px 0;color:#666;">Cash received</td>' +
+            '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.cash_received) + '</td>' +
+        '</tr>' +
+        '<tr>' +
+            '<td style="padding:2px 0;color:#666;">Change</td>' +
+            '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.change_given || 0) + '</td>' +
+        '</tr>';
+}
 
     var html =
         '<!DOCTYPE html>' +
@@ -1284,9 +1735,10 @@ function browserPrintReceipt() {
         '<h2>' + escapeHtml(r.restaurantName) + '</h2>' +
         '<div class="sub">Receipt #' + r.orderId + '<br>' + r.date.toLocaleString() + '</div>' +
         '<table>' + lines + '</table>' +
-        '<table class="totals">' +
+               '<table class="totals">' +
             '<tr><td>Subtotal</td><td style="text-align:right;">' + formatMoney(r.subtotal) + '</td></tr>' +
             taxLine +
+            cashLine +
             '<tr class="grand"><td>TOTAL</td><td style="text-align:right;">' + formatMoney(r.total) + '</td></tr>' +
             '<tr><td colspan="2" style="padding-top:8px;font-size:0.85em;color:#666;">Paid by: ' + escapeHtml(r.method) + '</td></tr>' +
             '<tr><td colspan="2" style="font-size:0.85em;color:#666;">Cashier: ' + escapeHtml(r.cashier) + '</td></tr>' +
