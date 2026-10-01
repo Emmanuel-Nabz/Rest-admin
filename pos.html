@@ -865,11 +865,17 @@ var QZ_AVAILABLE = false;
 // HELPERS
 // ============================================================
 function getToken() {
-    return localStorage.getItem('adminToken') || localStorage.getItem('token') || '';
+    // Dashboard stores it under 'adminToken'
+    return localStorage.getItem('adminToken')
+        || localStorage.getItem('token')
+        || localStorage.getItem('authToken')
+        || '';
 }
-
 function withRestaurant(url) {
-    var slug = localStorage.getItem('adminRestaurantSlug') || '';
+    // The slug might not be in localStorage — check multiple keys
+    var slug = localStorage.getItem('adminRestaurantSlug')
+        || localStorage.getItem('restaurantSlug')
+        || '';
     if (!slug) return url;
     return url + (url.indexOf('?') === -1 ? '?' : '&') + 'restaurant=' + encodeURIComponent(slug);
 }
@@ -935,28 +941,21 @@ function init() {
     var rawUser = localStorage.getItem('adminUser');
     var loggedIn = localStorage.getItem('adminLoggedIn');
 
-    if (!rawUser && !loggedIn) {
+    if (!rawUser && loggedIn !== 'true') {
         showToast('Not logged in — redirecting…', 'error');
         setTimeout(function() { window.location.href = 'index.html'; }, 1500);
         return;
     }
 
-    // adminUser could be a plain string ("Emmy") OR a JSON object
-    try {
-        var parsed = JSON.parse(rawUser);
-        if (parsed && typeof parsed === 'object') {
-            ADMIN = parsed;
-        } else {
-            ADMIN = { username: String(rawUser), role: 'owner' };
-        }
-    } catch (e) {
-        // JSON.parse failed — treat as plain string
-        ADMIN = { username: String(rawUser), role: 'owner' };
-    }
+    // adminUser is a plain string like "Emmy", not JSON
+    ADMIN = {
+        username: rawUser || 'Cashier',
+        role: 'staff'
+    };
+    console.log('✅ POS: admin loaded:', ADMIN);
 
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
     document.getElementById('cashierRole').textContent = '(' + (ADMIN.role || 'staff') + ')';
-
     // Detect QZ Tray silently (won't block the POS from loading)
     detectQzTray();
 
@@ -973,8 +972,7 @@ function init() {
         });
 }
 function loadRestaurantConfig() {
-    // First call — do NOT include ?restaurant= because we don't know the slug yet.
-    // The backend will resolve it from the admin's JWT (req.admin.restaurant_id).
+    // First call — no ?restaurant= yet. The backend resolves it from the JWT.
     return fetch(API + '/admin/restaurant-info', {
         headers: { 'Authorization': 'Bearer ' + getToken() }
     })
@@ -983,9 +981,10 @@ function loadRestaurantConfig() {
         if (!data || data.error) throw new Error(data.error || 'Config failed');
         RESTAURANT = data;
 
-        // Remember the slug so subsequent calls are scoped correctly
+        // Save the slug so all future API calls are correctly scoped
         if (data.slug) {
             localStorage.setItem('adminRestaurantSlug', data.slug);
+            console.log('✅ POS: restaurant slug saved:', data.slug);
         }
 
         document.getElementById('currencyBadge').textContent = RESTAURANT.currency || '';
