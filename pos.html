@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>POS · Nabz</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- QZ Tray for silent thermal printing (optional — auto-detected at runtime) -->
+<script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+    background: #f1f5f9;
+    color: #0f172a;
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.pos-wrap {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    height: 100vh;
+    height: 100dvh;
+}
+
+/* ============================================================
+   TOP BAR
+   ============================================================ */
+.pos-topbar {
+    grid-column: 1 / -1;
+    background: #1e293b;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 56px;
+    flex-shrink: 0;
+}
+.pos-topbar .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-weight: 700;
+}
+.pos-topbar .brand i { color: #60a5fa; }
+.pos-topbar .meta {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 0.88em;
+}
+.pos-topbar .meta .who {
+    background: rgba(255,255,255,0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+.pos-topbar .meta .who .role {
+    color: #94a3b8;
+    font-weight: 400;
+    font-size: 0.85em;
+}
+.pos-topbar .meta .currency {
+    background: rgba(37,99,235,0.25);
+    color: #93c5fd;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 0.85em;
+}
+.pos-topbar .meta .printer-status {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.08);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+.pos-topbar .meta .printer-status .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #94a3b8;
+    box-shadow: 0 0 6px rgba(148,163,184,0.6);
+}
+.pos-topbar .meta .printer-status.ready .dot {
+    background: #16a34a;
+    box-shadow: 0 0 8px rgba(22,163,74,0.7);
+}
+.pos-topbar .meta .printer-status.offline .dot {
+    background: #dc2626;
+    box-shadow: 0 0 8px rgba(220,38,38,0.7);
+}
+.pos-topbar .topbar-btn {
+    background: rgba(255,255,255,0.1);
+    border: none; color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.15s;
+}
+.pos-topbar .topbar-btn:hover { background: rgba(255,255,255,0.2); }
+.pos-topbar .topbar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.pos-body {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    height: calc(100vh - 56px);
+    height: calc(100dvh - 56px);
+    overflow: hidden;
+}
+
+/* ============================================================
+   LEFT: MENU
+   ============================================================ */
+.pos-menu {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 12px;
+}
+
+.pos-tabs {
+    display: flex; gap: 8px;
+    padding-bottom: 12px;
+    overflow-x: auto;
+    flex-shrink: 0;
+    scrollbar-width: none;
+}
+.pos-tabs::-webkit-scrollbar { display: none; }
+.pos-tabs .tab {
+    padding: 10px 20px;
+    border-radius: 30px;
+    background: white;
+    border: 1px solid #cbd5e1;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 0.92em;
+    font-family: inherit;
+    transition: all 0.15s;
+}
+.pos-tabs .tab:hover { border-color: #2563eb; color: #2563eb; }
+.pos-tabs .tab.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+.pos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    overflow-y: auto;
+    padding-bottom: 12px;
+    align-content: start;
+}
+.pos-item {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 12px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: transform 0.1s, border-color 0.15s, box-shadow 0.15s;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    user-select: none;
+}
+.pos-item:hover { border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.12); }
+.pos-item:active { transform: scale(0.96); }
+.pos-item .item-name {
+    font-weight: 700;
+    font-size: 0.92em;
+    color: #0f172a;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.pos-item .item-price {
+    font-weight: 800;
+    color: #2563eb;
+    font-size: 1em;
+    margin-top: 8px;
+}
+
+/* ============================================================
+   RIGHT: BILL
+   ============================================================ */
+.pos-bill {
+    background: white;
+    border-left: 1px solid #e2e8f0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.bill-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+.bill-header h3 {
+    font-size: 1.05em;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.bill-header .count {
+    background: #2563eb;
+    color: white;
+    border-radius: 20px;
+    padding: 2px 10px;
+    font-size: 0.75em;
+    font-weight: 700;
+}
+.bill-clear {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+}
+.bill-clear:hover:not(:disabled) { background: #fee2e2; }
+.bill-clear:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.bill-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 20px;
+    -webkit-overflow-scrolling: touch;
+}
+.bill-empty {
+    color: #94a3b8;
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 0.9em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+.bill-empty i { font-size: 2.5em; opacity: 0.35; }
+
+.bill-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px dashed #e2e8f0;
+    gap: 10px;
+}
+.bill-line:last-child { border-bottom: none; }
+.bill-line .bl-name {
+    flex: 1;
+    font-weight: 500;
+    font-size: 0.92em;
+    line-height: 1.3;
+    min-width: 0;
+}
+.bill-line .bl-qty {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.bill-line .bl-qty button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    font-weight: 700;
+    font-size: 1em;
+    cursor: pointer;
+    background: #e2e8f0;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.1s;
+    font-family: inherit;
+    padding: 0;
+}
+.bill-line .bl-qty button:active { transform: scale(0.9); }
+.bill-line .bl-qty button.plus { background: #2563eb; color: white; }
+.bill-line .bl-qty button.plus:hover { background: #1d4ed8; }
+.bill-line .bl-qty button.minus:hover { background: #cbd5e1; }
+.bill-line .bl-qty .num {
+    min-width: 22px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95em;
+}
+.bill-line .bl-price {
+    min-width: 80px;
+    text-align: right;
+    font-weight: 700;
+    color: #16a34a;
+    font-size: 0.92em;
+    white-space: nowrap;
+}
+
+.bill-summary {
+    padding: 16px 20px 8px;
+    border-top: 2px solid #e2e8f0;
+    flex-shrink: 0;
+}
+.bill-summary .row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    font-size: 0.9em;
+    color: #64748b;
+}
+.bill-summary .row.total {
+    font-size: 1.4em;
+    font-weight: 800;
+    color: #0f172a;
+    padding-top: 10px;
+    margin-top: 8px;
+    border-top: 2px solid #2563eb;
+}
+.bill-summary .row.total .value { color: #16a34a; }
+
+.bill-payments {
+    padding: 12px 20px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.bill-payments .pay-btn {
+    padding: 16px 8px;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.9em;
+    cursor: pointer;
+    color: white;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.1s, background 0.15s;
+    min-height: 54px;
+}
+.bill-payments .pay-btn:active { transform: scale(0.97); }
+.bill-payments .pay-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.bill-payments .pay-btn i { font-size: 1.1em; }
+
+.bill-payments .pay-cash     { background: #16a34a; }
+.bill-payments .pay-cash:hover:not(:disabled) { background: #15803d; }
+.bill-payments .pay-card     { background: #2563eb; }
+.bill-payments .pay-card:hover:not(:disabled) { background: #1d4ed8; }
+.bill-payments .pay-benefit  { background: #8e44ad; }
+.bill-payments .pay-benefit:hover:not(:disabled) { background: #7d3c98; }
+.bill-payments .pay-momo     { background: #ffcc00; color: #1e293b; }
+.bill-payments .pay-momo:hover:not(:disabled) { background: #f0bb00; }
+.bill-payments .pay-airtel   { background: #e30613; }
+.bill-payments .pay-airtel:hover:not(:disabled) { background: #c40412; }
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+.pos-toast {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    padding: 14px 26px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 700;
+    font-size: 0.95em;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    z-index: 99999;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    max-width: 90vw;
+    text-align: center;
+}
+.pos-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.pos-toast.success { background: #16a34a; }
+.pos-toast.error   { background: #dc2626; }
+.pos-toast.info    { background: #2563eb; }
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+.pos-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99998;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+.pos-modal.open { display: flex; }
+.pos-modal-box {
+    background: white;
+    border-radius: 20px;
+    padding: 32px 28px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+}
+.pos-modal-box .icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: rgba(22,163,74,0.15);
+    color: #16a34a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 18px;
+    font-size: 2em;
+}
+.pos-modal-box h2 {
+    color: #0f172a;
+    margin-bottom: 8px;
+    font-size: 1.3em;
+}
+.pos-modal-box .amount {
+    font-size: 2em;
+    font-weight: 800;
+    color: #16a34a;
+    margin: 14px 0;
+    letter-spacing: -0.02em;
+}
+.pos-modal-box .meta {
+    color: #64748b;
+    font-size: 0.9em;
+    margin-bottom: 22px;
+}
+.pos-modal-box .btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.pos-modal-box .btns button {
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    font-size: 0.95em;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+.pos-modal-box .btn-print { background: #2563eb; color: white; }
+.pos-modal-box .btn-print:hover { background: #1d4ed8; }
+.pos-modal-box .btn-next  { background: #16a34a; color: white; }
+.pos-modal-box .btn-next:hover { background: #15803d; }
+
+/* ============================================================
+   MOBILE / TABLET
+   ============================================================ */
+@media (max-width: 900px) {
+    .pos-body {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr auto;
+    }
+    .pos-bill {
+        border-left: none;
+        border-top: 2px solid #cbd5e1;
+        max-height: 55vh;
+    }
+    .pos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    }
+    .pos-item { min-height: 92px; padding: 10px; }
+    .pos-item .item-name { font-size: 0.85em; }
+    .pos-item .item-price { font-size: 0.9em; }
+    .pos-topbar { height: 52px; padding: 8px 14px; }
+    .pos-body { height: calc(100vh - 52px); height: calc(100dvh - 52px); }
+    .pos-topbar .meta .who .role { display: none; }
+    .pos-topbar .meta .currency { display: none; }
+    .pos-topbar .meta .printer-status span.label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="pos-wrap">
+    <!-- TOP BAR -->
+    <div class="pos-topbar">
+        <div class="brand">
+            <i class="fas fa-cash-register"></i>
+            <span>POS</span>
+        </div>
+        <div class="meta">
+            <span class="who">
+                <i class="fas fa-user-circle"></i>
+                <span id="cashierName">—</span>
+                <span class="role" id="cashierRole"></span>
+            </span>
+            <span class="currency" id="currencyBadge">—</span>
+            <span class="printer-status" id="printerStatus" title="Printer status">
+                <span class="dot"></span>
+                <span class="label" id="printerLabel">Checking…</span>
+            </span>
+            <button class="topbar-btn" id="reprintBtn" onclick="reprintLast()" disabled title="Reprint last receipt">
+                <i class="fas fa-print"></i> Last
+            </button>
+            <button class="topbar-btn" onclick="exitPos()">
+                <i class="fas fa-times"></i> Exit
+            </button>
+        </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="pos-body">
+        <!-- LEFT: MENU -->
+        <div class="pos-menu">
+            <div class="pos-tabs" id="posTabs"></div>
+            <div class="pos-grid" id="posGrid">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #94a3b8;">
+                    <i class="fas fa-spinner fa-spin" style="font-size: 2em;"></i>
+                    <div style="margin-top: 12px;">Loading menu…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: BILL -->
+        <div class="pos-bill">
+            <div class="bill-header">
+                <h3>
+                    <i class="fas fa-receipt"></i>
+                    Current Bill
+                    <span class="count" id="billCount">0</span>
+                </h3>
+                <button class="bill-clear" id="billClear" onclick="posClear()" disabled>
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+
+            <div class="bill-items" id="billItems">
+                <div class="bill-empty">
+                    <i class="fas fa-hand-pointer"></i>
+                    <div>Tap items to add</div>
+                </div>
+            </div>
+
+            <div class="bill-summary">
+                <div class="row">
+                    <span>Subtotal</span>
+                    <span id="billSubtotal">—</span>
+                </div>
+                <div class="row" id="taxRow" style="display:none;">
+                    <span id="taxLabel">Tax</span>
+                    <span id="billTax">—</span>
+                </div>
+                <div class="row total">
+                    <span>Total</span>
+                    <span class="value" id="billTotal">—</span>
+                </div>
+            </div>
+
+            <div class="bill-payments" id="billPayments"></div>
+        </div>
+    </div>
+</div>
+
+<div class="pos-toast" id="toast"></div>
+
+<!-- PAID MODAL -->
+<div class="pos-modal" id="paidModal">
+    <div class="pos-modal-box">
+        <div class="icon"><i class="fas fa-check"></i></div>
+        <h2>Payment Received</h2>
+        <div class="amount" id="paidAmount">—</div>
+        <div class="meta" id="paidMeta">—</div>
+        <div class="btns">
+            <button class="btn-print" onclick="posPrintReceipt()">
+                <i class="fas fa-print"></i> Print
+            </button>
+            <button class="btn-next" id="nextOrderBtn" onclick="posCloseModal()">
+                <i class="fas fa-arrow-right"></i> Next Order
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+var API = 'https://api.nabztech.com/api';
+
+// ============================================================
+// STATE
+// ============================================================
+var RESTAURANT = null;
+var ADMIN = null;
+var MENU_ITEMS = [];
+var CATEGORIES = [];
+var CURRENT_CAT = 'All';
+var BILL = [];
+var LAST_RECEIPT = null;
+var PRINTER_MODE = 'browser';   // 'qz' | 'browser'
+var QZ_CONNECTED = false;
+var QZ_AVAILABLE = false;
+
+// ============================================================
+// HELPERS
+// ============================================================
+function getToken() {
+    return localStorage.getItem('adminToken') || localStorage.getItem('token') || '';
+}
+
+function withRestaurant(url) {
+    var slug = localStorage.getItem('adminRestaurantSlug') || '';
+    if (!slug) return url;
+    return url + (url.indexOf('?') === -1 ? '?' : '&') + 'restaurant=' + encodeURIComponent(slug);
+}
+
+function formatMoney(amount) {
+    if (!RESTAURANT) return amount;
+    var n = parseFloat(amount) || 0;
+    var c = RESTAURANT.currency || 'BD';
+
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') {
+        return c + ' ' + Math.round(n).toLocaleString('en-US');
+    }
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') {
+        return c + ' ' + n.toFixed(3);
+    }
+    return c + ' ' + n.toFixed(2);
+}
+
+function getCurrencyDecimals() {
+    if (!RESTAURANT) return 3;
+    var c = RESTAURANT.currency || 'BD';
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') return 0;
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') return 3;
+    return 2;
+}
+
+function roundToCurrency(n) {
+    var d = getCurrencyDecimals();
+    return parseFloat(parseFloat(n).toFixed(d));
+}
+
+function escapeHtml(s) {
+    if (s === null || s === undefined) return '';
+    return String(s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ============================================================
+// PAYMENT METHOD STYLES
+// ============================================================
+var PAYMENT_STYLES = {
+    'cash':            { icon: 'fa-money-bill-wave',  cls: 'pay-cash',    label: 'Cash' },
+    'card':            { icon: 'fa-credit-card',      cls: 'pay-card',    label: 'Card' },
+    'benefit pay':     { icon: 'fa-mobile-screen',    cls: 'pay-benefit', label: 'Benefit' },
+    'benefit':         { icon: 'fa-mobile-screen',    cls: 'pay-benefit', label: 'Benefit' },
+    'mtn mobile money':{ icon: 'fa-mobile-screen',    cls: 'pay-momo',    label: 'MTN MoMo' },
+    'mtn momo':        { icon: 'fa-mobile-screen',    cls: 'pay-momo',    label: 'MTN MoMo' },
+    'airtel money':    { icon: 'fa-mobile-screen',    cls: 'pay-airtel',  label: 'Airtel' },
+    'airtel':          { icon: 'fa-mobile-screen',    cls: 'pay-airtel',  label: 'Airtel' },
+    'cash on delivery':{ icon: 'fa-money-bill-wave',  cls: 'pay-cash',    label: 'Cash' }
+};
+
+function getPaymentStyle(name) {
+    var key = String(name || '').toLowerCase().trim();
+    return PAYMENT_STYLES[key] || { icon: 'fa-circle-dollar-to-slot', cls: 'pay-card', label: name };
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+    try {
+        ADMIN = JSON.parse(localStorage.getItem('adminUser') || 'null');
+    } catch (e) { ADMIN = null; }
+
+    if (!ADMIN) {
+        showToast('Not logged in — redirecting…', 'error');
+        setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+        return;
+    }
+
+    document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
+    document.getElementById('cashierRole').textContent = '(' + (ADMIN.role || 'staff') + ')';
+
+    // Detect QZ Tray (silent printing) in the background
+    detectQzTray();
+
+    // Load restaurant config, then menu
+    loadRestaurantConfig()
+        .then(loadMenu)
+        .then(function() {
+            renderBill();
+            renderPaymentButtons();
+        })
+        .catch(function(err) {
+            console.error('POS init error:', err);
+            showToast('Could not load restaurant config', 'error');
+        });
+}
+
+function loadRestaurantConfig() {
+    return fetch(withRestaurant(API + '/admin/restaurant-info'), {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (!data || data.error) throw new Error(data.error || 'Config failed');
+        RESTAURANT = data;
+        document.getElementById('currencyBadge').textContent = RESTAURANT.currency || '';
+        return RESTAURANT;
+    });
+}
+
+function loadMenu() {
+    return fetch(withRestaurant(API + '/admin/menu'), {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(items) {
+        MENU_ITEMS = items.map(function(i) {
+            return {
+                id: i.id,
+                name: i.name,
+                price: parseFloat(i.price),
+                category: i.category || 'Other'
+            };
+        });
+
+        var cats = {};
+        MENU_ITEMS.forEach(function(i) { cats[i.category] = 1; });
+        CATEGORIES = Object.keys(cats).sort();
+
+        renderTabs();
+        renderGrid();
+    });
+}
+
+// ============================================================
+// QZ TRAY AUTO-DETECT
+// ============================================================
+function detectQzTray() {
+    updatePrinterStatus('checking');
+
+    if (typeof qz === 'undefined' || !qz.websocket) {
+        // QZ Tray script not loaded — use browser print
+        PRINTER_MODE = 'browser';
+        QZ_AVAILABLE = false;
+        QZ_CONNECTED = false;
+        updatePrinterStatus('browser');
+        return;
+    }
+
+    QZ_AVAILABLE = true;
+
+    // Try connecting silently. If QZ Tray isn't installed/running on this PC,
+    // the connection will fail and we fall back to browser print — no error shown.
+    qz.websocket.connect({ retries: 0, delay: 0 })
+        .then(function() {
+            QZ_CONNECTED = true;
+            PRINTER_MODE = 'qz';
+            updatePrinterStatus('ready');
+            console.log('🖨️ QZ Tray connected — silent printing enabled');
+        })
+        .catch(function() {
+            QZ_CONNECTED = false;
+            PRINTER_MODE = 'browser';
+            updatePrinterStatus('browser');
+            console.log('🖨️ QZ Tray not running — using browser print dialog');
+        });
+}
+
+function updatePrinterStatus(state) {
+    var el = document.getElementById('printerStatus');
+    var label = document.getElementById('printerLabel');
+    el.classList.remove('ready', 'offline');
+    if (state === 'ready') {
+        el.classList.add('ready');
+        label.textContent = 'Printer ready';
+    } else if (state === 'browser') {
+        label.textContent = 'Print dialog';
+    } else if (state === 'offline') {
+        el.classList.add('offline');
+        label.textContent = 'Offline';
+    } else {
+        label.textContent = 'Checking…';
+    }
+}
+
+// ============================================================
+// RENDER — MENU
+// ============================================================
+function renderTabs() {
+    var wrap = document.getElementById('posTabs');
+    wrap.innerHTML = '';
+
+    var allBtn = document.createElement('button');
+    allBtn.className = 'tab' + (CURRENT_CAT === 'All' ? ' active' : '');
+    allBtn.textContent = 'All';
+    allBtn.onclick = function() { CURRENT_CAT = 'All'; renderTabs(); renderGrid(); };
+    wrap.appendChild(allBtn);
+
+    CATEGORIES.forEach(function(c) {
+        var b = document.createElement('button');
+        b.className = 'tab' + (CURRENT_CAT === c ? ' active' : '');
+        b.textContent = c;
+        b.onclick = function() { CURRENT_CAT = c; renderTabs(); renderGrid(); };
+        wrap.appendChild(b);
+    });
+}
+
+function renderGrid() {
+    var grid = document.getElementById('posGrid');
+    grid.innerHTML = '';
+
+    var list = CURRENT_CAT === 'All'
+        ? MENU_ITEMS
+        : MENU_ITEMS.filter(function(i) { return i.category === CURRENT_CAT; });
+
+    if (list.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">No items in this category</div>';
+        return;
+    }
+
+    list.forEach(function(item) {
+        var btn = document.createElement('button');
+        btn.className = 'pos-item';
+        btn.onclick = function() { addToBill(item); };
+        btn.innerHTML =
+            '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
+            '<div class="item-price">' + formatMoney(item.price) + '</div>';
+        grid.appendChild(btn);
+    });
+}
+
+// ============================================================
+// RENDER — BILL
+// ============================================================
+function renderBill() {
+    var wrap = document.getElementById('billItems');
+    var countEl = document.getElementById('billCount');
+    var clearBtn = document.getElementById('billClear');
+
+    var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
+    countEl.textContent = totalQty;
+    clearBtn.disabled = BILL.length === 0;
+
+    if (BILL.length === 0) {
+        wrap.innerHTML =
+            '<div class="bill-empty">' +
+                '<i class="fas fa-hand-pointer"></i>' +
+                '<div>Tap items to add</div>' +
+            '</div>';
+        document.getElementById('billSubtotal').textContent = formatMoney(0);
+        document.getElementById('billTotal').textContent = formatMoney(0);
+        document.getElementById('taxRow').style.display = 'none';
+        updatePayButtonsState();
+        return;
+    }
+
+    wrap.innerHTML = '';
+
+    BILL.forEach(function(line) {
+        var row = document.createElement('div');
+        row.className = 'bill-line';
+        row.innerHTML =
+            '<div class="bl-name">' + escapeHtml(line.name) + '</div>' +
+            '<div class="bl-qty">' +
+                '<button class="minus" type="button">−</button>' +
+                '<span class="num">' + line.quantity + '</span>' +
+                '<button class="plus" type="button">+</button>' +
+            '</div>' +
+            '<div class="bl-price">' + formatMoney(line.price * line.quantity) + '</div>';
+
+        row.querySelector('.minus').onclick = function() { changeQty(line.id, -1); };
+        row.querySelector('.plus').onclick  = function() { changeQty(line.id, 1); };
+
+        wrap.appendChild(row);
+    });
+
+    wrap.scrollTop = wrap.scrollHeight;
+    updateTotals();
+    updatePayButtonsState();
+}
+
+function updateTotals() {
+    var subtotal = BILL.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
+
+    var taxRate = parseFloat(RESTAURANT && RESTAURANT.tax_rate) || 0;
+    var taxIncluded = RESTAURANT && (RESTAURANT.tax_included === 1 || RESTAURANT.tax_included === '1' || RESTAURANT.tax_included === true);
+
+    var taxAmount = 0;
+    var total = subtotal;
+
+    if (taxRate > 0) {
+        if (taxIncluded) {
+            taxAmount = subtotal - (subtotal / (1 + taxRate / 100));
+            total = subtotal;
+        } else {
+            taxAmount = subtotal * (taxRate / 100);
+            total = subtotal + taxAmount;
+        }
+    }
+
+    document.getElementById('billSubtotal').textContent = formatMoney(subtotal);
+
+    var taxRow = document.getElementById('taxRow');
+    if (taxRate > 0) {
+        taxRow.style.display = 'flex';
+        document.getElementById('taxLabel').textContent =
+            'VAT (' + taxRate + '%)' + (taxIncluded ? ' incl.' : '');
+        document.getElementById('billTax').textContent = formatMoney(taxAmount);
+    } else {
+        taxRow.style.display = 'none';
+    }
+
+    document.getElementById('billTotal').textContent = formatMoney(total);
+}
+
+// ============================================================
+// BILL OPERATIONS
+// ============================================================
+function addToBill(item) {
+    var existing = BILL.find(function(l) { return l.id === item.id; });
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        BILL.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
+    }
+    renderBill();
+}
+
+function changeQty(id, delta) {
+    var line = BILL.find(function(l) { return l.id === id; });
+    if (!line) return;
+    line.quantity += delta;
+    if (line.quantity <= 0) {
+        BILL = BILL.filter(function(l) { return l.id !== id; });
+    }
+    renderBill();
+}
+
+function posClear() {
+    if (BILL.length === 0) return;
+    if (!confirm('Clear the current bill?')) return;
+    BILL = [];
+    renderBill();
+}
+
+// ============================================================
+// PAYMENT BUTTONS
+// ============================================================
+function renderPaymentButtons() {
+    var wrap = document.getElementById('billPayments');
+    wrap.innerHTML = '';
+
+    var methods = (RESTAURANT && RESTAURANT.payment_methods)
+        ? RESTAURANT.payment_methods.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
+        : ['Cash'];
+
+    methods.forEach(function(m) {
+        var style = getPaymentStyle(m);
+        var btn = document.createElement('button');
+        btn.className = 'pay-btn ' + style.cls;
+        btn.innerHTML = '<i class="fas ' + style.icon + '"></i> ' + escapeHtml(style.label);
+        btn.onclick = function() { payOrder(m); };
+        wrap.appendChild(btn);
+    });
+
+    updatePayButtonsState();
+}
+
+function updatePayButtonsState() {
+    var buttons = document.querySelectorAll('.bill-payments .pay-btn');
+    var disabled = BILL.length === 0;
+    buttons.forEach(function(b) { b.disabled = disabled; });
+}
+
+// ============================================================
+// PAY
+// ============================================================
+function payOrder(method) {
+    if (BILL.length === 0) {
+        showToast('Nothing on the bill', 'error');
+        return;
+    }
+
+    var subtotal = BILL.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
+    var taxRate = parseFloat(RESTAURANT.tax_rate) || 0;
+    var taxIncluded = RESTAURANT.tax_included === 1 || RESTAURANT.tax_included === '1' || RESTAURANT.tax_included === true;
+
+    var taxAmount = 0;
+    var total = subtotal;
+
+    if (taxRate > 0) {
+        if (taxIncluded) {
+            taxAmount = subtotal - (subtotal / (1 + taxRate / 100));
+            total = subtotal;
+        } else {
+            taxAmount = subtotal * (taxRate / 100);
+            total = subtotal + taxAmount;
+        }
+    }
+
+    var buttons = document.querySelectorAll('.bill-payments .pay-btn');
+    buttons.forEach(function(b) { b.disabled = true; });
+
+    fetch(withRestaurant(API + '/pos/orders'), {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + getToken(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            items: BILL.map(function(l) {
+                return { name: l.name, quantity: l.quantity, price: l.price };
+            }),
+            total: roundToCurrency(total),
+            tax_amount: roundToCurrency(taxAmount),
+            payment_method: method
+        })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+        if (!result.ok) {
+            showToast('❌ ' + (result.data.error || 'Payment failed'), 'error');
+            updatePayButtonsState();
+            return;
+        }
+
+        LAST_RECEIPT = {
+            orderId: result.data.orderId,
+            items: BILL.slice(),
+            subtotal: subtotal,
+            tax: taxAmount,
+            taxRate: taxRate,
+            total: total,
+            method: method,
+            cashier: ADMIN.username,
+            restaurantName: RESTAURANT.name || 'Receipt',
+            currency: RESTAURANT.currency,
+            date: new Date()
+        };
+
+        document.getElementById('reprintBtn').disabled = false;
+
+        showPaidModal(total, method);
+        BILL = [];
+        renderBill();
+        updatePayButtonsState();
+    })
+    .catch(function(err) {
+        console.error('POS order error:', err);
+        showToast('❌ Network error — order not saved', 'error');
+        updatePayButtonsState();
+    });
+}
+
+// ============================================================
+// PAID MODAL
+// ============================================================
+function showPaidModal(total, method) {
+    document.getElementById('paidAmount').textContent = formatMoney(total);
+    document.getElementById('paidMeta').textContent =
+        method + ' · Order #' + LAST_RECEIPT.orderId + ' · ' + ADMIN.username;
+    document.getElementById('paidModal').classList.add('open');
+
+    // Auto-focus "Next Order" so Enter/Space moves on quickly
+    setTimeout(function() {
+        var btn = document.getElementById('nextOrderBtn');
+        if (btn) btn.focus();
+    }, 100);
+}
+
+function posCloseModal() {
+    document.getElementById('paidModal').classList.remove('open');
+}
+
+// ============================================================
+// PRINT — MASTER ENTRY POINT
+// ============================================================
+function posPrintReceipt() {
+    if (!LAST_RECEIPT) {
+        showToast('No receipt to print', 'error');
+        return;
+    }
+
+    console.log('🖨️ Print requested · order', LAST_RECEIPT.orderId, '· mode', PRINTER_MODE);
+
+    // Prefer QZ Tray when connected (silent)
+    if (PRINTER_MODE === 'qz' && QZ_CONNECTED && typeof qz !== 'undefined') {
+        qzPrintReceipt();
+        return;
+    }
+
+    // Fallback: browser print dialog
+    browserPrintReceipt();
+}
+
+function reprintLast() {
+    if (!LAST_RECEIPT) {
+        showToast('No recent receipt to reprint', 'error');
+        return;
+    }
+    posPrintReceipt();
+}
+
+// ============================================================
+// QZ TRAY — SILENT THERMAL PRINTING
+// ============================================================
+function qzPrintReceipt() {
+    if (!LAST_RECEIPT) return;
+
+    var r = LAST_RECEIPT;
+
+    // Try to auto-pick a printer named "default" — falls back to first found
+    qz.printers.find()
+        .then(function(printers) {
+            var name = null;
+            if (RESTAURANT && RESTAURANT.printer_name) {
+                name = RESTAURANT.printer_name;
+            } else if (Array.isArray(printers) && printers.length > 0) {
+                // Prefer one that looks like a receipt printer
+                for (var i = 0; i < printers.length; i++) {
+                    var p = String(printers[i]).toLowerCase();
+                    if (p.indexOf('thermal') !== -1 || p.indexOf('receipt') !== -1 ||
+                        p.indexOf('tm-') !== -1 || p.indexOf('xp-') !== -1 ||
+                        p.indexOf('pos') !== -1) {
+                        name = printers[i];
+                        break;
+                    }
+                }
+                if (!name) name = printers[0];
+            }
+
+            if (!name) {
+                throw new Error('No printer found on this system');
+            }
+
+            var config = qz.configs.create(name);
+            var data = buildEscPosReceipt(r);
+            return qz.print(config, [{ type: 'raw', format: 'plain', data: data }]);
+        })
+        .then(function() {
+            showToast('✅ Receipt printed', 'success');
+        })
+        .catch(function(err) {
+            console.error('QZ print error:', err);
+            showToast('⚠️ Silent print failed — opening dialog…', 'error');
+            browserPrintReceipt();
+        });
+}
+
+// ESC/POS text receipt — monospace, line-printer friendly
+function buildEscPosReceipt(r) {
+    var W = 42; // typical 80mm printer character width
+    var line = '\n';
+    var dashes = '------------------------------------------';
+
+    function pad(left, right) {
+        left = String(left);
+        right = String(right);
+        var space = W - left.length - right.length;
+        if (space < 1) space = 1;
+        return left + ' '.repeat(space) + right;
+    }
+
+    function center(text) {
+        text = String(text);
+        var pad = Math.floor((W - text.length) / 2);
+        if (pad < 0) pad = 0;
+        return ' '.repeat(pad) + text;
+    }
+
+    var out = '';
+    out += line;
+    out += center(r.restaurantName) + line;
+    out += center('Receipt #' + r.orderId) + line;
+    out += center(r.date.toLocaleString()) + line;
+    out += dashes + line;
+
+    r.items.forEach(function(it) {
+        var nameLine = it.quantity + 'x ' + it.name;
+        var price = formatPlainMoney(it.price * it.quantity, r.currency);
+        out += pad(nameLine, price) + line;
+    });
+
+    out += dashes + line;
+    out += pad('Subtotal', formatPlainMoney(r.subtotal, r.currency)) + line;
+
+    if (r.tax > 0) {
+        out += pad('VAT (' + r.taxRate + '%)', formatPlainMoney(r.tax, r.currency)) + line;
+    }
+
+    out += dashes + line;
+    out += pad('TOTAL', formatPlainMoney(r.total, r.currency)) + line;
+    out += dashes + line;
+    out += pad('Paid by', r.method) + line;
+    out += pad('Cashier', r.cashier) + line;
+    out += line;
+    out += center('Thank you!') + line;
+    out += line + line + line + line;
+
+    return out;
+}
+
+function formatPlainMoney(amount, currency) {
+    var n = parseFloat(amount) || 0;
+    var c = currency || 'BD';
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') {
+        return c + ' ' + Math.round(n).toLocaleString('en-US');
+    }
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') {
+        return c + ' ' + n.toFixed(3);
+    }
+    return c + ' ' + n.toFixed(2);
+}
+
+// ============================================================
+// BROWSER PRINT (fallback)
+// ============================================================
+function browserPrintReceipt() {
+    if (!LAST_RECEIPT) return;
+
+    var r = LAST_RECEIPT;
+    var lines = '';
+
+    r.items.forEach(function(it) {
+        lines +=
+            '<tr>' +
+                '<td style="padding:3px 0;">' + it.quantity + '× ' + escapeHtml(it.name) + '</td>' +
+                '<td style="text-align:right;padding:3px 0;">' + formatMoney(it.price * it.quantity) + '</td>' +
+            '</tr>';
+    });
+
+    var taxLine = '';
+    if (r.tax > 0) {
+        taxLine =
+            '<tr>' +
+                '<td style="padding:2px 0;color:#666;">VAT (' + r.taxRate + '%)</td>' +
+                '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.tax) + '</td>' +
+            '</tr>';
+    }
+
+    var html =
+        '<!DOCTYPE html>' +
+        '<html><head><meta charset="utf-8"><title>Receipt #' + r.orderId + '</title>' +
+        '<style>' +
+            'body { font-family: "Courier New", monospace; width: 280px; margin: 0 auto; padding: 10px; color: #000; }' +
+            'h2 { text-align: center; font-size: 1.1em; margin: 0 0 4px; }' +
+            '.sub { text-align: center; font-size: 0.8em; color: #666; margin-bottom: 12px; }' +
+            'table { width: 100%; border-collapse: collapse; font-size: 0.9em; }' +
+            '.totals { border-top: 1px dashed #999; margin-top: 8px; padding-top: 6px; }' +
+            '.grand { font-weight: bold; font-size: 1.15em; border-top: 2px solid #000; padding-top: 6px; }' +
+            '.footer { text-align: center; font-size: 0.75em; margin-top: 16px; color: #666; }' +
+            '@media print { @page { margin: 0; } }' +
+        '</style></head><body>' +
+        '<h2>' + escapeHtml(r.restaurantName) + '</h2>' +
+        '<div class="sub">Receipt #' + r.orderId + '<br>' + r.date.toLocaleString() + '</div>' +
+        '<table>' + lines + '</table>' +
+        '<table class="totals">' +
+            '<tr><td>Subtotal</td><td style="text-align:right;">' + formatMoney(r.subtotal) + '</td></tr>' +
+            taxLine +
+            '<tr class="grand"><td>TOTAL</td><td style="text-align:right;">' + formatMoney(r.total) + '</td></tr>' +
+            '<tr><td colspan="2" style="padding-top:8px;font-size:0.85em;color:#666;">Paid by: ' + escapeHtml(r.method) + '</td></tr>' +
+            '<tr><td colspan="2" style="font-size:0.85em;color:#666;">Cashier: ' + escapeHtml(r.cashier) + '</td></tr>' +
+        '</table>' +
+        '<div class="footer">Thank you!</div>' +
+        '</body></html>';
+
+    var w = window.open('', '_blank', 'width=320,height=600');
+    if (!w) {
+        showToast('Pop-up blocked — allow pop-ups to print', 'error');
+        return;
+    }
+    w.document.write(html);
+    w.document.close();
+    setTimeout(function() { w.focus(); w.print(); }, 300);
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function showToast(msg, type) {
+    var el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'pos-toast ' + (type || 'info');
+    setTimeout(function() { el.classList.add('show'); }, 10);
+    setTimeout(function() { el.classList.remove('show'); }, 2500);
+}
+
+function exitPos() {
+    if (BILL.length > 0) {
+        if (!confirm('There are items on the bill. Exit anyway?')) return;
+    }
+    if (window.history.length > 1) {
+        window.history.back();
+    } else {
+        window.location.href = 'index.html';
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('paidModal').addEventListener('click', function(e) {
+    if (e.target === this) posCloseModal();
+});
+
+// Keyboard shortcuts for speed
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F2') { e.preventDefault(); posClear(); }
+    if (e.key === 'F3') { e.preventDefault(); if (LAST_RECEIPT) posPrintReceipt(); }
+    if (e.key === 'Escape') posCloseModal();
+    // Enter on the paid modal = Next Order
+    if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
+        e.preventDefault();
+        posCloseModal();
+    }
+});
+
+// ============================================================
+// BOOT
+// ============================================================
+init();
+</script>
+</body>
+</html>
