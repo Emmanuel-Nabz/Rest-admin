@@ -221,7 +221,67 @@ html, body {
     padding: 16px;
     background: var(--bg);
 }
-
+/* ============================================================
+   SEARCH BAR
+   ============================================================ */
+.pos-search-wrap {
+    position: relative;
+    margin-bottom: 12px;
+    flex-shrink: 0;
+}
+.pos-search-wrap > i.fa-search {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 0.95em;
+    pointer-events: none;
+}
+.pos-search-input {
+    width: 100%;
+    padding: 13px 44px 13px 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 30px;
+    font-size: 0.95em;
+    color: var(--text);
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+}
+.pos-search-input::placeholder {
+    color: var(--text-muted);
+}
+.pos-search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.15);
+}
+[data-theme="dark"] .pos-search-input:focus {
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
+}
+.pos-search-clear {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-secondary);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    transition: background 0.15s, color 0.15s;
+}
+.pos-search-clear:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+}
 .pos-tabs {
     display: flex; gap: 8px;
     padding-bottom: 14px;
@@ -848,9 +908,16 @@ html, body {
     <!-- BODY -->
     <div class="pos-body">
         <!-- LEFT: MENU -->
-        <div class="pos-menu">
-            <div class="pos-tabs" id="posTabs"></div>
-            <div class="pos-grid" id="posGrid">
+       <div class="pos-menu">
+    <div class="pos-search-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="posSearch" class="pos-search-input" placeholder="Search items…" autocomplete="off" oninput="onSearchChange()">
+        <button class="pos-search-clear" id="posSearchClear" onclick="clearSearch()" style="display:none;">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    <div class="pos-tabs" id="posTabs"></div>
+    <div class="pos-grid" id="posGrid">
                 <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--accent);"></i>
                     <div style="margin-top: 12px;">Loading menu…</div>
@@ -991,6 +1058,7 @@ var ADMIN = null;
 var MENU_ITEMS = [];
 var CATEGORIES = [];
 var CURRENT_CAT = 'All';
+var CURRENT_SEARCH = '';
 var BILL = [];
 var LAST_RECEIPT = null;
 var PRINTER_MODE = 'browser';
@@ -1245,14 +1313,24 @@ function renderTabs() {
     var allBtn = document.createElement('button');
     allBtn.className = 'tab' + (CURRENT_CAT === 'All' ? ' active' : '');
     allBtn.textContent = 'All';
-    allBtn.onclick = function() { CURRENT_CAT = 'All'; renderTabs(); renderGrid(); };
+    allBtn.onclick = function() {
+        CURRENT_CAT = 'All';
+        clearSearch();          // ⚡ clear search when switching category
+        renderTabs();
+        renderGrid();
+    };
     wrap.appendChild(allBtn);
 
     CATEGORIES.forEach(function(c) {
         var b = document.createElement('button');
         b.className = 'tab' + (CURRENT_CAT === c ? ' active' : '');
         b.textContent = c;
-        b.onclick = function() { CURRENT_CAT = c; renderTabs(); renderGrid(); };
+        b.onclick = function() {
+            CURRENT_CAT = c;
+            clearSearch();      // ⚡ clear search when switching category
+            renderTabs();
+            renderGrid();
+        };
         wrap.appendChild(b);
     });
 }
@@ -1261,12 +1339,30 @@ function renderGrid() {
     var grid = document.getElementById('posGrid');
     grid.innerHTML = '';
 
-    var list = CURRENT_CAT === 'All'
-        ? MENU_ITEMS
-        : MENU_ITEMS.filter(function(i) { return i.category === CURRENT_CAT; });
+    var list = MENU_ITEMS;
+
+    // Filter by category (if not "All")
+    if (CURRENT_CAT !== 'All') {
+        list = list.filter(function(i) { return i.category === CURRENT_CAT; });
+    }
+
+    // Filter by search query (case-insensitive, matches name)
+    if (CURRENT_SEARCH) {
+        var q = CURRENT_SEARCH.toLowerCase();
+        list = list.filter(function(i) {
+            return i.name.toLowerCase().indexOf(q) !== -1;
+        });
+    }
 
     if (list.length === 0) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-muted);">No items in this category</div>';
+        var emptyMsg = CURRENT_SEARCH
+            ? 'No items match "' + escapeHtml(CURRENT_SEARCH) + '"'
+            : 'No items in this category';
+        grid.innerHTML =
+            '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);">' +
+                '<i class="fas fa-search" style="font-size:2.5em;opacity:0.3;display:block;margin-bottom:14px;"></i>' +
+                '<div>' + emptyMsg + '</div>' +
+            '</div>';
         return;
     }
 
@@ -1279,6 +1375,29 @@ function renderGrid() {
             '<div class="item-price">' + formatMoney(item.price) + '</div>';
         grid.appendChild(btn);
     });
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function onSearchChange() {
+    var input = document.getElementById('posSearch');
+    var clearBtn = document.getElementById('posSearchClear');
+    CURRENT_SEARCH = input.value.trim();
+
+    // Show/hide the clear button
+    clearBtn.style.display = CURRENT_SEARCH ? 'flex' : 'none';
+
+    renderGrid();
+}
+
+function clearSearch() {
+    var input = document.getElementById('posSearch');
+    input.value = '';
+    CURRENT_SEARCH = '';
+    document.getElementById('posSearchClear').style.display = 'none';
+    renderGrid();
+    input.focus();
 }
 
 // ============================================================
@@ -1930,6 +2049,15 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
         e.preventDefault();
         posCloseModal();
+    }
+
+    // ⚡ F1 or "/" jumps to the search box
+    if ((e.key === 'F1' || e.key === '/') && !e.ctrlKey && !e.metaKey) {
+        var active = document.activeElement;
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
+        e.preventDefault();
+        document.getElementById('posSearch').focus();
+        document.getElementById('posSearch').select();
     }
 });
 
