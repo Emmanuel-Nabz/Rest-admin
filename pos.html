@@ -1120,7 +1120,24 @@ html, body {
         </div>
     </div>
 </div>
-
+<!-- LOGOUT CONFIRM MODAL -->
+<div class="pos-modal" id="logoutModal">
+    <div class="pos-modal-box">
+        <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <h2 id="logoutTitle">Log out of POS?</h2>
+        <div class="meta" id="logoutMessage">The next cashier will need to sign in.</div>
+        <div class="btns">
+            <button class="btn-print" id="logoutCancelBtn" onclick="closeLogoutModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn-next" id="logoutConfirmBtn" onclick="confirmLogout()" style="background:var(--danger);">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </button>
+        </div>
+    </div>
+</div>
 <div class="pos-toast" id="toast"></div>
 
 <!-- PAID MODAL -->
@@ -2285,11 +2302,26 @@ function showToast(msg, type) {
     setTimeout(function() { el.classList.remove('show'); }, 2500);
 }
 function exitPos() {
-    if (BILL.length > 0) {
-        if (!confirm('There are items on the bill. Exit anyway?')) return;
-    }
-    if (!confirm('Log out of POS?\n\nThe next cashier will need to sign in.')) return;
+    // Show the custom logout modal instead of native confirm()
+    var titleEl = document.getElementById('logoutTitle');
+    var msgEl = document.getElementById('logoutMessage');
 
+    if (BILL.length > 0) {
+        titleEl.textContent = 'You have items on the bill.';
+        msgEl.innerHTML = 'Logging out will <strong>clear the current bill</strong>. The next cashier will need to sign in.';
+    } else {
+        titleEl.textContent = 'Log out of POS?';
+        msgEl.textContent = 'The next cashier will need to sign in.';
+    }
+
+    document.getElementById('logoutModal').classList.add('open');
+}
+
+function closeLogoutModal() {
+    document.getElementById('logoutModal').classList.remove('open');
+}
+
+function confirmLogout() {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
     localStorage.removeItem('adminLoggedIn');
@@ -2302,11 +2334,16 @@ function exitPos() {
 document.getElementById('paidModal').addEventListener('click', function(e) {
     if (e.target === this) posCloseModal();
 });
-
+document.getElementById('logoutModal').addEventListener('click', function(e) {
+    if (e.target === this) closeLogoutModal();
+});
 document.addEventListener('keydown', function(e) {
     if (e.key === 'F2') { e.preventDefault(); posClear(); }
     if (e.key === 'F3') { e.preventDefault(); if (LAST_RECEIPT) posPrintReceipt(); }
-    if (e.key === 'Escape') posCloseModal();
+    if (e.key === 'Escape') {
+    posCloseModal();
+    closeLogoutModal();
+}
     if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
         e.preventDefault();
         posCloseModal();
