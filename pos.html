@@ -345,8 +345,8 @@ html, body {
 }
 .pos-item:active { transform: scale(0.97); }
 .pos-item .item-name {
-    font-weight: 700;
-    font-size: 0.95em;
+    font-weight: 600;
+    font-size: 0.98em;
     color: var(--text);
     line-height: 1.3;
     display: -webkit-box;
@@ -356,9 +356,10 @@ html, body {
 }
 .pos-item .item-price {
     font-weight: 800;
-    color: var(--accent);
-    font-size: 1.05em;
+    color: var(--success);
+    font-size: 1.1em;
     margin-top: 10px;
+    letter-spacing: -0.01em;
 }
 
 /* ============================================================
@@ -422,16 +423,32 @@ html, body {
     -webkit-overflow-scrolling: touch;
 }
 .bill-empty {
-    color: var(--text-muted);
+    color: var(--text-secondary);
     text-align: center;
     padding: 70px 20px;
-    font-size: 0.95em;
+    font-size: 1.05em;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 16px;
+    gap: 18px;
+    font-weight: 500;
 }
-.bill-empty i { font-size: 3em; opacity: 0.4; color: var(--accent); }
+.bill-empty i {
+    font-size: 3em;
+    opacity: 0.5;
+    color: var(--accent);
+    animation: billEmptyPulse 2.4s ease-in-out infinite;
+}
+.bill-empty .bill-empty-hint {
+    font-size: 0.82em;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-top: -6px;
+}
+@keyframes billEmptyPulse {
+    0%, 100% { transform: translateY(0); opacity: 0.5; }
+    50%      { transform: translateY(-4px); opacity: 0.7; }
+}
 
 .bill-line {
     display: flex;
@@ -939,10 +956,11 @@ html, body {
             </div>
 
             <div class="bill-items" id="billItems">
-                <div class="bill-empty">
-                    <i class="fas fa-hand-pointer"></i>
-                    <div>Tap items to add</div>
-                </div>
+               <div class="bill-empty">
+    <i class="fas fa-hand-pointer"></i>
+    <div>Tap items to add</div>
+    <div class="bill-empty-hint">Or search above to find items faster</div>
+</div>
             </div>
 
             <div class="bill-summary">
@@ -1413,11 +1431,12 @@ function renderBill() {
     clearBtn.disabled = BILL.length === 0;
 
     if (BILL.length === 0) {
-        wrap.innerHTML =
-            '<div class="bill-empty">' +
-                '<i class="fas fa-hand-pointer"></i>' +
-                '<div>Tap items to add</div>' +
-            '</div>';
+      wrap.innerHTML =
+    '<div class="bill-empty">' +
+        '<i class="fas fa-hand-pointer"></i>' +
+        '<div>Tap items to add</div>' +
+        '<div class="bill-empty-hint">Or search above to find items faster</div>' +
+    '</div>';
         document.getElementById('billSubtotal').textContent = formatMoney(0);
         document.getElementById('billTotal').textContent = formatMoney(0);
         document.getElementById('taxRow').style.display = 'none';
