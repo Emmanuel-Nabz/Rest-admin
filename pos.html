@@ -932,14 +932,26 @@ function getPaymentStyle(name) {
 // INIT
 // ============================================================
 function init() {
-    try {
-        ADMIN = JSON.parse(localStorage.getItem('adminUser') || 'null');
-    } catch (e) { ADMIN = null; }
+    var rawUser = localStorage.getItem('adminUser');
+    var loggedIn = localStorage.getItem('adminLoggedIn');
 
-    if (!ADMIN) {
+    if (!rawUser && !loggedIn) {
         showToast('Not logged in — redirecting…', 'error');
         setTimeout(function() { window.location.href = 'index.html'; }, 1500);
         return;
+    }
+
+    // adminUser could be a plain string ("Emmy") OR a JSON object
+    try {
+        var parsed = JSON.parse(rawUser);
+        if (parsed && typeof parsed === 'object') {
+            ADMIN = parsed;
+        } else {
+            ADMIN = { username: String(rawUser), role: 'owner' };
+        }
+    } catch (e) {
+        // JSON.parse failed — treat as plain string
+        ADMIN = { username: String(rawUser), role: 'owner' };
     }
 
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
@@ -960,15 +972,22 @@ function init() {
             showToast('Could not load restaurant config', 'error');
         });
 }
-
 function loadRestaurantConfig() {
-    return fetch(withRestaurant(API + '/admin/restaurant-info'), {
+    // First call — do NOT include ?restaurant= because we don't know the slug yet.
+    // The backend will resolve it from the admin's JWT (req.admin.restaurant_id).
+    return fetch(API + '/admin/restaurant-info', {
         headers: { 'Authorization': 'Bearer ' + getToken() }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (!data || data.error) throw new Error(data.error || 'Config failed');
         RESTAURANT = data;
+
+        // Remember the slug so subsequent calls are scoped correctly
+        if (data.slug) {
+            localStorage.setItem('adminRestaurantSlug', data.slug);
+        }
+
         document.getElementById('currencyBadge').textContent = RESTAURANT.currency || '';
         return RESTAURANT;
     });
