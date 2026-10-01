@@ -1224,6 +1224,24 @@ html, body {
         </div>
     </div>
 </div>
+<!-- CLEAR BILL CONFIRM MODAL -->
+<div class="pos-modal" id="clearModal">
+    <div class="pos-modal-box">
+        <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
+            <i class="fas fa-trash-alt"></i>
+        </div>
+        <h2>Clear the current bill?</h2>
+        <div class="meta" id="clearMessage">All <strong>0</strong> items will be removed. This cannot be undone.</div>
+        <div class="btns">
+            <button class="btn-print" onclick="closeClearModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn-next" onclick="confirmClearBill()" style="background:var(--danger);">
+                <i class="fas fa-trash"></i> Clear
+            </button>
+        </div>
+    </div>
+</div>
 
 <script>
 // ============================================================
@@ -1812,11 +1830,26 @@ function changeQty(id, delta) {
     }
     renderBill();
 }
-
 function posClear() {
     if (BILL.length === 0) return;
-    if (!confirm('Clear the current bill?')) return;
+
+    // Update the modal message with the current item count
+    var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
+    var msgEl = document.getElementById('clearMessage');
+    msgEl.innerHTML =
+        'All <strong>' + totalQty + '</strong> item' + (totalQty === 1 ? '' : 's') +
+        ' will be removed. This cannot be undone.';
+
+    document.getElementById('clearModal').classList.add('open');
+}
+
+function closeClearModal() {
+    document.getElementById('clearModal').classList.remove('open');
+}
+
+function confirmClearBill() {
     BILL = [];
+    closeClearModal();
     renderBill();
 }
 
@@ -2368,12 +2401,16 @@ document.getElementById('paidModal').addEventListener('click', function(e) {
 document.getElementById('logoutModal').addEventListener('click', function(e) {
     if (e.target === this) closeLogoutModal();
 });
+document.getElementById('clearModal').addEventListener('click', function(e) {
+    if (e.target === this) closeClearModal();
+});
 document.addEventListener('keydown', function(e) {
     if (e.key === 'F2') { e.preventDefault(); posClear(); }
     if (e.key === 'F3') { e.preventDefault(); if (LAST_RECEIPT) posPrintReceipt(); }
     if (e.key === 'Escape') {
     posCloseModal();
     closeLogoutModal();
+    closeClearModal();
 }
     if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
         e.preventDefault();
