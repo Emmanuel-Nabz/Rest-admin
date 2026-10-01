@@ -20,6 +20,114 @@
 </script>
 
 <style>
+    /* ============================================================
+   POS LOGIN SCREEN
+   ============================================================ */
+#posLogin {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100000;
+}
+.pos-login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 40px 36px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+.pos-login-logo {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2em;
+    margin: 0 auto 20px;
+}
+.pos-login-box h1 {
+    font-size: 1.5em;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+}
+.pos-login-sub {
+    color: var(--text-secondary);
+    font-size: 0.95em;
+    margin-bottom: 28px;
+}
+.pos-login-field {
+    text-align: left;
+    margin-bottom: 16px;
+}
+.pos-login-field label {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    font-size: 0.92em;
+}
+.pos-login-field input {
+    width: 100%;
+    padding: 13px 16px;
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1em;
+    color: var(--text);
+    font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    outline: none;
+}
+.pos-login-field input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(230,126,34,0.15);
+}
+.pos-login-error {
+    color: var(--danger);
+    font-size: 0.9em;
+    min-height: 20px;
+    margin-bottom: 12px;
+    text-align: left;
+    font-weight: 500;
+}
+.pos-login-btn {
+    width: 100%;
+    padding: 15px;
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 1.05em;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background 0.15s, transform 0.1s;
+}
+.pos-login-btn:hover:not(:disabled) { background: var(--accent-hover); }
+.pos-login-btn:active:not(:disabled) { transform: scale(0.98); }
+.pos-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.pos-login-hint {
+    font-size: 0.82em;
+    color: var(--text-muted);
+    margin-top: 20px;
+    line-height: 1.4;
+}
+.pos-login-hint i { margin-right: 4px; }
 /* ============================================================
    THEME VARIABLES — matches admin dashboard
    ============================================================ */
@@ -894,8 +1002,38 @@ html, body {
 </style>
 </head>
 <body>
+<!-- POS LOGIN SCREEN (only shown if not logged in) -->
+<div id="posLogin" style="display:none;">
+    <div class="pos-login-box">
+        <div class="pos-login-logo">
+            <i class="fas fa-cash-register"></i>
+        </div>
+        <h1>POS Login</h1>
+        <p class="pos-login-sub">Sign in to start taking orders</p>
 
-<div class="pos-wrap">
+        <div class="pos-login-field">
+            <label>Username</label>
+            <input type="text" id="posLoginUser" placeholder="Enter username" autocomplete="username" autofocus>
+        </div>
+
+        <div class="pos-login-field">
+            <label>Password</label>
+            <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="current-password">
+        </div>
+
+        <div id="posLoginError" class="pos-login-error"></div>
+
+        <button class="pos-login-btn" id="posLoginBtn" onclick="posLogin()">
+            <i class="fas fa-sign-in-alt"></i> Sign In
+        </button>
+
+        <p class="pos-login-hint">
+            <i class="fas fa-info-circle"></i>
+            Drivers use the driver app, not the POS.
+        </p>
+    </div>
+</div>
+<div class="pos-wrap" id="posWrap" style="display:none;"></div>
     <!-- TOP BAR -->
     <div class="pos-topbar">
         <div class="brand">
@@ -1175,21 +1313,122 @@ window.addEventListener('storage', function(e) {
 function init() {
     var rawUser = localStorage.getItem('adminUser');
     var loggedIn = localStorage.getItem('adminLoggedIn');
+    var token = getToken();
 
-    if (!rawUser && loggedIn !== 'true') {
-        showToast('Not logged in — redirecting…', 'error');
-        setTimeout(function() { window.location.href = 'index.html'; }, 1500);
+    // Not logged in? Show the POS login screen
+    if (!token || !rawUser || loggedIn !== 'true') {
+        showPosLogin();
         return;
     }
 
+    // Already logged in — boot normally
+    bootPos(rawUser);
+}
+
+// Show the login screen and hide the POS
+function showPosLogin() {
+    document.getElementById('posLogin').style.display = 'flex';
+    document.getElementById('posWrap').style.display = 'none';
+
+    // Prefill username if we have one saved
+    var savedUser = localStorage.getItem('adminUser');
+    if (savedUser) {
+        document.getElementById('posLoginUser').value = savedUser;
+        document.getElementById('posLoginPass').focus();
+    } else {
+        document.getElementById('posLoginUser').focus();
+    }
+
+    // Enter key submits the form
+    document.getElementById('posLoginPass').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') posLogin();
+    });
+    document.getElementById('posLoginUser').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') document.getElementById('posLoginPass').focus();
+    });
+}
+
+// Attempt login
+function posLogin() {
+    var username = document.getElementById('posLoginUser').value.trim();
+    var password = document.getElementById('posLoginPass').value;
+    var errorEl = document.getElementById('posLoginError');
+    var btn = document.getElementById('posLoginBtn');
+
+    errorEl.textContent = '';
+
+    if (!username || !password) {
+        errorEl.textContent = '❌ Please enter both fields.';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
+
+    fetch(API + '/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: username, password: password })
+    })
+    .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
+    .then(function(result) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+
+        if (!result.ok) {
+            errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
+            return;
+        }
+
+        // Block drivers
+        var payload;
+        try {
+            payload = JSON.parse(atob(result.data.token.split('.')[1]));
+        } catch (e) {
+            errorEl.textContent = '❌ Invalid token received';
+            return;
+        }
+        if (payload.role === 'driver') {
+            errorEl.textContent = '❌ Drivers must use the driver app, not the POS.';
+            return;
+        }
+
+        // Save auth to this device
+        localStorage.setItem('adminToken', result.data.token);
+        localStorage.setItem('adminUser', result.data.username);
+        localStorage.setItem('adminLoggedIn', 'true');
+        if (result.data.restaurant_slug) {
+            localStorage.setItem('adminRestaurantSlug', result.data.restaurant_slug);
+        }
+
+        // Hide login, boot POS
+        document.getElementById('posLogin').style.display = 'none';
+        document.getElementById('posWrap').style.display = '';
+        errorEl.textContent = '';
+
+        bootPos(result.data.username);
+    })
+    .catch(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
+        console.error('POS login error:', err);
+        errorEl.textContent = '❌ Network error. Try again.';
+    });
+}
+
+// Boot the POS once authenticated
+function bootPos(username) {
     ADMIN = {
-        username: rawUser || 'Cashier',
+        username: username || 'Cashier',
         role: 'staff'
     };
     console.log('✅ POS: admin loaded:', ADMIN);
 
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
-    document.getElementById('cashierRole').textContent = '(' + (ADMIN.role || 'staff') + ')';
+    document.getElementById('cashierRole').textContent = '(staff)';
+
+    document.getElementById('posWrap').style.display = '';
+    document.getElementById('posLogin').style.display = 'none';
 
     detectQzTray();
 
@@ -2045,16 +2284,19 @@ function showToast(msg, type) {
     setTimeout(function() { el.classList.add('show'); }, 10);
     setTimeout(function() { el.classList.remove('show'); }, 2500);
 }
-
 function exitPos() {
     if (BILL.length > 0) {
         if (!confirm('There are items on the bill. Exit anyway?')) return;
     }
-    if (window.history.length > 1) {
-        window.history.back();
-    } else {
-        window.location.href = 'index.html';
-    }
+    if (!confirm('Log out of POS?\n\nThe next cashier will need to sign in.')) return;
+
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminRestaurantSlug');
+
+    // Reload to show the login screen again
+    window.location.reload();
 }
 
 document.getElementById('paidModal').addEventListener('click', function(e) {
