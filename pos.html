@@ -8,10 +8,13 @@
 <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
 
 <script>
-    // Apply theme IMMEDIATELY (before paint) — matches the admin dashboard theme
+    // Apply theme IMMEDIATELY (before paint)
+    // Priority: posTheme > adminTheme > default dark
     (function() {
         try {
-            var saved = localStorage.getItem('adminTheme') || 'dark';
+            var saved = localStorage.getItem('posTheme')
+                || localStorage.getItem('adminTheme')
+                || 'dark';
             document.documentElement.setAttribute('data-theme', saved);
         } catch (e) {
             document.documentElement.setAttribute('data-theme', 'dark');
@@ -997,6 +1000,7 @@ html, body {
     .pos-topbar .meta .who .role { display: none; }
     .pos-topbar .meta .currency { display: none; }
     .pos-topbar .meta .printer-status span.label { display: none; }
+        .pos-topbar #posThemeLabel { display: none; }
     .pos-topbar .brand span { display: none; }
 }
 </style>
@@ -1052,11 +1056,15 @@ html, body {
                 <span class="label" id="printerLabel">Checking…</span>
             </span>
             <button class="topbar-btn" id="reprintBtn" onclick="reprintLast()" disabled title="Reprint last receipt">
-                <i class="fas fa-print"></i> Last
-            </button>
-            <button class="topbar-btn" onclick="exitPos()">
-                <i class="fas fa-times"></i> Exit
-            </button>
+    <i class="fas fa-print"></i> Last
+</button>
+<button class="topbar-btn" id="posThemeToggle" onclick="togglePosTheme()" title="Toggle dark mode">
+    <i class="fas fa-moon" id="posThemeIcon"></i>
+    <span id="posThemeLabel">Dark</span>
+</button>
+<button class="topbar-btn" onclick="exitPos()">
+    <i class="fas fa-times"></i> Exit
+</button>
         </div>
     </div>
 
@@ -1309,19 +1317,40 @@ function getPaymentStyle(name) {
     var key = String(name || '').toLowerCase().trim();
     return PAYMENT_STYLES[key] || { icon: 'fa-circle-dollar-to-slot', cls: 'pay-card', label: name };
 }
-
 // ============================================================
-// THEME — Auto-apply on load, react to changes
+// THEME — Independent per POS device, persisted in localStorage
 // ============================================================
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
+    updateThemeToggleUI(theme);
 }
 
-// Watch for theme changes in the admin dashboard (another tab of the same origin)
-window.addEventListener('storage', function(e) {
-    if (e.key === 'adminTheme' && e.newValue) {
-        applyTheme(e.newValue);
+function togglePosTheme() {
+    var current = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try {
+        localStorage.setItem('posTheme', next);
+    } catch (e) {}
+}
+
+function updateThemeToggleUI(theme) {
+    var icon = document.getElementById('posThemeIcon');
+    var label = document.getElementById('posThemeLabel');
+    if (!icon || !label) return;
+    if (theme === 'dark') {
+        icon.className = 'fas fa-sun';
+        label.textContent = 'Light';
+    } else {
+        icon.className = 'fas fa-moon';
+        label.textContent = 'Dark';
     }
+}
+
+// On page load, sync the toggle icon with whatever theme is active
+document.addEventListener('DOMContentLoaded', function() {
+    var current = document.documentElement.getAttribute('data-theme') || 'dark';
+    updateThemeToggleUI(current);
 });
 
 // ============================================================
@@ -1432,14 +1461,16 @@ function posLogin() {
         errorEl.textContent = '❌ Network error. Try again.';
     });
 }
-
-// Boot the POS once authenticated
 function bootPos(username) {
     ADMIN = {
         username: username || 'Cashier',
         role: 'staff'
     };
     console.log('✅ POS: admin loaded:', ADMIN);
+
+    // Sync the theme toggle with the active theme
+    var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+    updateThemeToggleUI(currentTheme);
 
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
     document.getElementById('cashierRole').textContent = '(staff)';
