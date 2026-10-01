@@ -945,23 +945,9 @@ function init() {
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
     document.getElementById('cashierRole').textContent = '(' + (ADMIN.role || 'staff') + ')';
 
-    // Detect QZ Tray (silent printing) in the background
+    // Detect QZ Tray silently (won't block the POS from loading)
     detectQzTray();
-qz.websocket.connect({ retries: 0, delay: 0 })
-    .then(function() {
-        QZ_CONNECTED = true;
-        PRINTER_MODE = 'qz';
-        updatePrinterStatus('ready');
-        console.log('🖨️ QZ Tray connected — silent printing enabled');
 
-        // Handle unexpected disconnect
-        qz.websocket.setClosedCallbacks(function() {
-            QZ_CONNECTED = false;
-            PRINTER_MODE = 'browser';
-            updatePrinterStatus('offline');
-            console.log('🖨️ QZ Tray disconnected — falling back to browser print');
-        });
-    })
     // Load restaurant config, then menu
     loadRestaurantConfig()
         .then(loadMenu)
@@ -1165,7 +1151,6 @@ function detectQzTray() {
     updatePrinterStatus('checking');
 
     if (typeof qz === 'undefined' || !qz.websocket) {
-        // QZ Tray script not loaded — use browser print
         PRINTER_MODE = 'browser';
         QZ_AVAILABLE = false;
         QZ_CONNECTED = false;
@@ -1175,14 +1160,20 @@ function detectQzTray() {
 
     QZ_AVAILABLE = true;
 
-    // Try connecting silently. If QZ Tray isn't installed/running on this PC,
-    // the connection will fail and we fall back to browser print — no error shown.
     qz.websocket.connect({ retries: 0, delay: 0 })
         .then(function() {
             QZ_CONNECTED = true;
             PRINTER_MODE = 'qz';
             updatePrinterStatus('ready');
             console.log('🖨️ QZ Tray connected — silent printing enabled');
+
+            // Handle unexpected disconnect
+            qz.websocket.setClosedCallbacks(function() {
+                QZ_CONNECTED = false;
+                PRINTER_MODE = 'browser';
+                updatePrinterStatus('offline');
+                console.log('🖨️ QZ Tray disconnected — falling back to browser print');
+            });
         })
         .catch(function() {
             QZ_CONNECTED = false;
