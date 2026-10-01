@@ -526,13 +526,17 @@
                 </h1>
             </div>
 
-            <nav class="sidebar-nav">
-                <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
-                    <i class="fas fa-receipt"></i><span>Orders</span>
-                </button>
-                <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
-                    <i class="fas fa-book-open"></i><span>Menu</span>
-                </button>
+           <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
+        <i class="fas fa-receipt"></i><span>Orders</span>
+    </button>
+    <a class="nav-item" href="pos.html" target="_blank" id="tabPos" style="text-decoration:none;background:linear-gradient(135deg,rgba(22,163,74,0.12),rgba(22,163,74,0.05));color:var(--success);font-weight:700;border:1px dashed var(--success);margin-top:6px;margin-bottom:6px;">
+        <i class="fas fa-cash-register"></i><span>Open POS</span>
+        <i class="fas fa-external-link-alt" style="margin-left:auto;font-size:0.7em;opacity:0.6;"></i>
+    </a>
+    <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
+        <i class="fas fa-book-open"></i><span>Menu</span>
+    </button>
                 <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
                     <i class="fas fa-users"></i><span>Customers</span>
                 </button>
@@ -607,6 +611,16 @@
 
                 <!-- ORDERS TAB -->
                 <div id="tabOrdersContent" class="tab-content active">
+                    <a href="pos.html" target="_blank" style="display:block;background:linear-gradient(135deg,#16a34a,#15803d);color:white;text-decoration:none;padding:18px 22px;border-radius:var(--radius);margin-bottom:24px;box-shadow:0 6px 20px rgba(22,163,74,0.3);transition:transform 0.15s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 10px 25px rgba(22,163,74,0.4)'" onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 6px 20px rgba(22,163,74,0.3)'">
+    <div style="display:flex;align-items:center;gap:16px;">
+        <div style="font-size:2.2em;">💵</div>
+        <div style="flex:1;">
+            <div style="font-weight:800;font-size:1.15em;margin-bottom:2px;">Take a Walk-in Order</div>
+            <div style="font-size:0.9em;opacity:0.9;">Open POS — take orders at the counter, take cash, print receipts</div>
+        </div>
+        <i class="fas fa-arrow-right" style="font-size:1.3em;opacity:0.8;"></i>
+    </div>
+</a>
                     <div class="stats">
                         <div class="stat-card">
                             <div class="label">Total Orders</div>
