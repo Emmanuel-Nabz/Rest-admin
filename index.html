@@ -527,12 +527,16 @@
             </div>
 
             <nav class="sidebar-nav">
-                <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
-                    <i class="fas fa-receipt"></i><span>Orders</span>
-                </button>
-                <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
-                    <i class="fas fa-book-open"></i><span>Menu</span>
-                </button>
+    <button class="nav-item active" onclick="switchTab('orders')" id="tabOrders">
+        <i class="fas fa-receipt"></i><span>Orders</span>
+    </button>
+    <a class="nav-item" href="pos.html" target="_blank" id="tabPos" style="text-decoration:none;background:linear-gradient(135deg,rgba(16,185,129,0.12),rgba(16,185,129,0.05));color:var(--success);font-weight:700;border:1px dashed var(--success);margin-top:6px;margin-bottom:6px;display:none;">
+        <i class="fas fa-cash-register"></i><span>Open POS</span>
+        <i class="fas fa-external-link-alt" style="margin-left:auto;font-size:0.7em;opacity:0.6;"></i>
+    </a>
+    <button class="nav-item" onclick="switchTab('menu')" id="tabMenu">
+        <i class="fas fa-book-open"></i><span>Menu</span>
+    </button>
                 <button class="nav-item" onclick="switchTab('customers')" id="tabCustomers">
                     <i class="fas fa-users"></i><span>Customers</span>
                 </button>
@@ -1024,22 +1028,24 @@ var RESTAURANT = {
     currency: 'BD',
     delivery_fee: 0.500,
     min_order: 3.000,
-    logo_url: 'logo.png'
+    logo_url: 'logo.png',
+    pos_enabled: 0
 };
 
 function loadRestaurantInfo() {
     return authFetch(API + '/admin/restaurant-info')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            if (data && !data.error) {
-                RESTAURANT.id = data.id;
-                RESTAURANT.name = data.name || RESTAURANT.name;
-                RESTAURANT.currency = data.currency || RESTAURANT.currency;
-                RESTAURANT.delivery_fee = parseFloat(data.delivery_fee) || RESTAURANT.delivery_fee;
-                RESTAURANT.min_order = parseFloat(data.min_order) || RESTAURANT.min_order;
-                RESTAURANT.logo_url = data.logo_url || RESTAURANT.logo_url;
-                applyRestaurantBranding();
-            }
+           if (data && !data.error) {
+    RESTAURANT.id = data.id;
+    RESTAURANT.name = data.name || RESTAURANT.name;
+    RESTAURANT.currency = data.currency || RESTAURANT.currency;
+    RESTAURANT.delivery_fee = parseFloat(data.delivery_fee) || RESTAURANT.delivery_fee;
+    RESTAURANT.min_order = parseFloat(data.min_order) || RESTAURANT.min_order;
+    RESTAURANT.logo_url = data.logo_url || RESTAURANT.logo_url;
+    RESTAURANT.pos_enabled = parseInt(data.pos_enabled) || 0;
+    applyRestaurantBranding();
+}
             return RESTAURANT;
         })
         .catch(function(err) {
@@ -1114,6 +1120,11 @@ function withRestaurantFilter(url) {
 
 function applyRestaurantBranding() {
     document.title = 'Admin Dashboard — ' + RESTAURANT.name;
+        // Show or hide the POS link based on restaurant config
+    var posLink = document.getElementById('tabPos');
+    if (posLink) {
+        posLink.style.display = RESTAURANT.pos_enabled ? '' : 'none';
+    }
 
     var loginTitle = document.getElementById('loginTitle');
     if (loginTitle) loginTitle.textContent = RESTAURANT.name;
