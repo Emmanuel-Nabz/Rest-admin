@@ -3263,12 +3263,13 @@ function loadAnalytics() {
         renderHourlyChart(results[2]);
         renderTopItems(results[3]);
         renderDriversTable(results[4]);
-    }).catch(function(err) {
+   }).catch(function(err) {
         console.error('Analytics load error:', err);
         showNotification('Failed to load analytics');
     });
 }
 
+function renderAnalyticsStats(s) {
     // ⚡ POS vs Delivery split
     var posRev = parseFloat(s.pos_revenue) || 0;
     var delRev = parseFloat(s.delivery_revenue) || 0;
