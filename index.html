@@ -893,6 +893,7 @@
                     </div>
 
                     <div class="stats" id="analyticsStats">
+                                          <div class="stats" id="analyticsStats">
                         <div class="stat-card">
                             <div class="label">Orders</div>
                             <div class="number" id="an_orders">—</div>
@@ -914,13 +915,6 @@
                             <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_active_sub">&nbsp;</div>
                         </div>
                     </div>
-
-                                        <div class="stat-card">
-                        <div class="label">Active Right Now</div>
-                        <div class="number accent" id="an_active">—</div>
-                        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_active_sub">&nbsp;</div>
-                    </div>
-                </div>
 
                 <!-- ⚡ NEW — POS vs Delivery split -->
                 <div class="split-card">
@@ -954,21 +948,15 @@
                     </div>
                 </div>
 
-                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
+                               <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
                     <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                         <i class="fas fa-chart-line" style="color:var(--success);"></i>
                         Revenue & Orders
                     </h3>
-
-                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
-                        <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-                            <i class="fas fa-chart-line" style="color:var(--success);"></i>
-                            Revenue & Orders
-                        </h3>
-                        <div style="position:relative;height:280px;">
-                            <canvas id="chartDaily"></canvas>
-                        </div>
+                    <div style="position:relative;height:280px;">
+                        <canvas id="chartDaily"></canvas>
                     </div>
+                </div>
 
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
                         <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
@@ -3234,7 +3222,7 @@ function renderAnalyticsStats(s) {
     document.getElementById('an_active_sub').textContent =
         s.active + ' in range · ' + s.active_now + ' right now';
 
-    // ⚡ NEW — POS vs Delivery split
+    // ⚡ POS vs Delivery split
     var posRev = parseFloat(s.pos_revenue) || 0;
     var delRev = parseFloat(s.delivery_revenue) || 0;
     var posOrd = parseInt(s.pos_orders) || 0;
@@ -3259,30 +3247,6 @@ function renderAnalyticsStats(s) {
     document.getElementById('splitDeliveryPct').textContent =
         (total > 0 ? delPct.toFixed(0) : '0') + '% of sales';
 }
-function renderAnalyticsStats(s) {
-    if (!s || s.error) return;
-    document.getElementById('an_orders').textContent = s.total_orders;
-    document.getElementById('an_orders_sub').textContent =
-        s.delivered + ' delivered · ' + s.cancelled + ' cancelled';
-    document.getElementById('an_revenue').textContent = formatMoney(s.revenue);
-
-    // ⚡ NEW — Show POS vs delivery split in the sub-line
-    var posRev = parseFloat(s.pos_revenue) || 0;
-    var delRev = parseFloat(s.delivery_revenue) || 0;
-    var split = '';
-    if (posRev > 0 || delRev > 0) {
-        split = ' · 🏪 ' + formatMoney(posRev) + ' pos · 🛵 ' + formatMoney(delRev) + ' delivery';
-    }
-    document.getElementById('an_revenue_sub').textContent =
-        'Today: ' + formatMoney(s.today_revenue) + ' · ' + s.today_orders + ' orders' + split;
-
-    document.getElementById('an_avg').textContent = formatMoney(s.avg_order_value);
-    document.getElementById('an_avg_sub').textContent = 'Per delivered order';
-    document.getElementById('an_active').textContent = s.active_now;
-    document.getElementById('an_active_sub').textContent =
-        s.active + ' in range · ' + s.active_now + ' right now';
-}
-
 function renderDailyChart(data) {
     var canvas = document.getElementById('chartDaily');
     if (!canvas) return;
