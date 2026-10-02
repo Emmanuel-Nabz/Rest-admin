@@ -131,6 +131,40 @@
     line-height: 1.4;
 }
 .pos-login-hint i { margin-right: 4px; }
+/* Password field with eye toggle */
+.pos-login-pw-wrap {
+    position: relative;
+}
+.pos-login-pw-wrap input {
+    padding-right: 48px !important;
+}
+.pos-login-pw-toggle {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    font-size: 1em;
+    color: var(--text-muted);
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s, background 0.15s;
+    font-family: inherit;
+}
+.pos-login-pw-toggle:hover {
+    color: var(--accent);
+    background: var(--surface-secondary);
+}
+.pos-login-pw-toggle.showing {
+    color: var(--accent);
+}
 /* ============================================================
    THEME VARIABLES — matches admin dashboard
    ============================================================ */
@@ -1015,10 +1049,15 @@ html, body {
         <h1>POS Login</h1>
         <p class="pos-login-sub">Sign in to start taking orders</p>
 
-        <div class="pos-login-field">
-            <label>Username</label>
-            <input type="text" id="posLoginUser" placeholder="Enter username" autocomplete="username" autofocus>
-        </div>
+       <div class="pos-login-field">
+    <label>Password</label>
+    <div class="pos-login-pw-wrap">
+        <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="current-password">
+        <button type="button" class="pos-login-pw-toggle" id="posLoginPwToggle" onclick="toggleLoginPassword()" title="Show password" aria-label="Toggle password visibility">
+            <i class="fas fa-eye" id="posLoginPwIcon"></i>
+        </button>
+    </div>
+</div>
 
         <div class="pos-login-field">
             <label>Password</label>
@@ -1388,7 +1427,22 @@ function init() {
     // Already logged in — boot normally
     bootPos(rawUser);
 }
+// Toggle password visibility on the login screen
+function toggleLoginPassword() {
+    var input = document.getElementById('posLoginPass');
+    var btn = document.getElementById('posLoginPwToggle');
+    var icon = document.getElementById('posLoginPwIcon');
 
+    var showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+
+    btn.classList.toggle('showing', !showing);
+    icon.className = showing ? 'fas fa-eye' : 'fas fa-eye-slash';
+    btn.title = showing ? 'Show password' : 'Hide password';
+
+    // Keep focus on the password field so the user can keep typing
+    input.focus();
+}
 // Show the login screen and hide the POS
 function showPosLogin() {
     document.getElementById('posLogin').style.display = 'flex';
