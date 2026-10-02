@@ -1049,21 +1049,20 @@ html, body {
         <h1>POS Login</h1>
         <p class="pos-login-sub">Sign in to start taking orders</p>
 
-       <div class="pos-login-field">
+      <div class="pos-login-field">
+    <label>Username</label>
+    <input type="text" id="posLoginUser" placeholder="Enter username" autocomplete="off" autofocus>
+</div>
+
+<div class="pos-login-field">
     <label>Password</label>
     <div class="pos-login-pw-wrap">
-        <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="current-password">
+        <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="new-password">
         <button type="button" class="pos-login-pw-toggle" id="posLoginPwToggle" onclick="toggleLoginPassword()" title="Show password" aria-label="Toggle password visibility">
             <i class="fas fa-eye" id="posLoginPwIcon"></i>
         </button>
     </div>
 </div>
-
-        <div class="pos-login-field">
-            <label>Password</label>
-            <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="current-password">
-        </div>
-
         <div id="posLoginError" class="pos-login-error"></div>
 
         <button class="pos-login-btn" id="posLoginBtn" onclick="posLogin()">
@@ -1427,6 +1426,16 @@ function init() {
     // Already logged in — boot normally
     bootPos(rawUser);
 }
+function resetLoginPasswordVisibility() {
+    var input = document.getElementById('posLoginPass');
+    var btn = document.getElementById('posLoginPwToggle');
+    var icon = document.getElementById('posLoginPwIcon');
+    if (!input || !btn || !icon) return;
+    input.type = 'password';
+    btn.classList.remove('showing');
+    icon.className = 'fas fa-eye';
+    btn.title = 'Show password';
+}
 // Toggle password visibility on the login screen
 function toggleLoginPassword() {
     var input = document.getElementById('posLoginPass');
@@ -1493,7 +1502,9 @@ function posLogin() {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
 
-        if (!result.ok) {
+               if (!result.ok) {
+            // Force the password field back to hidden on failure
+            resetLoginPasswordVisibility();
             errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
             return;
         }
