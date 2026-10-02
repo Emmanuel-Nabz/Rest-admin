@@ -2460,6 +2460,8 @@ function openCloseDay() {
     document.getElementById('closeDaySubtitle').textContent = 'Fetching today\'s totals…';
     document.getElementById('cdTotalSales').textContent = '—';
     document.getElementById('cdOrders').textContent = '—';
+    document.getElementById('cdPos').textContent = '—';
+    document.getElementById('cdDelivery').textContent = '—';
     document.getElementById('cdCash').textContent = '—';
     document.getElementById('cdOther').textContent = '—';
     modal.classList.add('open');
@@ -2476,13 +2478,15 @@ function openCloseDay() {
         var posRev = parseFloat(data.pos_revenue) || 0;
         var deliveryRev = parseFloat(data.delivery_revenue) || 0;
         var total = posRev + deliveryRev;
+        var cashCollected = parseFloat(data.cash_collected) || 0;
 
-       document.getElementById('cdTotalSales').textContent = formatMoney(total);
-document.getElementById('cdOrders').textContent = data.total_orders || 0;
-document.getElementById('cdPos').textContent = formatMoney(posRev);
-document.getElementById('cdDelivery').textContent = formatMoney(deliveryRev);
-document.getElementById('cdCash').textContent = formatMoney(data.cash_collected || 0);
-document.getElementById('cdOther').textContent = formatMoney((total - (parseFloat(data.cash_collected) || 0)));
+        document.getElementById('cdTotalSales').textContent = formatMoney(total);
+        document.getElementById('cdOrders').textContent     = data.total_orders || 0;
+        document.getElementById('cdPos').textContent        = formatMoney(posRev);
+        document.getElementById('cdDelivery').textContent   = formatMoney(deliveryRev);
+        document.getElementById('cdCash').textContent       = formatMoney(cashCollected);
+        document.getElementById('cdOther').textContent      = formatMoney(Math.max(0, total - cashCollected));
+    })
     .catch(function() {
         document.getElementById('closeDaySubtitle').textContent = 'Could not load report (offline?)';
     });
