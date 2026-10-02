@@ -196,10 +196,43 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        .stats {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-            gap: 16px; margin-bottom: 28px;
-        }
+       .stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 16px; margin-bottom: 28px;
+}
+
+/* Analytics tab — stack blocks vertically for breathing room */
+#tabAnalyticsContent {
+    display: none;
+}
+#tabAnalyticsContent.active {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+#tabAnalyticsContent > .stats {
+    margin-bottom: 0;
+    grid-template-columns: repeat(4, 1fr);
+}
+#tabAnalyticsContent .split-card {
+    margin-bottom: 0;
+}
+#tabAnalyticsContent .chart-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+@media (max-width: 960px) {
+    #tabAnalyticsContent > .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 640px) {
+    #tabAnalyticsContent > .stats {
+        grid-template-columns: 1fr;
+    }
+}
         .stat-card {
             background: var(--surface); padding: 20px 22px; border-radius: var(--radius); border: 1px solid var(--border);
         }
@@ -306,7 +339,37 @@
     .split-grid { grid-template-columns: 1fr; gap: 12px; }
     .split-tile .tile-value { font-size: 1.5em; }
 }
-
+/* Analytics tab — stacked layout */
+#tabAnalyticsContent.active {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+#tabAnalyticsContent > .stats {
+    margin-bottom: 0;
+    grid-template-columns: repeat(4, 1fr);
+}
+.chart-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+}
+@media (max-width: 960px) {
+    #tabAnalyticsContent > .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 900px) {
+    .analytics-two-col {
+        grid-template-columns: 1fr !important;
+    }
+}
+@media (max-width: 640px) {
+    #tabAnalyticsContent > .stats {
+        grid-template-columns: 1fr;
+    }
+}
         .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; align-items: center; }
         .filters input, .filters select {
             padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius);
@@ -867,7 +930,7 @@
                     </div>
                 </div>
 
-                <!-- ANALYTICS TAB -->
+                              <!-- ANALYTICS TAB -->
                 <div id="tabAnalyticsContent" class="tab-content">
                     <div class="orders-header" style="margin-bottom:18px;">
                         <h2><i class="fas fa-chart-line"></i> Analytics</h2>
@@ -893,7 +956,6 @@
                     </div>
 
                     <div class="stats" id="analyticsStats">
-                                          <div class="stats" id="analyticsStats">
                         <div class="stat-card">
                             <div class="label">Orders</div>
                             <div class="number" id="an_orders">—</div>
@@ -916,70 +978,73 @@
                         </div>
                     </div>
 
-                <!-- ⚡ NEW — POS vs Delivery split -->
-                <div class="split-card">
-                    <div class="split-card-title">
-                        <i class="fas fa-chart-pie"></i>
-                        Counter vs Online Delivery
-                    </div>
-                    <div class="split-grid">
-                        <div class="split-tile pos">
-                            <div class="tile-label">
-                                <i class="fas fa-cash-register"></i> Counter (POS)
-                            </div>
-                            <div class="tile-value" id="splitPosRev">—</div>
-                            <div class="tile-sub" id="splitPosSub">—</div>
+                    <!-- POS vs Delivery split -->
+                    <div class="split-card">
+                        <div class="split-card-title">
+                            <i class="fas fa-chart-pie"></i>
+                            Counter vs Online Delivery
                         </div>
-                        <div class="split-tile delivery">
-                            <div class="tile-label">
-                                <i class="fas fa-motorcycle"></i> Online Delivery
+                        <div class="split-grid">
+                            <div class="split-tile pos">
+                                <div class="tile-label">
+                                    <i class="fas fa-cash-register"></i> Counter (POS)
+                                </div>
+                                <div class="tile-value" id="splitPosRev">—</div>
+                                <div class="tile-sub" id="splitPosSub">—</div>
                             </div>
-                            <div class="tile-value" id="splitDeliveryRev">—</div>
-                            <div class="tile-sub" id="splitDeliverySub">—</div>
+                            <div class="split-tile delivery">
+                                <div class="tile-label">
+                                    <i class="fas fa-motorcycle"></i> Online Delivery
+                                </div>
+                                <div class="tile-value" id="splitDeliveryRev">—</div>
+                                <div class="tile-sub" id="splitDeliverySub">—</div>
+                            </div>
+                        </div>
+                        <div class="split-bar" id="splitBar">
+                            <div class="split-bar-pos" id="splitBarPos" style="width:50%;"></div>
+                            <div class="split-bar-delivery" id="splitBarDelivery" style="width:50%;"></div>
+                        </div>
+                        <div class="split-legend">
+                            <span><span class="dot pos"></span><span id="splitPosPct">—</span></span>
+                            <span><span class="dot delivery"></span><span id="splitDeliveryPct">—</span></span>
                         </div>
                     </div>
-                    <div class="split-bar" id="splitBar">
-                        <div class="split-bar-pos" id="splitBarPos" style="width:50%;"></div>
-                        <div class="split-bar-delivery" id="splitBarDelivery" style="width:50%;"></div>
-                    </div>
-                    <div class="split-legend">
-                        <span><span class="dot pos"></span><span id="splitPosPct">—</span></span>
-                        <span><span class="dot delivery"></span><span id="splitDeliveryPct">—</span></span>
-                    </div>
-                </div>
 
-                               <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
-                    <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
-                        <i class="fas fa-chart-line" style="color:var(--success);"></i>
-                        Revenue & Orders
-                    </h3>
-                    <div style="position:relative;height:280px;">
-                        <canvas id="chartDaily"></canvas>
+                    <!-- Revenue & Orders (full width) -->
+                    <div class="chart-block">
+                        <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                            <i class="fas fa-chart-line" style="color:var(--success);"></i>
+                            Revenue & Orders
+                        </h3>
+                        <div style="position:relative;height:300px;">
+                            <canvas id="chartDaily"></canvas>
+                        </div>
                     </div>
-                </div>
 
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
-                        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                    <!-- Peak Hours + Top Items (2 columns) -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;" class="analytics-two-col">
+                        <div class="chart-block">
                             <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                                 <i class="fas fa-clock" style="color:var(--info);"></i>
                                 Peak Hours
                             </h3>
-                            <div style="position:relative;height:240px;">
+                            <div style="position:relative;height:260px;">
                                 <canvas id="chartHourly"></canvas>
                             </div>
                         </div>
-                        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                        <div class="chart-block">
                             <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                                 <i class="fas fa-fire" style="color:var(--accent);"></i>
                                 Top Items
                             </h3>
-                            <div id="topItemsContainer" style="max-height:240px;overflow-y:auto;">
+                            <div id="topItemsContainer" style="max-height:260px;overflow-y:auto;">
                                 <p style="color:var(--text-muted);text-align:center;padding:20px;">Loading…</p>
                             </div>
                         </div>
                     </div>
 
-                    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;">
+                    <!-- Driver Performance (full width) -->
+                    <div class="chart-block">
                         <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
                             <i class="fas fa-motorcycle" style="color:var(--purple);"></i>
                             Driver Performance
@@ -3203,24 +3268,6 @@ function loadAnalytics() {
         showNotification('Failed to load analytics');
     });
 }
-
-function renderAnalyticsStats(s) {
-    if (!s || s.error) return;
-
-    document.getElementById('an_orders').textContent = s.total_orders;
-    document.getElementById('an_orders_sub').textContent =
-        s.delivered + ' delivered · ' + s.cancelled + ' cancelled';
-
-    document.getElementById('an_revenue').textContent = formatMoney(s.revenue);
-    document.getElementById('an_revenue_sub').textContent =
-        'Today: ' + formatMoney(s.today_revenue) + ' · ' + s.today_orders + ' orders';
-
-    document.getElementById('an_avg').textContent = formatMoney(s.avg_order_value);
-    document.getElementById('an_avg_sub').textContent = 'Per delivered order';
-
-    document.getElementById('an_active').textContent = s.active_now;
-    document.getElementById('an_active_sub').textContent =
-        s.active + ' in range · ' + s.active_now + ' right now';
 
     // ⚡ POS vs Delivery split
     var posRev = parseFloat(s.pos_revenue) || 0;
