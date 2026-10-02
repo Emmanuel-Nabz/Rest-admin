@@ -1137,24 +1137,32 @@ html, body {
         <h2>Today's Summary</h2>
         <div class="meta" id="closeDaySubtitle">—</div>
 
-        <div class="close-day-grid">
-            <div class="close-day-stat">
-                <div class="label">Total Sales</div>
-                <div class="value green" id="cdTotalSales">—</div>
-            </div>
-            <div class="close-day-stat">
-                <div class="label">Total Orders</div>
-                <div class="value" id="cdOrders">—</div>
-            </div>
-            <div class="close-day-stat">
-                <div class="label">Cash Collected</div>
-                <div class="value" id="cdCash">—</div>
-            </div>
-            <div class="close-day-stat">
-                <div class="label">Card / Other</div>
-                <div class="value purple" id="cdOther">—</div>
-            </div>
-        </div>
+      <div class="close-day-grid">
+    <div class="close-day-stat">
+        <div class="label">Total Sales</div>
+        <div class="value green" id="cdTotalSales">—</div>
+    </div>
+    <div class="close-day-stat">
+        <div class="label">Total Orders</div>
+        <div class="value" id="cdOrders">—</div>
+    </div>
+    <div class="close-day-stat">
+        <div class="label">Counter (POS)</div>
+        <div class="value green" id="cdPos">—</div>
+    </div>
+    <div class="close-day-stat">
+        <div class="label">Online Delivery</div>
+        <div class="value purple" id="cdDelivery">—</div>
+    </div>
+    <div class="close-day-stat">
+        <div class="label">Cash Collected</div>
+        <div class="value" id="cdCash">—</div>
+    </div>
+    <div class="close-day-stat">
+        <div class="label">Card / Other</div>
+        <div class="value purple" id="cdOther">—</div>
+    </div>
+</div>
 
         <div class="btns" style="grid-template-columns: 1fr 1fr;">
             <button class="btn-print" onclick="closeCloseDayModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
@@ -2456,20 +2464,25 @@ function openCloseDay() {
     document.getElementById('cdOther').textContent = '—';
     modal.classList.add('open');
 
-    var today = new Date().toISOString().slice(0, 10);
-    fetch(withRestaurant(API + '/analytics/summary?start=' + today + '&end=' + today), {
+    fetch(withRestaurant(API + '/analytics/today-breakdown'), {
         headers: { 'Authorization': 'Bearer ' + getToken() }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
         if (!data || data.error) throw new Error('Failed');
-        document.getElementById('closeDaySubtitle').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        document.getElementById('cdTotalSales').textContent = formatMoney(data.today_revenue || 0);
-        document.getElementById('cdOrders').textContent = data.today_orders || 0;
-        // We don't have a direct cash/card split from this endpoint
-        document.getElementById('cdCash').textContent = '—';
-        document.getElementById('cdOther').textContent = '—';
-    })
+        document.getElementById('closeDaySubtitle').textContent =
+            new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        var posRev = parseFloat(data.pos_revenue) || 0;
+        var deliveryRev = parseFloat(data.delivery_revenue) || 0;
+        var total = posRev + deliveryRev;
+
+       document.getElementById('cdTotalSales').textContent = formatMoney(total);
+document.getElementById('cdOrders').textContent = data.total_orders || 0;
+document.getElementById('cdPos').textContent = formatMoney(posRev);
+document.getElementById('cdDelivery').textContent = formatMoney(deliveryRev);
+document.getElementById('cdCash').textContent = formatMoney(data.cash_collected || 0);
+document.getElementById('cdOther').textContent = formatMoney((total - (parseFloat(data.cash_collected) || 0)));
     .catch(function() {
         document.getElementById('closeDaySubtitle').textContent = 'Could not load report (offline?)';
     });
