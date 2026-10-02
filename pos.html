@@ -8,8 +8,6 @@
 <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
 
 <script>
-    // Apply theme IMMEDIATELY (before paint)
-    // Priority: posTheme > adminTheme > default dark
     (function() {
         try {
             var saved = localStorage.getItem('posTheme')
@@ -23,9 +21,6 @@
 </script>
 
 <style>
-    /* ============================================================
-   POS LOGIN SCREEN
-   ============================================================ */
 #posLogin {
     position: fixed;
     inset: 0;
@@ -47,129 +42,55 @@
     text-align: center;
 }
 .pos-login-logo {
-    width: 72px;
-    height: 72px;
+    width: 72px; height: 72px;
     border-radius: 50%;
     background: var(--accent-soft);
     color: var(--accent);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     font-size: 2em;
     margin: 0 auto 20px;
 }
-.pos-login-box h1 {
-    font-size: 1.5em;
-    font-weight: 800;
-    color: var(--text);
-    margin-bottom: 6px;
-}
-.pos-login-sub {
-    color: var(--text-secondary);
-    font-size: 0.95em;
-    margin-bottom: 28px;
-}
-.pos-login-field {
-    text-align: left;
-    margin-bottom: 16px;
-}
-.pos-login-field label {
-    display: block;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 8px;
-    font-size: 0.92em;
-}
+.pos-login-box h1 { font-size: 1.5em; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.pos-login-sub { color: var(--text-secondary); font-size: 0.95em; margin-bottom: 28px; }
+.pos-login-field { text-align: left; margin-bottom: 16px; }
+.pos-login-field label { display: block; font-weight: 600; color: var(--text); margin-bottom: 8px; font-size: 0.92em; }
 .pos-login-field input {
-    width: 100%;
-    padding: 13px 16px;
+    width: 100%; padding: 13px 16px;
     background: var(--surface-secondary);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    font-size: 1em;
-    color: var(--text);
-    font-family: inherit;
+    font-size: 1em; color: var(--text); font-family: inherit;
     transition: border-color 0.15s, box-shadow 0.15s;
     outline: none;
 }
-.pos-login-field input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(230,126,34,0.15);
-}
-.pos-login-error {
-    color: var(--danger);
-    font-size: 0.9em;
-    min-height: 20px;
-    margin-bottom: 12px;
-    text-align: left;
-    font-weight: 500;
-}
+.pos-login-field input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(230,126,34,0.15); }
+.pos-login-error { color: var(--danger); font-size: 0.9em; min-height: 20px; margin-bottom: 12px; text-align: left; font-weight: 500; }
 .pos-login-btn {
-    width: 100%;
-    padding: 15px;
-    background: var(--accent);
-    color: white;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 1.05em;
-    font-weight: 700;
-    cursor: pointer;
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
+    width: 100%; padding: 15px;
+    background: var(--accent); color: white;
+    border: none; border-radius: var(--radius);
+    font-size: 1.05em; font-weight: 700; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
     transition: background 0.15s, transform 0.1s;
 }
 .pos-login-btn:hover:not(:disabled) { background: var(--accent-hover); }
 .pos-login-btn:active:not(:disabled) { transform: scale(0.98); }
 .pos-login-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.pos-login-hint {
-    font-size: 0.82em;
-    color: var(--text-muted);
-    margin-top: 20px;
-    line-height: 1.4;
-}
+.pos-login-hint { font-size: 0.82em; color: var(--text-muted); margin-top: 20px; line-height: 1.4; }
 .pos-login-hint i { margin-right: 4px; }
-/* Password field with eye toggle */
-.pos-login-pw-wrap {
-    position: relative;
-}
-.pos-login-pw-wrap input {
-    padding-right: 48px !important;
-}
+.pos-login-pw-wrap { position: relative; }
+.pos-login-pw-wrap input { padding-right: 48px !important; }
 .pos-login-pw-toggle {
-    position: absolute;
-    top: 50%;
-    right: 10px;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    font-size: 1em;
-    color: var(--text-muted);
-    width: 34px;
-    height: 34px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.15s, background 0.15s;
-    font-family: inherit;
+    position: absolute; top: 50%; right: 10px; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer; padding: 6px;
+    font-size: 1em; color: var(--text-muted);
+    width: 34px; height: 34px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    transition: color 0.15s, background 0.15s; font-family: inherit;
 }
-.pos-login-pw-toggle:hover {
-    color: var(--accent);
-    background: var(--surface-secondary);
-}
-.pos-login-pw-toggle.showing {
-    color: var(--accent);
-}
-/* ============================================================
-   THEME VARIABLES — matches admin dashboard
-   ============================================================ */
-:root,
-[data-theme="light"] {
+.pos-login-pw-toggle:hover, .pos-login-pw-toggle.showing { color: var(--accent); background: var(--surface-secondary); }
+
+:root, [data-theme="light"] {
     --bg: #f5f6f8;
     --surface: #ffffff;
     --surface-secondary: #f9fafb;
@@ -218,7 +139,6 @@
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
@@ -242,9 +162,6 @@ html, body {
     height: 100dvh;
 }
 
-/* ============================================================
-   TOP BAR
-   ============================================================ */
 .pos-topbar {
     grid-column: 1 / -1;
     background: var(--surface);
@@ -261,90 +178,55 @@ html, body {
 }
 .pos-topbar .brand {
     display: flex; align-items: center; gap: 10px;
-    font-weight: 800;
-    font-size: 1.05rem;
-    color: var(--text);
+    font-weight: 800; font-size: 1.05rem; color: var(--text);
 }
-.pos-topbar .brand i {
-    color: var(--accent);
-    font-size: 1.3rem;
-}
-.pos-topbar .meta {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 0.88em;
-}
+.pos-topbar .brand i { color: var(--accent); font-size: 1.3rem; }
+.pos-topbar .meta { display: flex; align-items: center; gap: 10px; font-size: 0.88em; }
 .pos-topbar .meta .who {
     background: var(--surface-secondary);
     border: 1px solid var(--border);
     color: var(--text);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 600;
+    padding: 6px 14px; border-radius: 20px; font-weight: 600;
 }
 .pos-topbar .meta .who i { color: var(--accent); margin-right: 6px; }
-.pos-topbar .meta .who .role {
-    color: var(--text-muted);
-    font-weight: 400;
-    font-size: 0.85em;
-    margin-left: 4px;
-}
+.pos-topbar .meta .who .role { color: var(--text-muted); font-weight: 400; font-size: 0.85em; margin-left: 4px; }
 .pos-topbar .meta .currency {
-    background: var(--accent-soft);
-    color: var(--accent);
+    background: var(--accent-soft); color: var(--accent);
     border: 1px solid var(--accent);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-weight: 700;
-    font-size: 0.85em;
+    padding: 6px 14px; border-radius: 20px; font-weight: 700; font-size: 0.85em;
 }
 .pos-topbar .meta .printer-status {
     display: flex; align-items: center; gap: 6px;
-    background: var(--surface-secondary);
-    border: 1px solid var(--border);
+    background: var(--surface-secondary); border: 1px solid var(--border);
     color: var(--text-secondary);
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.8em;
-    font-weight: 600;
+    padding: 6px 14px; border-radius: 20px; font-size: 0.8em; font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.15s;
 }
+.pos-topbar .meta .printer-status:hover { border-color: var(--accent); }
 .pos-topbar .meta .printer-status .dot {
     width: 8px; height: 8px; border-radius: 50%;
     background: #94a3b8;
     box-shadow: 0 0 6px rgba(148,163,184,0.6);
 }
-.pos-topbar .meta .printer-status.ready .dot {
-    background: #10b981;
-    box-shadow: 0 0 8px rgba(16,185,129,0.7);
-}
-.pos-topbar .meta .printer-status.offline .dot {
-    background: #ef4444;
-    box-shadow: 0 0 8px rgba(239,68,68,0.7);
-}
+.pos-topbar .meta .printer-status.ready .dot { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.7); }
+.pos-topbar .meta .printer-status.offline .dot { background: #ef4444; box-shadow: 0 0 8px rgba(239,68,68,0.7); }
 .pos-topbar .topbar-btn {
-    background: var(--surface-secondary);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 7px 16px;
-    border-radius: 20px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 0.85em;
-    font-weight: 500;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    background: var(--surface-secondary); border: 1px solid var(--border); color: var(--text);
+    padding: 7px 16px; border-radius: 20px; cursor: pointer; font-family: inherit;
+    font-size: 0.85em; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
+    position: relative;
 }
-.pos-topbar .topbar-btn:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent);
-}
+.pos-topbar .topbar-btn:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 .pos-topbar .topbar-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-.pos-topbar .topbar-btn:disabled:hover {
-    background: var(--surface-secondary);
-    border-color: var(--border);
-    color: var(--text);
+.pos-topbar .topbar-btn:disabled:hover { background: var(--surface-secondary); border-color: var(--border); color: var(--text); }
+.pos-topbar .topbar-btn .badge {
+    background: var(--accent); color: white;
+    font-size: 0.7em; font-weight: 700;
+    padding: 1px 6px; border-radius: 10px;
+    margin-left: 2px;
 }
 
 .pos-body {
@@ -356,662 +238,481 @@ html, body {
     overflow: hidden;
 }
 
-/* ============================================================
-   LEFT: MENU
-   ============================================================ */
-.pos-menu {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    padding: 16px;
-    background: var(--bg);
-}
-/* ============================================================
-   SEARCH BAR
-   ============================================================ */
-.pos-search-wrap {
-    position: relative;
-    margin-bottom: 12px;
-    flex-shrink: 0;
-}
+.pos-menu { display: flex; flex-direction: column; overflow: hidden; padding: 16px; background: var(--bg); }
+
+.pos-search-wrap { position: relative; margin-bottom: 12px; flex-shrink: 0; }
 .pos-search-wrap > i.fa-search {
-    position: absolute;
-    left: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: var(--text-muted);
-    font-size: 0.95em;
-    pointer-events: none;
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--text-muted); font-size: 0.95em; pointer-events: none;
 }
 .pos-search-input {
-    width: 100%;
-    padding: 13px 44px 13px 44px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 30px;
-    font-size: 0.95em;
-    color: var(--text);
-    font-family: inherit;
-    transition: border-color 0.15s, box-shadow 0.15s;
-    outline: none;
+    width: 100%; padding: 13px 44px 13px 44px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 30px; font-size: 0.95em; color: var(--text); font-family: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s; outline: none;
 }
-.pos-search-input::placeholder {
-    color: var(--text-muted);
-}
-.pos-search-input:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.15);
-}
-[data-theme="dark"] .pos-search-input:focus {
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
-}
+.pos-search-input::placeholder { color: var(--text-muted); }
+.pos-search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.15); }
+[data-theme="dark"] .pos-search-input:focus { box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2); }
 .pos-search-clear {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: none;
-    background: var(--surface-secondary);
-    color: var(--text-muted);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.85em;
-    transition: background 0.15s, color 0.15s;
+    position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+    width: 28px; height: 28px; border-radius: 50%; border: none;
+    background: var(--surface-secondary); color: var(--text-muted);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 0.85em; transition: background 0.15s, color 0.15s;
 }
-.pos-search-clear:hover {
-    background: rgba(239, 68, 68, 0.15);
-    color: var(--danger);
-}
+.pos-search-clear:hover { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+
 .pos-tabs {
-    display: flex; gap: 8px;
-    padding-bottom: 14px;
-    overflow-x: auto;
-    flex-shrink: 0;
-    scrollbar-width: none;
+    display: flex; gap: 8px; padding-bottom: 14px;
+    overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
 }
 .pos-tabs::-webkit-scrollbar { display: none; }
 .pos-tabs .tab {
-    padding: 10px 20px;
-    border-radius: 30px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    font-weight: 600;
-    cursor: pointer;
-    white-space: nowrap;
-    font-size: 0.9em;
-    font-family: inherit;
+    padding: 10px 20px; border-radius: 30px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text-secondary); font-weight: 600; cursor: pointer;
+    white-space: nowrap; font-size: 0.9em; font-family: inherit;
     transition: all 0.15s;
 }
-.pos-tabs .tab:hover {
-    border-color: var(--accent);
-    color: var(--accent);
-}
+.pos-tabs .tab:hover { border-color: var(--accent); color: var(--accent); }
 .pos-tabs .tab.active {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
+    background: var(--accent); color: #fff; border-color: var(--accent);
     box-shadow: 0 4px 12px rgba(230,126,34,0.25);
 }
 
 .pos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 14px;
-    overflow-y: auto;
-    padding-bottom: 12px;
-    align-content: start;
+    gap: 14px; overflow-y: auto; padding-bottom: 12px; align-content: start;
 }
 .pos-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 16px 14px;
-    cursor: pointer;
-    text-align: left;
+    padding: 16px 14px; cursor: pointer; text-align: left;
     font-family: inherit;
     transition: transform 0.1s, border-color 0.15s, box-shadow 0.15s, background 0.15s;
     min-height: 110px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    user-select: none;
-    box-shadow: var(--shadow-sm);
+    display: flex; flex-direction: column; justify-content: space-between;
+    user-select: none; box-shadow: var(--shadow-sm);
 }
-.pos-item:hover {
-    border-color: var(--accent);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-}
+.pos-item:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .pos-item:active { transform: scale(0.97); }
 .pos-item .item-name {
-    font-weight: 600;
-    font-size: 0.98em;
-    color: var(--text);
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    font-weight: 600; font-size: 0.98em; color: var(--text); line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
 .pos-item .item-price {
-    font-weight: 800;
-    color: var(--success);
-    font-size: 1.1em;
-    margin-top: 10px;
-    letter-spacing: -0.01em;
+    font-weight: 800; color: var(--success); font-size: 1.1em; margin-top: 10px; letter-spacing: -0.01em;
 }
 
-/* ============================================================
-   RIGHT: BILL
-   ============================================================ */
 .pos-bill {
     background: var(--surface);
     border-left: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    display: flex; flex-direction: column; overflow: hidden;
 }
 
 .bill-header {
-    padding: 18px 20px;
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-shrink: 0;
+    display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+    gap: 8px;
 }
 .bill-header h3 {
-    font-size: 1.05em;
-    font-weight: 700;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    font-size: 1.05em; font-weight: 700; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
 }
 .bill-header h3 i { color: var(--accent); }
 .bill-header .count {
-    background: var(--accent);
-    color: #fff;
-    border-radius: 20px;
-    padding: 3px 11px;
-    font-size: 0.75em;
-    font-weight: 700;
+    background: var(--accent); color: #fff;
+    border-radius: 20px; padding: 3px 11px;
+    font-size: 0.75em; font-weight: 700;
 }
-.bill-clear {
-    background: rgba(239,68,68,0.12);
-    color: var(--danger);
-    border: 1px solid rgba(239,68,68,0.3);
+.bill-header-actions {
+    display: flex; gap: 6px; align-items: center;
+}
+.bill-header-btn {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
     border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 0.82em;
+    padding: 6px 12px;
+    font-size: 0.8em;
     font-weight: 600;
     cursor: pointer;
     font-family: inherit;
-    transition: background 0.15s;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
 }
-.bill-clear:hover:not(:disabled) { background: rgba(239,68,68,0.2); }
-.bill-clear:disabled { opacity: 0.4; cursor: not-allowed; }
+.bill-header-btn:hover { border-color: var(--accent); color: var(--accent); }
+.bill-header-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.bill-header-btn.danger { color: var(--danger); border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.08); }
+.bill-header-btn.danger:hover:not(:disabled) { background: rgba(239,68,68,0.18); border-color: var(--danger); }
+
+.bill-customer-strip {
+    padding: 10px 20px;
+    background: var(--surface-secondary);
+    border-bottom: 1px solid var(--border);
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+.bill-customer-strip i { color: var(--accent); }
+.bill-customer-strip strong { color: var(--text); font-weight: 600; }
+.bill-customer-strip .edit-link {
+    margin-left: auto;
+    color: var(--accent);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95em;
+}
 
 .bill-items {
-    flex: 1;
-    overflow-y: auto;
-    padding: 10px 20px;
-    -webkit-overflow-scrolling: touch;
+    flex: 1; overflow-y: auto; padding: 10px 20px; -webkit-overflow-scrolling: touch;
 }
 .bill-empty {
     color: var(--text-secondary);
     text-align: center;
-    padding: 70px 20px;
+    padding: 60px 20px;
     font-size: 1.05em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-    font-weight: 500;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 18px; font-weight: 500;
 }
 .bill-empty i {
-    font-size: 3em;
-    opacity: 0.5;
-    color: var(--accent);
+    font-size: 3em; opacity: 0.5; color: var(--accent);
     animation: billEmptyPulse 2.4s ease-in-out infinite;
 }
-.bill-empty .bill-empty-hint {
-    font-size: 0.82em;
-    color: var(--text-muted);
-    font-weight: 400;
-    margin-top: -6px;
-}
+.bill-empty .bill-empty-hint { font-size: 0.82em; color: var(--text-muted); font-weight: 400; margin-top: -6px; }
 @keyframes billEmptyPulse {
     0%, 100% { transform: translateY(0); opacity: 0.5; }
     50%      { transform: translateY(-4px); opacity: 0.7; }
 }
 
 .bill-line {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    gap: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px;
+    position: relative;
 }
 .bill-line:last-child { border-bottom: none; }
 .bill-line .bl-name {
-    flex: 1;
-    font-weight: 500;
-    font-size: 0.92em;
-    line-height: 1.3;
-    min-width: 0;
-    color: var(--text);
+    flex: 1; font-weight: 500; font-size: 0.92em; line-height: 1.3;
+    min-width: 0; color: var(--text);
 }
 .bill-line .bl-qty {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex-shrink: 0;
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
 }
 .bill-line .bl-qty button {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
+    width: 30px; height: 30px; border-radius: 50%;
     border: 1px solid var(--border);
-    font-weight: 700;
-    font-size: 1em;
-    cursor: pointer;
-    background: var(--surface-secondary);
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-weight: 700; font-size: 1em; cursor: pointer;
+    background: var(--surface-secondary); color: var(--text);
+    display: flex; align-items: center; justify-content: center;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
-    font-family: inherit;
-    padding: 0;
+    font-family: inherit; padding: 0;
 }
 .bill-line .bl-qty button:active { transform: scale(0.9); }
-.bill-line .bl-qty button.plus {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-}
+.bill-line .bl-qty button.plus { background: var(--accent); color: #fff; border-color: var(--accent); }
 .bill-line .bl-qty button.plus:hover { background: var(--accent-hover); }
 .bill-line .bl-qty button.minus:hover {
-    background: rgba(239,68,68,0.15);
-    color: var(--danger);
-    border-color: var(--danger);
+    background: rgba(239,68,68,0.15); color: var(--danger); border-color: var(--danger);
 }
 .bill-line .bl-qty .num {
-    min-width: 22px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 0.95em;
-    color: var(--text);
+    min-width: 22px; text-align: center;
+    font-weight: 700; font-size: 0.95em; color: var(--text);
 }
 .bill-line .bl-price {
-    min-width: 90px;
-    text-align: right;
-    font-weight: 700;
-    color: var(--success);
-    font-size: 0.95em;
-    white-space: nowrap;
+    min-width: 90px; text-align: right;
+    font-weight: 700; color: var(--success);
+    font-size: 0.95em; white-space: nowrap;
 }
 
 .bill-summary {
-    padding: 16px 20px 8px;
+    padding: 14px 20px 8px;
     border-top: 2px solid var(--border);
     flex-shrink: 0;
     background: var(--surface-secondary);
 }
 .bill-summary .row {
-    display: flex;
-    justify-content: space-between;
-    padding: 5px 0;
-    font-size: 0.9em;
-    color: var(--text-secondary);
+    display: flex; justify-content: space-between;
+    padding: 4px 0; font-size: 0.9em; color: var(--text-secondary);
 }
+.bill-summary .row.discount { color: var(--purple); font-weight: 600; }
+.bill-summary .row.discount .label i { color: var(--purple); }
+.bill-summary .row .label { display: flex; align-items: center; gap: 6px; }
 .bill-summary .row.total {
-    font-size: 1.4em;
-    font-weight: 800;
-    color: var(--text);
-    padding-top: 12px;
-    margin-top: 8px;
+    font-size: 1.4em; font-weight: 800; color: var(--text);
+    padding-top: 12px; margin-top: 8px;
     border-top: 2px solid var(--accent);
 }
 .bill-summary .row.total .value { color: var(--success); }
 
+.bill-discount-btn {
+    background: rgba(139, 92, 246, 0.12);
+    color: var(--purple);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+.bill-discount-btn:hover:not(:disabled) { background: rgba(139, 92, 246, 0.2); }
+.bill-discount-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
 .bill-payments {
     padding: 10px 16px 14px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    flex-shrink: 0;
-    background: var(--surface-secondary);
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+    flex-shrink: 0; background: var(--surface-secondary);
 }
 .bill-payments .pay-btn {
-    padding: 12px 8px;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: 700;
-    font-size: 0.88em;
-    cursor: pointer;
-    color: white;
+    padding: 12px 8px; border: none; border-radius: var(--radius);
+    font-weight: 700; font-size: 0.88em; cursor: pointer; color: white;
     font-family: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     gap: 6px;
     transition: transform 0.1s, filter 0.15s;
-    min-height: 46px;
-    box-shadow: var(--shadow-sm);
+    min-height: 46px; box-shadow: var(--shadow-sm);
 }
 .bill-payments .pay-btn:active { transform: scale(0.97); }
 .bill-payments .pay-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
 .bill-payments .pay-btn:not(:disabled):hover { filter: brightness(1.08); }
 .bill-payments .pay-btn i { font-size: 1em; }
-
-/* Payment buttons keep brand colors — cashier taps by color */
 .bill-payments .pay-cash     { background: #16a34a; }
 .bill-payments .pay-card     { background: #2563eb; }
 .bill-payments .pay-benefit  { background: #8e44ad; }
 .bill-payments .pay-momo     { background: #ffcc00; color: #1e293b; }
 .bill-payments .pay-airtel   { background: #e30613; }
 
-/* ============================================================
-   TOAST
-   ============================================================ */
 .pos-toast {
-    position: fixed;
-    top: 80px;
-    left: 50%;
+    position: fixed; top: 80px; left: 50%;
     transform: translateX(-50%) translateY(-20px);
-    padding: 14px 26px;
-    border-radius: 30px;
-    color: white;
-    font-weight: 700;
-    font-size: 0.95em;
-    box-shadow: var(--shadow-lg);
-    z-index: 99999;
-    opacity: 0;
-    transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none;
-    max-width: 90vw;
-    text-align: center;
+    padding: 14px 26px; border-radius: 30px;
+    color: white; font-weight: 700; font-size: 0.95em;
+    box-shadow: var(--shadow-lg); z-index: 99999;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; max-width: 90vw; text-align: center;
 }
 .pos-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .pos-toast.success { background: #10b981; }
 .pos-toast.error   { background: #ef4444; }
 .pos-toast.info    { background: #3b82f6; }
 
-/* ============================================================
-   MODALS
-   ============================================================ */
 .pos-modal {
-    position: fixed;
-    inset: 0;
+    position: fixed; inset: 0;
     background: rgba(15, 23, 42, 0.75);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 99998;
-    padding: 20px;
+    display: none; align-items: center; justify-content: center;
+    z-index: 99998; padding: 20px;
     backdrop-filter: blur(4px);
 }
 .pos-modal.open { display: flex; }
 .pos-modal-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 32px 28px;
-    max-width: 420px;
-    width: 100%;
-    text-align: center;
-    box-shadow: var(--shadow-lg);
+    padding: 32px 28px; max-width: 420px; width: 100%;
+    text-align: center; box-shadow: var(--shadow-lg);
+    max-height: 92vh; overflow-y: auto;
 }
 .pos-modal-box .icon {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    background: rgba(16,185,129,0.15);
-    color: var(--success);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 18px;
-    font-size: 2em;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(16,185,129,0.15); color: var(--success);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 18px; font-size: 2em;
 }
-.pos-modal-box h2 {
-    color: var(--text);
-    margin-bottom: 8px;
-    font-size: 1.3em;
-}
+.pos-modal-box h2 { color: var(--text); margin-bottom: 8px; font-size: 1.3em; }
 .pos-modal-box .amount {
-    font-size: 2em;
-    font-weight: 800;
-    color: var(--success);
-    margin: 14px 0;
-    letter-spacing: -0.02em;
+    font-size: 2em; font-weight: 800; color: var(--success);
+    margin: 14px 0; letter-spacing: -0.02em;
 }
-.pos-modal-box .meta {
-    color: var(--text-secondary);
-    font-size: 0.9em;
-    margin-bottom: 22px;
-}
-.pos-modal-box .btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
+.pos-modal-box .meta { color: var(--text-secondary); font-size: 0.9em; margin-bottom: 22px; }
+.pos-modal-box .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .pos-modal-box .btns button {
-    padding: 14px;
-    border-radius: var(--radius);
-    border: none;
-    font-weight: 700;
-    font-size: 0.95em;
-    cursor: pointer;
-    font-family: inherit;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    padding: 14px; border-radius: var(--radius); border: none;
+    font-weight: 700; font-size: 0.95em; cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
 }
 .pos-modal-box .btn-print { background: #3b82f6; color: white; }
 .pos-modal-box .btn-print:hover { background: #2563eb; }
 .pos-modal-box .btn-next  { background: #10b981; color: white; }
 .pos-modal-box .btn-next:hover { background: #059669; }
 
-/* ============================================================
-   CASH PAYMENT MODAL
-   ============================================================ */
 .cash-modal-box {
-    background: var(--surface);
-    border: 1px solid var(--border);
+    background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 20px 22px 22px;
-    max-width: 440px;
-    width: 100%;
-    max-height: 95vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-lg);
+    padding: 20px 22px 22px; max-width: 440px; width: 100%;
+    max-height: 95vh; overflow-y: auto; box-shadow: var(--shadow-lg);
 }
 .cash-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 14px;
+    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
 }
-.cash-header h2 {
-    font-size: 1.15em;
-    font-weight: 700;
-    color: var(--text);
-}
+.cash-header h2 { font-size: 1.15em; font-weight: 700; color: var(--text); }
 .cash-close {
-    background: none;
-    border: none;
-    font-size: 1.6em;
-    color: var(--text-muted);
-    cursor: pointer;
-    line-height: 1;
-    padding: 0 4px;
-    font-family: inherit;
-    transition: color 0.15s;
+    background: none; border: none; font-size: 1.6em;
+    color: var(--text-muted); cursor: pointer; line-height: 1; padding: 0 4px;
+    font-family: inherit; transition: color 0.15s;
 }
 .cash-close:hover { color: var(--text); }
 
 .cash-total-display,
 .cash-received-display,
 .cash-change-display {
-    padding: 14px 18px;
-    border-radius: var(--radius);
+    padding: 14px 18px; border-radius: var(--radius);
     margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
+    display: flex; justify-content: space-between; align-items: baseline;
 }
-.cash-total-display {
-    background: var(--surface-secondary);
-    border: 1px solid var(--border);
-}
-.cash-received-display {
-    background: rgba(59,130,246,0.08);
-    border: 1px solid rgba(59,130,246,0.3);
-}
-.cash-change-display {
-    background: rgba(16,185,129,0.08);
-    border: 1px solid rgba(16,185,129,0.3);
-}
-.cash-change-display.negative {
-    background: rgba(239,68,68,0.08);
-    border-color: rgba(239,68,68,0.4);
-}
+.cash-total-display { background: var(--surface-secondary); border: 1px solid var(--border); }
+.cash-received-display { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); }
+.cash-change-display { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.3); }
+.cash-change-display.negative { background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.4); }
 .cash-label {
-    font-size: 0.82em;
-    color: var(--text-muted);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
+    font-size: 0.82em; color: var(--text-muted); font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.03em;
 }
-.cash-total-value {
-    font-size: 1.4em;
-    font-weight: 800;
-    color: var(--text);
-}
-.cash-received-value {
-    font-size: 1.6em;
-    font-weight: 800;
-    color: #3b82f6;
-}
-.cash-change-value {
-    font-size: 1.6em;
-    font-weight: 800;
-    color: #10b981;
-}
-.cash-change-display.negative .cash-change-value {
-    color: #ef4444;
-}
+.cash-total-value { font-size: 1.4em; font-weight: 800; color: var(--text); }
+.cash-received-value { font-size: 1.6em; font-weight: 800; color: #3b82f6; }
+.cash-change-value { font-size: 1.6em; font-weight: 800; color: #10b981; }
+.cash-change-display.negative .cash-change-value { color: #ef4444; }
 
 .cash-quick {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    margin-bottom: 10px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;
 }
 .cash-quick button {
     padding: 11px 4px;
-    background: var(--surface-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-weight: 700;
-    font-size: 0.85em;
-    cursor: pointer;
-    font-family: inherit;
-    color: var(--text);
+    background: var(--surface-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); font-weight: 700; font-size: 0.85em;
+    cursor: pointer; font-family: inherit; color: var(--text);
     transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
-.cash-quick button:hover {
-    background: var(--accent-soft);
-    border-color: var(--accent);
-    color: var(--accent);
-}
+.cash-quick button:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
 .cash-keypad {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    margin-bottom: 12px;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;
 }
 .cash-keypad button {
     padding: 14px 4px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-weight: 700;
-    font-size: 1.2em;
-    cursor: pointer;
-    font-family: inherit;
-    color: var(--text);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); font-weight: 700; font-size: 1.2em;
+    cursor: pointer; font-family: inherit; color: var(--text);
     transition: background 0.1s, border-color 0.15s, transform 0.1s;
     min-height: 54px;
 }
-.cash-keypad button:hover {
-    background: var(--surface-secondary);
-    border-color: var(--accent);
-}
+.cash-keypad button:hover { background: var(--surface-secondary); border-color: var(--accent); }
 .cash-keypad button:active { transform: scale(0.95); }
 .cash-keypad button.wide { grid-column: span 1; }
 .cash-keypad button.danger {
-    background: rgba(239,68,68,0.1);
-    color: var(--danger);
+    background: rgba(239,68,68,0.1); color: var(--danger);
     border-color: rgba(239,68,68,0.3);
 }
 .cash-keypad button.danger:hover { background: rgba(239,68,68,0.2); }
 
 .cash-actions {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr;
-    gap: 8px;
-    margin-top: 4px;
+    display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px; margin-top: 4px;
 }
 .cash-btn-skip, .cash-btn-confirm {
-    padding: 16px;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: 700;
-    font-size: 0.95em;
-    cursor: pointer;
-    font-family: inherit;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+    padding: 16px; border: none; border-radius: var(--radius);
+    font-weight: 700; font-size: 0.95em; cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     transition: background 0.15s, transform 0.1s;
 }
 .cash-btn-skip {
-    background: var(--surface-secondary);
-    color: var(--text);
+    background: var(--surface-secondary); color: var(--text);
     border: 1px solid var(--border);
 }
 .cash-btn-skip:hover { background: var(--border); }
-.cash-btn-confirm {
-    background: #10b981;
-    color: white;
-}
+.cash-btn-confirm { background: #10b981; color: white; }
 .cash-btn-confirm:hover:not(:disabled) { background: #059669; }
-.cash-btn-confirm:disabled {
-    background: #64748b;
-    cursor: not-allowed;
-    opacity: 0.5;
+.cash-btn-confirm:disabled { background: #64748b; cursor: not-allowed; opacity: 0.5; }
+
+/* Form fields (used inside modals) */
+.form-field { text-align: left; margin-bottom: 14px; }
+.form-field label { display: block; font-weight: 600; color: var(--text); margin-bottom: 6px; font-size: 0.9em; }
+.form-field input, .form-field select, .form-field textarea {
+    width: 100%; padding: 11px 14px;
+    background: var(--surface-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); font-size: 0.95em; color: var(--text);
+    font-family: inherit; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(230,126,34,0.15);
+}
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* Held bills list */
+.held-bills-list {
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 18px; max-height: 300px; overflow-y: auto;
+    text-align: left;
+}
+.held-bill-item {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+.held-bill-item:hover {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+.held-bill-item .held-info { flex: 1; min-width: 0; }
+.held-bill-item .held-label {
+    font-weight: 700; color: var(--text);
+    font-size: 0.95em;
+    margin-bottom: 2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.held-bill-item .held-meta {
+    font-size: 0.8em; color: var(--text-muted);
+}
+.held-bill-item .held-total {
+    font-weight: 800; color: var(--success);
+    font-size: 1em; white-space: nowrap;
+}
+.held-bill-item .held-actions {
+    display: flex; gap: 6px;
 }
 
-/* ============================================================
-   MOBILE / TABLET
-   ============================================================ */
+/* Close day report */
+.close-day-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+    text-align: left;
+}
+.close-day-stat {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+}
+.close-day-stat .label {
+    font-size: 0.75em; color: var(--text-muted);
+    font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.04em; margin-bottom: 4px;
+}
+.close-day-stat .value {
+    font-size: 1.15em; font-weight: 800; color: var(--text);
+}
+.close-day-stat .value.green { color: var(--success); }
+.close-day-stat .value.purple { color: var(--purple); }
+
 @media (max-width: 900px) {
     .pos-wrap { grid-template-columns: 1fr; }
     .pos-body {
@@ -1023,9 +724,7 @@ html, body {
         border-top: 2px solid var(--accent);
         max-height: 60vh;
     }
-    .pos-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-    }
+    .pos-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
     .pos-item { min-height: 95px; padding: 12px 10px; }
     .pos-item .item-name { font-size: 0.88em; }
     .pos-item .item-price { font-size: 0.95em; }
@@ -1034,35 +733,36 @@ html, body {
     .pos-topbar .meta .who .role { display: none; }
     .pos-topbar .meta .currency { display: none; }
     .pos-topbar .meta .printer-status span.label { display: none; }
-        .pos-topbar #posThemeLabel { display: none; }
+    .pos-topbar #posThemeLabel { display: none; }
     .pos-topbar .brand span { display: none; }
+    .pos-topbar .topbar-btn span { display: none; }
 }
 </style>
 </head>
 <body>
-<!-- POS LOGIN SCREEN (only shown if not logged in) -->
+
+<!-- ============ POS LOGIN ============ -->
 <div id="posLogin" style="display:none;">
     <div class="pos-login-box">
-        <div class="pos-login-logo">
-            <i class="fas fa-cash-register"></i>
-        </div>
+        <div class="pos-login-logo"><i class="fas fa-cash-register"></i></div>
         <h1>POS Login</h1>
         <p class="pos-login-sub">Sign in to start taking orders</p>
 
-      <div class="pos-login-field">
-    <label>Username</label>
-    <input type="text" id="posLoginUser" placeholder="Enter username" autocomplete="off" autofocus>
-</div>
+        <div class="pos-login-field">
+            <label>Username</label>
+            <input type="text" id="posLoginUser" placeholder="Enter username" autocomplete="off" autofocus>
+        </div>
 
-<div class="pos-login-field">
-    <label>Password</label>
-    <div class="pos-login-pw-wrap">
-        <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="new-password">
-        <button type="button" class="pos-login-pw-toggle" id="posLoginPwToggle" onclick="toggleLoginPassword()" title="Show password" aria-label="Toggle password visibility">
-            <i class="fas fa-eye" id="posLoginPwIcon"></i>
-        </button>
-    </div>
-</div>
+        <div class="pos-login-field">
+            <label>Password</label>
+            <div class="pos-login-pw-wrap">
+                <input type="password" id="posLoginPass" placeholder="Enter password" autocomplete="new-password">
+                <button type="button" class="pos-login-pw-toggle" id="posLoginPwToggle" onclick="toggleLoginPassword()" title="Show password">
+                    <i class="fas fa-eye" id="posLoginPwIcon"></i>
+                </button>
+            </div>
+        </div>
+
         <div id="posLoginError" class="pos-login-error"></div>
 
         <button class="pos-login-btn" id="posLoginBtn" onclick="posLogin()">
@@ -1075,8 +775,9 @@ html, body {
         </p>
     </div>
 </div>
+
+<!-- ============ POS APP ============ -->
 <div class="pos-wrap" id="posWrap" style="display:none;">
-    <!-- TOP BAR -->
     <div class="pos-topbar">
         <div class="brand">
             <i class="fas fa-cash-register"></i>
@@ -1089,36 +790,46 @@ html, body {
                 <span class="role" id="cashierRole"></span>
             </span>
             <span class="currency" id="currencyBadge">—</span>
-            <span class="printer-status" id="printerStatus" title="Printer status">
+            <span class="printer-status" id="printerStatus" title="Printer settings" onclick="openPrinterSettings()">
                 <span class="dot"></span>
                 <span class="label" id="printerLabel">Checking…</span>
             </span>
+            <button class="topbar-btn" id="heldBillsBtn" onclick="openHeldBills()" title="Held bills">
+                <i class="fas fa-pause-circle"></i>
+                <span>Held</span>
+                <span class="badge" id="heldBillsBadge" style="display:none;">0</span>
+            </button>
+            <button class="topbar-btn" id="closeDayBtn" onclick="openCloseDay()" title="Close day report">
+                <i class="fas fa-clipboard-check"></i>
+                <span>Close Day</span>
+            </button>
             <button class="topbar-btn" id="reprintBtn" onclick="reprintLast()" disabled title="Reprint last receipt">
-    <i class="fas fa-print"></i> Last
-</button>
-<button class="topbar-btn" id="posThemeToggle" onclick="togglePosTheme()" title="Toggle dark mode">
-    <i class="fas fa-moon" id="posThemeIcon"></i>
-    <span id="posThemeLabel">Dark</span>
-</button>
-<button class="topbar-btn" onclick="exitPos()">
-    <i class="fas fa-times"></i> Exit
-</button>
+                <i class="fas fa-print"></i>
+                <span>Last</span>
+            </button>
+            <button class="topbar-btn" id="posThemeToggle" onclick="togglePosTheme()" title="Toggle dark mode">
+                <i class="fas fa-moon" id="posThemeIcon"></i>
+                <span id="posThemeLabel">Dark</span>
+            </button>
+            <button class="topbar-btn" onclick="exitPos()">
+                <i class="fas fa-times"></i>
+                <span>Exit</span>
+            </button>
         </div>
     </div>
 
-    <!-- BODY -->
     <div class="pos-body">
         <!-- LEFT: MENU -->
-       <div class="pos-menu">
-    <div class="pos-search-wrap">
-        <i class="fas fa-search"></i>
-        <input type="text" id="posSearch" class="pos-search-input" placeholder="Search items…" autocomplete="off" oninput="onSearchChange()">
-        <button class="pos-search-clear" id="posSearchClear" onclick="clearSearch()" style="display:none;">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    <div class="pos-tabs" id="posTabs"></div>
-    <div class="pos-grid" id="posGrid">
+        <div class="pos-menu">
+            <div class="pos-search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" id="posSearch" class="pos-search-input" placeholder="Search items… (F1)" autocomplete="off" oninput="onSearchChange()">
+                <button class="pos-search-clear" id="posSearchClear" onclick="clearSearch()" style="display:none;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="pos-tabs" id="posTabs"></div>
+            <div class="pos-grid" id="posGrid">
                 <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--accent);"></i>
                     <div style="margin-top: 12px;">Loading menu…</div>
@@ -1134,30 +845,51 @@ html, body {
                     Current Bill
                     <span class="count" id="billCount">0</span>
                 </h3>
-                <button class="bill-clear" id="billClear" onclick="posClear()" disabled>
-                    <i class="fas fa-trash"></i> Clear
-                </button>
+                <div class="bill-header-actions">
+                    <button class="bill-header-btn" id="billHoldBtn" onclick="holdCurrentBill()" disabled title="Park this bill for later">
+                        <i class="fas fa-pause"></i> Hold
+                    </button>
+                    <button class="bill-header-btn danger" id="billClear" onclick="posClear()" disabled>
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
+            </div>
+
+            <!-- CUSTOMER STRIP -->
+            <div class="bill-customer-strip" id="billCustomerStrip">
+                <i class="fas fa-user"></i>
+                <span id="billCustomerText">Walk-in customer</span>
+                <span class="edit-link" onclick="openCustomerInfo()">Edit</span>
             </div>
 
             <div class="bill-items" id="billItems">
-               <div class="bill-empty">
-    <i class="fas fa-hand-pointer"></i>
-    <div>Tap items to add</div>
-    <div class="bill-empty-hint">Or search above to find items faster</div>
-</div>
+                <div class="bill-empty">
+                    <i class="fas fa-hand-pointer"></i>
+                    <div>Tap items to add</div>
+                    <div class="bill-empty-hint">Or search above to find items faster</div>
+                </div>
             </div>
 
             <div class="bill-summary">
                 <div class="row">
-                    <span>Subtotal</span>
+                    <span class="label"><i class="fas fa-box"></i> Subtotal</span>
                     <span id="billSubtotal">—</span>
                 </div>
                 <div class="row" id="taxRow" style="display:none;">
-                    <span id="taxLabel">Tax</span>
+                    <span class="label" id="taxLabel">Tax</span>
                     <span id="billTax">—</span>
                 </div>
+                <div class="row discount" id="discountRow" style="display:none;">
+                    <span class="label"><i class="fas fa-tag"></i> <span id="discountLabel">Discount</span></span>
+                    <span id="billDiscount">—</span>
+                </div>
+                <div class="row" style="justify-content: flex-start; padding-top: 6px;">
+                    <button class="bill-discount-btn" id="discountBtn" onclick="openDiscount()" disabled>
+                        <i class="fas fa-tag"></i> Add Discount
+                    </button>
+                </div>
                 <div class="row total">
-                    <span>Total</span>
+                    <span class="label">Total</span>
                     <span class="value" id="billTotal">—</span>
                 </div>
             </div>
@@ -1166,27 +898,10 @@ html, body {
         </div>
     </div>
 </div>
-<!-- LOGOUT CONFIRM MODAL -->
-<div class="pos-modal" id="logoutModal">
-    <div class="pos-modal-box">
-        <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
-            <i class="fas fa-sign-out-alt"></i>
-        </div>
-        <h2 id="logoutTitle">Log out of POS?</h2>
-        <div class="meta" id="logoutMessage">The next cashier will need to sign in.</div>
-        <div class="btns">
-            <button class="btn-print" id="logoutCancelBtn" onclick="closeLogoutModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
-                <i class="fas fa-times"></i> Cancel
-            </button>
-            <button class="btn-next" id="logoutConfirmBtn" onclick="confirmLogout()" style="background:var(--danger);">
-                <i class="fas fa-sign-out-alt"></i> Log Out
-            </button>
-        </div>
-    </div>
-</div>
-<div class="pos-toast" id="toast"></div>
 
-<!-- PAID MODAL -->
+<!-- ============ MODALS ============ -->
+
+<!-- PAID -->
 <div class="pos-modal" id="paidModal">
     <div class="pos-modal-box">
         <div class="icon"><i class="fas fa-check"></i></div>
@@ -1204,7 +919,7 @@ html, body {
     </div>
 </div>
 
-<!-- CASH PAYMENT MODAL -->
+<!-- CASH PAYMENT -->
 <div class="pos-modal" id="cashModal">
     <div class="cash-modal-box">
         <div class="cash-header">
@@ -1228,9 +943,7 @@ html, body {
             <button onclick="cashKey('7')">7</button>
             <button onclick="cashKey('8')">8</button>
             <button onclick="cashKey('9')">9</button>
-            <button onclick="cashKey('back')" class="wide">
-                <i class="fas fa-backspace"></i>
-            </button>
+            <button onclick="cashKey('back')" class="wide"><i class="fas fa-backspace"></i></button>
 
             <button onclick="cashKey('4')">4</button>
             <button onclick="cashKey('5')">5</button>
@@ -1262,7 +975,8 @@ html, body {
         </div>
     </div>
 </div>
-<!-- CLEAR BILL CONFIRM MODAL -->
+
+<!-- CLEAR BILL -->
 <div class="pos-modal" id="clearModal">
     <div class="pos-modal-box">
         <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
@@ -1281,6 +995,180 @@ html, body {
     </div>
 </div>
 
+<!-- LOGOUT -->
+<div class="pos-modal" id="logoutModal">
+    <div class="pos-modal-box">
+        <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <h2 id="logoutTitle">Log out of POS?</h2>
+        <div class="meta" id="logoutMessage">The next cashier will need to sign in.</div>
+        <div class="btns">
+            <button class="btn-print" onclick="closeLogoutModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+            <button class="btn-next" onclick="confirmLogout()" style="background:var(--danger);">
+                <i class="fas fa-sign-out-alt"></i> Log Out
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- HELD BILLS -->
+<div class="pos-modal" id="heldModal">
+    <div class="pos-modal-box" style="max-width: 520px;">
+        <div class="icon" style="background:rgba(59,130,246,0.15);color:var(--info);">
+            <i class="fas fa-pause-circle"></i>
+        </div>
+        <h2>Held Bills</h2>
+        <div class="meta">Resume a bill to continue taking orders</div>
+        <div class="held-bills-list" id="heldBillsList"></div>
+        <div class="btns" style="grid-template-columns: 1fr;">
+            <button class="btn-print" onclick="closeHeldModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CUSTOMER INFO -->
+<div class="pos-modal" id="customerModal">
+    <div class="pos-modal-box">
+        <div class="icon" style="background:rgba(230,126,34,0.15);color:var(--accent);">
+            <i class="fas fa-user"></i>
+        </div>
+        <h2>Customer Info</h2>
+        <div class="meta">Optional — attach a name or phone to this order</div>
+
+        <div class="form-field">
+            <label>Name</label>
+            <input type="text" id="custInfoName" placeholder="e.g. Ahmed" maxlength="80">
+        </div>
+        <div class="form-field">
+            <label>Phone</label>
+            <input type="tel" id="custInfoPhone" placeholder="e.g. 70012345" maxlength="20">
+        </div>
+
+        <div class="btns" style="grid-template-columns: 1fr 1fr;">
+            <button class="btn-print" onclick="closeCustomerModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                Cancel
+            </button>
+            <button class="btn-next" onclick="saveCustomerInfo()">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- DISCOUNT -->
+<div class="pos-modal" id="discountModal">
+    <div class="pos-modal-box">
+        <div class="icon" style="background:rgba(139,92,246,0.15);color:var(--purple);">
+            <i class="fas fa-tag"></i>
+        </div>
+        <h2>Apply Discount</h2>
+        <div class="meta">Add a percentage or fixed-amount discount</div>
+
+        <div class="form-field">
+            <label>Type</label>
+            <select id="discountType">
+                <option value="percent">Percentage (%)</option>
+                <option value="fixed">Fixed amount</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label id="discountValueLabel">Value</label>
+            <input type="number" id="discountValue" placeholder="e.g. 10" min="0" step="0.01">
+        </div>
+
+        <div class="btns" style="grid-template-columns: 1fr 1fr;">
+            <button class="btn-print" onclick="closeDiscountModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                Cancel
+            </button>
+            <button class="btn-next" onclick="applyDiscount()" style="background:var(--purple);">
+                Apply
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- PRINTER SETTINGS -->
+<div class="pos-modal" id="printerModal">
+    <div class="pos-modal-box">
+        <div class="icon" style="background:rgba(59,130,246,0.15);color:var(--info);">
+            <i class="fas fa-print"></i>
+        </div>
+        <h2>Printer Settings</h2>
+        <div class="meta">Choose the receipt printer for this POS</div>
+
+        <div class="form-field">
+            <label>Detected printers</label>
+            <select id="printerSelect">
+                <option value="">— loading —</option>
+            </select>
+        </div>
+        <div class="form-field">
+            <label>Test receipt</label>
+            <div style="font-size: 0.85em; color: var(--text-muted); margin-bottom: 8px;">
+                Print a small test to confirm the connection
+            </div>
+            <button onclick="testPrintPrinter()" style="width:100%;padding:11px;background:var(--surface-secondary);border:1px solid var(--border);border-radius:var(--radius);font-family:inherit;font-weight:600;cursor:pointer;color:var(--text);">
+                <i class="fas fa-print"></i> Print Test Receipt
+            </button>
+        </div>
+
+        <div class="btns" style="grid-template-columns: 1fr 1fr;">
+            <button class="btn-print" onclick="closePrinterModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                Cancel
+            </button>
+            <button class="btn-next" onclick="savePrinterName()">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- CLOSE DAY REPORT -->
+<div class="pos-modal" id="closeDayModal">
+    <div class="pos-modal-box" style="max-width: 520px;">
+        <div class="icon" style="background:rgba(16,185,129,0.15);color:var(--success);">
+            <i class="fas fa-clipboard-check"></i>
+        </div>
+        <h2>Today's Summary</h2>
+        <div class="meta" id="closeDaySubtitle">—</div>
+
+        <div class="close-day-grid">
+            <div class="close-day-stat">
+                <div class="label">Total Sales</div>
+                <div class="value green" id="cdTotalSales">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Total Orders</div>
+                <div class="value" id="cdOrders">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Cash Collected</div>
+                <div class="value" id="cdCash">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Card / Other</div>
+                <div class="value purple" id="cdOther">—</div>
+            </div>
+        </div>
+
+        <div class="btns" style="grid-template-columns: 1fr 1fr;">
+            <button class="btn-print" onclick="closeCloseDayModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
+                Close
+            </button>
+            <button class="btn-next" onclick="printCloseDayReport()">
+                <i class="fas fa-print"></i> Print
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="pos-toast" id="toast"></div>
+
 <script>
 // ============================================================
 // CONFIG
@@ -1297,43 +1185,34 @@ var CATEGORIES = [];
 var CURRENT_CAT = 'All';
 var CURRENT_SEARCH = '';
 var BILL = [];
+var HELD_BILLS = [];
+var CURRENT_CUSTOMER = { name: '', phone: '' };
+var CURRENT_DISCOUNT = null;
 var LAST_RECEIPT = null;
 var PRINTER_MODE = 'browser';
 var QZ_CONNECTED = false;
 var QZ_AVAILABLE = false;
+var IS_OFFLINE = false;
 
 // ============================================================
 // HELPERS
 // ============================================================
 function getToken() {
-    return localStorage.getItem('adminToken')
-        || localStorage.getItem('token')
-        || localStorage.getItem('authToken')
-        || '';
+    return localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken') || '';
 }
-
 function withRestaurant(url) {
-    var slug = localStorage.getItem('adminRestaurantSlug')
-        || localStorage.getItem('restaurantSlug')
-        || '';
+    var slug = localStorage.getItem('adminRestaurantSlug') || localStorage.getItem('restaurantSlug') || '';
     if (!slug) return url;
     return url + (url.indexOf('?') === -1 ? '?' : '&') + 'restaurant=' + encodeURIComponent(slug);
 }
-
 function formatMoney(amount) {
     if (!RESTAURANT) return amount;
     var n = parseFloat(amount) || 0;
     var c = RESTAURANT.currency || 'BD';
-
-    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') {
-        return c + ' ' + Math.round(n).toLocaleString('en-US');
-    }
-    if (c === 'BD' || c === 'KWD' || c === 'OMR') {
-        return c + ' ' + n.toFixed(3);
-    }
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') return c + ' ' + Math.round(n).toLocaleString('en-US');
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') return c + ' ' + n.toFixed(3);
     return c + ' ' + n.toFixed(2);
 }
-
 function getCurrencyDecimals() {
     if (!RESTAURANT) return 3;
     var c = RESTAURANT.currency || 'BD';
@@ -1341,12 +1220,10 @@ function getCurrencyDecimals() {
     if (c === 'BD' || c === 'KWD' || c === 'OMR') return 3;
     return 2;
 }
-
 function roundToCurrency(n) {
     var d = getCurrencyDecimals();
     return parseFloat(parseFloat(n).toFixed(d));
 }
-
 function escapeHtml(s) {
     if (s === null || s === undefined) return '';
     return String(s)
@@ -1355,7 +1232,41 @@ function escapeHtml(s) {
 }
 
 // ============================================================
-// PAYMENT METHOD STYLES
+// SOUND — tiny click on add
+// ============================================================
+var AUDIO_CTX = null;
+function getAudioCtx() {
+    if (!AUDIO_CTX) {
+        try {
+            var Ctx = window.AudioContext || window.webkitAudioContext;
+            if (!Ctx) return null;
+            AUDIO_CTX = new Ctx();
+        } catch (e) { return null; }
+    }
+    return AUDIO_CTX;
+}
+function playTick() {
+    var ctx = getAudioCtx();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') ctx.resume().catch(function(){});
+    try {
+        var now = ctx.currentTime;
+        var osc = ctx.createOscillator();
+        var gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 1600;
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.005);
+        gain.gain.linearRampToValueAtTime(0, now + 0.06);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+    } catch (e) {}
+}
+
+// ============================================================
+// PAYMENT STYLES
 // ============================================================
 var PAYMENT_STYLES = {
     'cash':            { icon: 'fa-money-bill-wave',  cls: 'pay-cash',    label: 'Cash' },
@@ -1368,42 +1279,31 @@ var PAYMENT_STYLES = {
     'airtel':          { icon: 'fa-mobile-screen',    cls: 'pay-airtel',  label: 'Airtel' },
     'cash on delivery':{ icon: 'fa-money-bill-wave',  cls: 'pay-cash',    label: 'Cash' }
 };
-
 function getPaymentStyle(name) {
     var key = String(name || '').toLowerCase().trim();
     return PAYMENT_STYLES[key] || { icon: 'fa-circle-dollar-to-slot', cls: 'pay-card', label: name };
 }
+
 // ============================================================
-// THEME — Independent per POS device, persisted in localStorage
+// THEME
 // ============================================================
 function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     updateThemeToggleUI(theme);
 }
-
 function togglePosTheme() {
     var current = document.documentElement.getAttribute('data-theme') || 'dark';
     var next = current === 'dark' ? 'light' : 'dark';
     applyTheme(next);
-    try {
-        localStorage.setItem('posTheme', next);
-    } catch (e) {}
+    try { localStorage.setItem('posTheme', next); } catch (e) {}
 }
-
 function updateThemeToggleUI(theme) {
     var icon = document.getElementById('posThemeIcon');
     var label = document.getElementById('posThemeLabel');
     if (!icon || !label) return;
-    if (theme === 'dark') {
-        icon.className = 'fas fa-sun';
-        label.textContent = 'Light';
-    } else {
-        icon.className = 'fas fa-moon';
-        label.textContent = 'Dark';
-    }
+    if (theme === 'dark') { icon.className = 'fas fa-sun'; label.textContent = 'Light'; }
+    else { icon.className = 'fas fa-moon'; label.textContent = 'Dark'; }
 }
-
-// On page load, sync the toggle icon with whatever theme is active
 document.addEventListener('DOMContentLoaded', function() {
     var current = document.documentElement.getAttribute('data-theme') || 'dark';
     updateThemeToggleUI(current);
@@ -1417,15 +1317,13 @@ function init() {
     var loggedIn = localStorage.getItem('adminLoggedIn');
     var token = getToken();
 
-    // Not logged in? Show the POS login screen
     if (!token || !rawUser || loggedIn !== 'true') {
         showPosLogin();
         return;
     }
-
-    // Already logged in — boot normally
     bootPos(rawUser);
 }
+
 function resetLoginPasswordVisibility() {
     var input = document.getElementById('posLoginPass');
     var btn = document.getElementById('posLoginPwToggle');
@@ -1436,28 +1334,21 @@ function resetLoginPasswordVisibility() {
     icon.className = 'fas fa-eye';
     btn.title = 'Show password';
 }
-// Toggle password visibility on the login screen
 function toggleLoginPassword() {
     var input = document.getElementById('posLoginPass');
     var btn = document.getElementById('posLoginPwToggle');
     var icon = document.getElementById('posLoginPwIcon');
-
     var showing = input.type === 'text';
     input.type = showing ? 'password' : 'text';
-
     btn.classList.toggle('showing', !showing);
     icon.className = showing ? 'fas fa-eye' : 'fas fa-eye-slash';
     btn.title = showing ? 'Show password' : 'Hide password';
-
-    // Keep focus on the password field so the user can keep typing
     input.focus();
 }
-// Show the login screen and hide the POS
+
 function showPosLogin() {
     document.getElementById('posLogin').style.display = 'flex';
     document.getElementById('posWrap').style.display = 'none';
-
-    // Prefill username if we have one saved
     var savedUser = localStorage.getItem('adminUser');
     if (savedUser) {
         document.getElementById('posLoginUser').value = savedUser;
@@ -1465,8 +1356,6 @@ function showPosLogin() {
     } else {
         document.getElementById('posLoginUser').focus();
     }
-
-    // Enter key submits the form
     document.getElementById('posLoginPass').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') posLogin();
     });
@@ -1475,20 +1364,13 @@ function showPosLogin() {
     });
 }
 
-// Attempt login
 function posLogin() {
     var username = document.getElementById('posLoginUser').value.trim();
     var password = document.getElementById('posLoginPass').value;
     var errorEl = document.getElementById('posLoginError');
     var btn = document.getElementById('posLoginBtn');
-
     errorEl.textContent = '';
-
-    if (!username || !password) {
-        errorEl.textContent = '❌ Please enter both fields.';
-        return;
-    }
-
+    if (!username || !password) { errorEl.textContent = '❌ Please enter both fields.'; return; }
     btn.disabled = true;
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in…';
 
@@ -1501,40 +1383,25 @@ function posLogin() {
     .then(function(result) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Sign In';
-
-               if (!result.ok) {
-            // Force the password field back to hidden on failure
+        if (!result.ok) {
             resetLoginPasswordVisibility();
             errorEl.textContent = '❌ ' + (result.data.error || 'Invalid credentials');
             return;
         }
-
-        // Block drivers
         var payload;
-        try {
-            payload = JSON.parse(atob(result.data.token.split('.')[1]));
-        } catch (e) {
-            errorEl.textContent = '❌ Invalid token received';
-            return;
-        }
+        try { payload = JSON.parse(atob(result.data.token.split('.')[1])); }
+        catch (e) { errorEl.textContent = '❌ Invalid token received'; return; }
         if (payload.role === 'driver') {
             errorEl.textContent = '❌ Drivers must use the driver app, not the POS.';
             return;
         }
-
-        // Save auth to this device
         localStorage.setItem('adminToken', result.data.token);
         localStorage.setItem('adminUser', result.data.username);
         localStorage.setItem('adminLoggedIn', 'true');
-        if (result.data.restaurant_slug) {
-            localStorage.setItem('adminRestaurantSlug', result.data.restaurant_slug);
-        }
-
-        // Hide login, boot POS
+        if (result.data.restaurant_slug) localStorage.setItem('adminRestaurantSlug', result.data.restaurant_slug);
         document.getElementById('posLogin').style.display = 'none';
         document.getElementById('posWrap').style.display = '';
         errorEl.textContent = '';
-
         bootPos(result.data.username);
     })
     .catch(function(err) {
@@ -1544,22 +1411,21 @@ function posLogin() {
         errorEl.textContent = '❌ Network error. Try again.';
     });
 }
+
 function bootPos(username) {
-    ADMIN = {
-        username: username || 'Cashier',
-        role: 'staff'
-    };
+    ADMIN = { username: username || 'Cashier', role: 'staff' };
     console.log('✅ POS: admin loaded:', ADMIN);
 
-    // Sync the theme toggle with the active theme
     var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     updateThemeToggleUI(currentTheme);
 
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
     document.getElementById('cashierRole').textContent = '(staff)';
-
     document.getElementById('posWrap').style.display = '';
     document.getElementById('posLogin').style.display = 'none';
+
+    // Load held bills from localStorage
+    loadHeldBills();
 
     detectQzTray();
 
@@ -1568,6 +1434,7 @@ function bootPos(username) {
         .then(function() {
             renderBill();
             renderPaymentButtons();
+            updateHeldBillsBadge();
         })
         .catch(function(err) {
             console.error('POS init error:', err);
@@ -1583,7 +1450,6 @@ function loadRestaurantConfig() {
     .then(function(data) {
         if (!data || data.error) throw new Error(data.error || 'Config failed');
         RESTAURANT = data;
-
         if (RESTAURANT.pos_enabled === 0 || RESTAURANT.pos_enabled === '0') {
             document.body.innerHTML =
                 '<div style="display:flex;align-items:center;justify-content:center;height:100vh;' +
@@ -1602,38 +1468,48 @@ function loadRestaurantConfig() {
                 '</div>';
             throw new Error('POS disabled');
         }
-
-        if (data.slug) {
-            localStorage.setItem('adminRestaurantSlug', data.slug);
-        }
-
+        if (data.slug) localStorage.setItem('adminRestaurantSlug', data.slug);
         document.getElementById('currencyBadge').textContent = RESTAURANT.currency || '';
         return RESTAURANT;
     });
 }
 
 function loadMenu() {
+    // Try network first, fall back to cached menu
     return fetch(withRestaurant(API + '/admin/menu'), {
         headers: { 'Authorization': 'Bearer ' + getToken() }
     })
     .then(function(r) { return r.json(); })
     .then(function(items) {
         MENU_ITEMS = items.map(function(i) {
-            return {
-                id: i.id,
-                name: i.name,
-                price: parseFloat(i.price),
-                category: i.category || 'Other'
-            };
+            return { id: i.id, name: i.name, price: parseFloat(i.price), category: i.category || 'Other' };
         });
-
-        var cats = {};
-        MENU_ITEMS.forEach(function(i) { cats[i.category] = 1; });
-        CATEGORIES = Object.keys(cats).sort();
-
-        renderTabs();
-        renderGrid();
+        // Cache menu for offline
+        try { localStorage.setItem('posCachedMenu', JSON.stringify(MENU_ITEMS)); } catch (e) {}
+        IS_OFFLINE = false;
+        buildCategoriesAndRender();
+    })
+    .catch(function(err) {
+        console.warn('Menu fetch failed — trying cache');
+        var cached = null;
+        try { cached = JSON.parse(localStorage.getItem('posCachedMenu')); } catch (e) {}
+        if (cached && cached.length) {
+            MENU_ITEMS = cached;
+            IS_OFFLINE = true;
+            showToast('⚠️ Offline mode — using cached menu', 'warn');
+            buildCategoriesAndRender();
+        } else {
+            showToast('Could not load menu', 'error');
+        }
     });
+}
+
+function buildCategoriesAndRender() {
+    var cats = {};
+    MENU_ITEMS.forEach(function(i) { cats[i.category] = 1; });
+    CATEGORIES = Object.keys(cats).sort();
+    renderTabs();
+    renderGrid();
 }
 
 // ============================================================
@@ -1641,7 +1517,6 @@ function loadMenu() {
 // ============================================================
 function detectQzTray() {
     updatePrinterStatus('checking');
-
     if (typeof qz === 'undefined' || !qz.websocket) {
         PRINTER_MODE = 'browser';
         QZ_AVAILABLE = false;
@@ -1649,28 +1524,22 @@ function detectQzTray() {
         updatePrinterStatus('browser');
         return;
     }
-
     QZ_AVAILABLE = true;
-
     qz.websocket.connect({ retries: 0, delay: 0 })
         .then(function() {
             QZ_CONNECTED = true;
             PRINTER_MODE = 'qz';
             updatePrinterStatus('ready');
-            console.log('🖨️ QZ Tray connected');
-
             qz.websocket.setClosedCallbacks(function() {
                 QZ_CONNECTED = false;
                 PRINTER_MODE = 'browser';
                 updatePrinterStatus('offline');
-                console.log('🖨️ QZ Tray disconnected');
             });
         })
         .catch(function() {
             QZ_CONNECTED = false;
             PRINTER_MODE = 'browser';
             updatePrinterStatus('browser');
-            console.log('🖨️ QZ Tray not running — browser print');
         });
 }
 
@@ -1678,17 +1547,10 @@ function updatePrinterStatus(state) {
     var el = document.getElementById('printerStatus');
     var label = document.getElementById('printerLabel');
     el.classList.remove('ready', 'offline');
-    if (state === 'ready') {
-        el.classList.add('ready');
-        label.textContent = 'Printer ready';
-    } else if (state === 'browser') {
-        label.textContent = 'Print dialog';
-    } else if (state === 'offline') {
-        el.classList.add('offline');
-        label.textContent = 'Offline';
-    } else {
-        label.textContent = 'Checking…';
-    }
+    if (state === 'ready') { el.classList.add('ready'); label.textContent = 'Printer ready'; }
+    else if (state === 'browser') { label.textContent = 'Print dialog'; }
+    else if (state === 'offline') { el.classList.add('offline'); label.textContent = 'Offline'; }
+    else { label.textContent = 'Checking…'; }
 }
 
 // ============================================================
@@ -1697,28 +1559,16 @@ function updatePrinterStatus(state) {
 function renderTabs() {
     var wrap = document.getElementById('posTabs');
     wrap.innerHTML = '';
-
     var allBtn = document.createElement('button');
     allBtn.className = 'tab' + (CURRENT_CAT === 'All' ? ' active' : '');
     allBtn.textContent = 'All';
-    allBtn.onclick = function() {
-        CURRENT_CAT = 'All';
-        clearSearch();          // ⚡ clear search when switching category
-        renderTabs();
-        renderGrid();
-    };
+    allBtn.onclick = function() { CURRENT_CAT = 'All'; clearSearch(); renderTabs(); renderGrid(); };
     wrap.appendChild(allBtn);
-
     CATEGORIES.forEach(function(c) {
         var b = document.createElement('button');
         b.className = 'tab' + (CURRENT_CAT === c ? ' active' : '');
         b.textContent = c;
-        b.onclick = function() {
-            CURRENT_CAT = c;
-            clearSearch();      // ⚡ clear search when switching category
-            renderTabs();
-            renderGrid();
-        };
+        b.onclick = function() { CURRENT_CAT = c; clearSearch(); renderTabs(); renderGrid(); };
         wrap.appendChild(b);
     });
 }
@@ -1726,26 +1576,14 @@ function renderTabs() {
 function renderGrid() {
     var grid = document.getElementById('posGrid');
     grid.innerHTML = '';
-
     var list = MENU_ITEMS;
-
-    // Filter by category (if not "All")
-    if (CURRENT_CAT !== 'All') {
-        list = list.filter(function(i) { return i.category === CURRENT_CAT; });
-    }
-
-    // Filter by search query (case-insensitive, matches name)
+    if (CURRENT_CAT !== 'All') list = list.filter(function(i) { return i.category === CURRENT_CAT; });
     if (CURRENT_SEARCH) {
         var q = CURRENT_SEARCH.toLowerCase();
-        list = list.filter(function(i) {
-            return i.name.toLowerCase().indexOf(q) !== -1;
-        });
+        list = list.filter(function(i) { return i.name.toLowerCase().indexOf(q) !== -1; });
     }
-
     if (list.length === 0) {
-        var emptyMsg = CURRENT_SEARCH
-            ? 'No items match "' + escapeHtml(CURRENT_SEARCH) + '"'
-            : 'No items in this category';
+        var emptyMsg = CURRENT_SEARCH ? 'No items match "' + escapeHtml(CURRENT_SEARCH) + '"' : 'No items in this category';
         grid.innerHTML =
             '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);">' +
                 '<i class="fas fa-search" style="font-size:2.5em;opacity:0.3;display:block;margin-bottom:14px;"></i>' +
@@ -1753,7 +1591,6 @@ function renderGrid() {
             '</div>';
         return;
     }
-
     list.forEach(function(item) {
         var btn = document.createElement('button');
         btn.className = 'pos-item';
@@ -1772,13 +1609,9 @@ function onSearchChange() {
     var input = document.getElementById('posSearch');
     var clearBtn = document.getElementById('posSearchClear');
     CURRENT_SEARCH = input.value.trim();
-
-    // Show/hide the clear button
     clearBtn.style.display = CURRENT_SEARCH ? 'flex' : 'none';
-
     renderGrid();
 }
-
 function clearSearch() {
     var input = document.getElementById('posSearch');
     input.value = '';
@@ -1789,33 +1622,39 @@ function clearSearch() {
 }
 
 // ============================================================
-// RENDER — BILL
+// BILL
 // ============================================================
 function renderBill() {
     var wrap = document.getElementById('billItems');
     var countEl = document.getElementById('billCount');
     var clearBtn = document.getElementById('billClear');
+    var holdBtn = document.getElementById('billHoldBtn');
+    var discountBtn = document.getElementById('discountBtn');
 
     var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
     countEl.textContent = totalQty;
     clearBtn.disabled = BILL.length === 0;
+    holdBtn.disabled = BILL.length === 0;
+    if (discountBtn) discountBtn.disabled = BILL.length === 0;
+
+    updateCustomerStrip();
 
     if (BILL.length === 0) {
-      wrap.innerHTML =
-    '<div class="bill-empty">' +
-        '<i class="fas fa-hand-pointer"></i>' +
-        '<div>Tap items to add</div>' +
-        '<div class="bill-empty-hint">Or search above to find items faster</div>' +
-    '</div>';
+        wrap.innerHTML =
+            '<div class="bill-empty">' +
+                '<i class="fas fa-hand-pointer"></i>' +
+                '<div>Tap items to add</div>' +
+                '<div class="bill-empty-hint">Or search above to find items faster</div>' +
+            '</div>';
         document.getElementById('billSubtotal').textContent = formatMoney(0);
         document.getElementById('billTotal').textContent = formatMoney(0);
         document.getElementById('taxRow').style.display = 'none';
+        document.getElementById('discountRow').style.display = 'none';
         updatePayButtonsState();
         return;
     }
 
     wrap.innerHTML = '';
-
     BILL.forEach(function(line) {
         var row = document.createElement('div');
         row.className = 'bill-line';
@@ -1827,16 +1666,27 @@ function renderBill() {
                 '<button class="plus" type="button">+</button>' +
             '</div>' +
             '<div class="bl-price">' + formatMoney(line.price * line.quantity) + '</div>';
-
         row.querySelector('.minus').onclick = function() { changeQty(line.id, -1); };
         row.querySelector('.plus').onclick  = function() { changeQty(line.id, 1); };
-
         wrap.appendChild(row);
     });
 
     wrap.scrollTop = wrap.scrollHeight;
     updateTotals();
     updatePayButtonsState();
+}
+
+function updateCustomerStrip() {
+    var txt = document.getElementById('billCustomerText');
+    if (!txt) return;
+    if (CURRENT_CUSTOMER.name || CURRENT_CUSTOMER.phone) {
+        var parts = [];
+        if (CURRENT_CUSTOMER.name) parts.push('<strong>' + escapeHtml(CURRENT_CUSTOMER.name) + '</strong>');
+        if (CURRENT_CUSTOMER.phone) parts.push(escapeHtml(CURRENT_CUSTOMER.phone));
+        txt.innerHTML = parts.join(' · ');
+    } else {
+        txt.textContent = 'Walk-in customer';
+    }
 }
 
 function updateTotals() {
@@ -1847,7 +1697,6 @@ function updateTotals() {
 
     var taxAmount = 0;
     var total = subtotal;
-
     if (taxRate > 0) {
         if (taxIncluded) {
             taxAmount = subtotal - (subtotal / (1 + taxRate / 100));
@@ -1863,26 +1712,40 @@ function updateTotals() {
     var taxRow = document.getElementById('taxRow');
     if (taxRate > 0) {
         taxRow.style.display = 'flex';
-        document.getElementById('taxLabel').textContent =
-            'VAT (' + taxRate + '%)' + (taxIncluded ? ' incl.' : '');
+        document.getElementById('taxLabel').textContent = 'VAT (' + taxRate + '%)' + (taxIncluded ? ' incl.' : '');
         document.getElementById('billTax').textContent = formatMoney(taxAmount);
     } else {
         taxRow.style.display = 'none';
     }
 
-    document.getElementById('billTotal').textContent = formatMoney(total);
+    // Apply discount
+    var discountAmount = 0;
+    var discountRow = document.getElementById('discountRow');
+    if (CURRENT_DISCOUNT) {
+        if (CURRENT_DISCOUNT.type === 'percent') {
+            discountAmount = subtotal * (CURRENT_DISCOUNT.value / 100);
+            if (discountAmount > subtotal) discountAmount = subtotal;
+            document.getElementById('discountLabel').textContent = 'Discount (' + CURRENT_DISCOUNT.value + '%)';
+        } else {
+            discountAmount = Math.min(CURRENT_DISCOUNT.value, subtotal);
+            document.getElementById('discountLabel').textContent = 'Discount (' + formatMoney(CURRENT_DISCOUNT.value) + ')';
+        }
+        document.getElementById('billDiscount').textContent = '− ' + formatMoney(discountAmount);
+        discountRow.style.display = 'flex';
+    } else {
+        discountRow.style.display = 'none';
+    }
+
+    var grand = total - discountAmount;
+    if (grand < 0) grand = 0;
+    document.getElementById('billTotal').textContent = formatMoney(grand);
 }
 
-// ============================================================
-// BILL OPERATIONS
-// ============================================================
 function addToBill(item) {
     var existing = BILL.find(function(l) { return l.id === item.id; });
-    if (existing) {
-        existing.quantity += 1;
-    } else {
-        BILL.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
-    }
+    if (existing) existing.quantity += 1;
+    else BILL.push({ id: item.id, name: item.name, price: item.price, quantity: 1 });
+    playTick();
     renderBill();
 }
 
@@ -1890,32 +1753,183 @@ function changeQty(id, delta) {
     var line = BILL.find(function(l) { return l.id === id; });
     if (!line) return;
     line.quantity += delta;
-    if (line.quantity <= 0) {
-        BILL = BILL.filter(function(l) { return l.id !== id; });
-    }
+    if (line.quantity <= 0) BILL = BILL.filter(function(l) { return l.id !== id; });
     renderBill();
 }
+
 function posClear() {
     if (BILL.length === 0) return;
-
-    // Update the modal message with the current item count
     var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
-    var msgEl = document.getElementById('clearMessage');
-    msgEl.innerHTML =
-        'All <strong>' + totalQty + '</strong> item' + (totalQty === 1 ? '' : 's') +
-        ' will be removed. This cannot be undone.';
-
+    document.getElementById('clearMessage').innerHTML =
+        'All <strong>' + totalQty + '</strong> item' + (totalQty === 1 ? '' : 's') + ' will be removed. This cannot be undone.';
     document.getElementById('clearModal').classList.add('open');
 }
-
-function closeClearModal() {
-    document.getElementById('clearModal').classList.remove('open');
-}
-
+function closeClearModal() { document.getElementById('clearModal').classList.remove('open'); }
 function confirmClearBill() {
     BILL = [];
+    CURRENT_CUSTOMER = { name: '', phone: '' };
+    CURRENT_DISCOUNT = null;
     closeClearModal();
     renderBill();
+}
+
+// ============================================================
+// HOLD / RESUME
+// ============================================================
+function loadHeldBills() {
+    try {
+        var raw = localStorage.getItem('posHeldBills');
+        HELD_BILLS = raw ? JSON.parse(raw) : [];
+    } catch (e) { HELD_BILLS = []; }
+}
+function saveHeldBills() {
+    try { localStorage.setItem('posHeldBills', JSON.stringify(HELD_BILLS)); } catch (e) {}
+}
+function updateHeldBillsBadge() {
+    var badge = document.getElementById('heldBillsBadge');
+    if (!badge) return;
+    if (HELD_BILLS.length > 0) {
+        badge.textContent = HELD_BILLS.length;
+        badge.style.display = 'inline-block';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+function holdCurrentBill() {
+    if (BILL.length === 0) return;
+    var label = CURRENT_CUSTOMER.name || ('Bill #' + (HELD_BILLS.length + 1));
+    var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
+    var subtotal = BILL.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
+
+    HELD_BILLS.push({
+        id: Date.now(),
+        label: label,
+        items: BILL.slice(),
+        customer: Object.assign({}, CURRENT_CUSTOMER),
+        discount: CURRENT_DISCOUNT ? Object.assign({}, CURRENT_DISCOUNT) : null,
+        totalQty: totalQty,
+        subtotal: subtotal,
+        heldAt: new Date().toISOString()
+    });
+    saveHeldBills();
+    updateHeldBillsBadge();
+
+    BILL = [];
+    CURRENT_CUSTOMER = { name: '', phone: '' };
+    CURRENT_DISCOUNT = null;
+    renderBill();
+    showToast('✅ Bill held', 'success');
+}
+
+function openHeldBills() {
+    var modal = document.getElementById('heldModal');
+    var list = document.getElementById('heldBillsList');
+    list.innerHTML = '';
+    if (HELD_BILLS.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:30px 20px;color:var(--text-muted);"><i class="fas fa-inbox" style="font-size:2em;opacity:0.4;display:block;margin-bottom:10px;"></i>No held bills</div>';
+    } else {
+        HELD_BILLS.forEach(function(h) {
+            var item = document.createElement('div');
+            item.className = 'held-bill-item';
+            item.innerHTML =
+                '<div class="held-info">' +
+                    '<div class="held-label">' + escapeHtml(h.label) + '</div>' +
+                    '<div class="held-meta">' + h.totalQty + ' item' + (h.totalQty === 1 ? '' : 's') + ' · ' + new Date(h.heldAt).toLocaleTimeString() + '</div>' +
+                '</div>' +
+                '<div class="held-total">' + formatMoney(h.subtotal) + '</div>' +
+                '<div class="held-actions">' +
+                    '<button class="bill-header-btn" onclick="resumeHeldBill(' + h.id + ')"><i class="fas fa-play"></i> Resume</button>' +
+                    '<button class="bill-header-btn danger" onclick="deleteHeldBill(' + h.id + ')"><i class="fas fa-trash"></i></button>' +
+                '</div>';
+            list.appendChild(item);
+        });
+    }
+    modal.classList.add('open');
+}
+function closeHeldModal() { document.getElementById('heldModal').classList.remove('open'); }
+
+function resumeHeldBill(id) {
+    var idx = HELD_BILLS.findIndex(function(h) { return h.id === id; });
+    if (idx === -1) return;
+    if (BILL.length > 0) {
+        if (!confirm('You have items on the current bill. Hold them first?\n\nOK = hold current & resume\nCancel = keep current')) {
+            return;
+        }
+        holdCurrentBill();
+    }
+    var h = HELD_BILLS[idx];
+    BILL = h.items.slice();
+    CURRENT_CUSTOMER = Object.assign({ name: '', phone: '' }, h.customer || {});
+    CURRENT_DISCOUNT = h.discount ? Object.assign({}, h.discount) : null;
+    HELD_BILLS.splice(idx, 1);
+    saveHeldBills();
+    updateHeldBillsBadge();
+    closeHeldModal();
+    renderBill();
+    showToast('✅ Bill resumed', 'success');
+}
+function deleteHeldBill(id) {
+    if (!confirm('Delete this held bill? This cannot be undone.')) return;
+    HELD_BILLS = HELD_BILLS.filter(function(h) { return h.id !== id; });
+    saveHeldBills();
+    updateHeldBillsBadge();
+    openHeldBills();
+}
+
+// ============================================================
+// CUSTOMER INFO
+// ============================================================
+function openCustomerInfo() {
+    document.getElementById('custInfoName').value = CURRENT_CUSTOMER.name || '';
+    document.getElementById('custInfoPhone').value = CURRENT_CUSTOMER.phone || '';
+    document.getElementById('customerModal').classList.add('open');
+    setTimeout(function() { document.getElementById('custInfoName').focus(); }, 100);
+}
+function closeCustomerModal() { document.getElementById('customerModal').classList.remove('open'); }
+function saveCustomerInfo() {
+    CURRENT_CUSTOMER.name = document.getElementById('custInfoName').value.trim();
+    CURRENT_CUSTOMER.phone = document.getElementById('custInfoPhone').value.trim();
+    closeCustomerModal();
+    updateCustomerStrip();
+    showToast('✅ Customer updated', 'success');
+}
+
+// ============================================================
+// DISCOUNT
+// ============================================================
+function openDiscount() {
+    if (BILL.length === 0) return;
+    if (CURRENT_DISCOUNT) {
+        // Already applied — offer to remove
+        if (confirm('Remove current discount?')) {
+            CURRENT_DISCOUNT = null;
+            renderBill();
+            showToast('Discount removed');
+        }
+        return;
+    }
+    document.getElementById('discountType').value = 'percent';
+    document.getElementById('discountValue').value = '';
+    document.getElementById('discountValueLabel').textContent = 'Value';
+    document.getElementById('discountModal').classList.add('open');
+    setTimeout(function() { document.getElementById('discountValue').focus(); }, 100);
+}
+function closeDiscountModal() { document.getElementById('discountModal').classList.remove('open'); }
+function applyDiscount() {
+    var type = document.getElementById('discountType').value;
+    var value = parseFloat(document.getElementById('discountValue').value);
+    if (isNaN(value) || value <= 0) {
+        showToast('Enter a valid discount value', 'error');
+        return;
+    }
+    if (type === 'percent' && value > 100) {
+        showToast('Percentage cannot exceed 100', 'error');
+        return;
+    }
+    CURRENT_DISCOUNT = { type: type, value: value };
+    closeDiscountModal();
+    renderBill();
+    showToast('✅ Discount applied', 'success');
 }
 
 // ============================================================
@@ -1924,11 +1938,9 @@ function confirmClearBill() {
 function renderPaymentButtons() {
     var wrap = document.getElementById('billPayments');
     wrap.innerHTML = '';
-
     var methods = (RESTAURANT && RESTAURANT.payment_methods)
         ? RESTAURANT.payment_methods.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
         : ['Cash'];
-
     methods.forEach(function(m) {
         var style = getPaymentStyle(m);
         var btn = document.createElement('button');
@@ -1937,10 +1949,8 @@ function renderPaymentButtons() {
         btn.onclick = function() { payOrder(m); };
         wrap.appendChild(btn);
     });
-
     updatePayButtonsState();
 }
-
 function updatePayButtonsState() {
     var buttons = document.querySelectorAll('.bill-payments .pay-btn');
     var disabled = BILL.length === 0;
@@ -1958,88 +1968,61 @@ function openCashModal(total, payload) {
     CASH_TOTAL = total;
     CASH_RECEIVED = '';
     CASH_PAYLOAD = payload;
-
     document.getElementById('cashTotalDue').textContent = formatMoney(total);
     document.getElementById('cashReceived').textContent = formatMoney(0);
     document.getElementById('cashChange').textContent = '—';
     document.getElementById('cashConfirmBtn').disabled = true;
     document.getElementById('cashChangeDisplay').classList.remove('negative');
-
     buildQuickAmounts(total);
     document.getElementById('cashModal').classList.add('open');
 }
-
 function closeCashModal() {
     document.getElementById('cashModal').classList.remove('open');
     CASH_RECEIVED = '';
     CASH_PAYLOAD = null;
 }
-
 function buildQuickAmounts(total) {
     var wrap = document.getElementById('cashQuick');
     wrap.innerHTML = '';
-
     var currency = RESTAURANT.currency || 'BD';
     var suggestions;
-
-    if (currency === 'UGX') {
-        suggestions = [5000, 10000, 20000, 50000];
-    } else if (currency === 'BD') {
-        suggestions = [1, 5, 10, 20];
-    } else {
+    if (currency === 'UGX') suggestions = [5000, 10000, 20000, 50000];
+    else if (currency === 'BD') suggestions = [1, 5, 10, 20];
+    else {
         var base = Math.pow(10, Math.floor(Math.log10(total)));
         suggestions = [base, base * 2, base * 5, base * 10];
     }
-
-    var exact = total;
-    var shown = [exact];
-
-    suggestions.forEach(function(s) {
-        if (s >= total && shown.indexOf(s) === -1) shown.push(s);
-    });
-
+    var shown = [total];
+    suggestions.forEach(function(s) { if (s >= total && shown.indexOf(s) === -1) shown.push(s); });
     shown.slice(0, 4).forEach(function(v) {
         var btn = document.createElement('button');
         btn.textContent = formatMoney(v);
-        btn.onclick = function() {
-            CASH_RECEIVED = String(v);
-            updateCashDisplay();
-        };
+        btn.onclick = function() { CASH_RECEIVED = String(v); updateCashDisplay(); };
         wrap.appendChild(btn);
     });
 }
-
 function cashKey(k) {
-    if (k === 'back') {
-        CASH_RECEIVED = CASH_RECEIVED.slice(0, -1);
-    } else if (k === 'clear') {
-        CASH_RECEIVED = '';
-    } else if (k === '.') {
-        if (CASH_RECEIVED.indexOf('.') === -1) {
-            CASH_RECEIVED = (CASH_RECEIVED || '0') + '.';
-        }
+    if (k === 'back') CASH_RECEIVED = CASH_RECEIVED.slice(0, -1);
+    else if (k === 'clear') CASH_RECEIVED = '';
+    else if (k === '.') {
+        if (CASH_RECEIVED.indexOf('.') === -1) CASH_RECEIVED = (CASH_RECEIVED || '0') + '.';
     } else {
         if (getCurrencyDecimals() === 0 && k === '.') return;
         CASH_RECEIVED += k;
     }
     updateCashDisplay();
 }
-
 function updateCashDisplay() {
     var received = parseFloat(CASH_RECEIVED) || 0;
-
     document.getElementById('cashReceived').textContent = formatMoney(received);
-
     var change = received - CASH_TOTAL;
     var changeDisplay = document.getElementById('cashChangeDisplay');
-
     if (received === 0) {
         document.getElementById('cashChange').textContent = '—';
         document.getElementById('cashConfirmBtn').disabled = true;
         changeDisplay.classList.remove('negative');
         return;
     }
-
     if (change < 0) {
         document.getElementById('cashChange').textContent = 'Short ' + formatMoney(Math.abs(change));
         changeDisplay.classList.add('negative');
@@ -2050,26 +2033,21 @@ function updateCashDisplay() {
         document.getElementById('cashConfirmBtn').disabled = false;
     }
 }
-
 function confirmCashPayment() {
     if (!CASH_PAYLOAD) return;
     var received = parseFloat(CASH_RECEIVED) || 0;
     if (received < CASH_TOTAL) return;
-
     var payload = CASH_PAYLOAD;
     payload.cash_received = received;
     payload.change_given = received - CASH_TOTAL;
-
     closeCashModal();
     submitPosOrder(payload);
 }
-
 function confirmCashExact() {
     if (!CASH_PAYLOAD) return;
     var payload = CASH_PAYLOAD;
     payload.cash_received = CASH_TOTAL;
     payload.change_given = 0;
-
     closeCashModal();
     submitPosOrder(payload);
 }
@@ -2078,44 +2056,40 @@ function confirmCashExact() {
 // PAY
 // ============================================================
 function payOrder(method) {
-    if (BILL.length === 0) {
-        showToast('Nothing on the bill', 'error');
-        return;
-    }
-
+    if (BILL.length === 0) { showToast('Nothing on the bill', 'error'); return; }
     var subtotal = BILL.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
     var taxRate = parseFloat(RESTAURANT.tax_rate) || 0;
     var taxIncluded = RESTAURANT.tax_included === 1 || RESTAURANT.tax_included === '1' || RESTAURANT.tax_included === true;
-
     var taxAmount = 0;
     var total = subtotal;
-
     if (taxRate > 0) {
-        if (taxIncluded) {
-            taxAmount = subtotal - (subtotal / (1 + taxRate / 100));
-            total = subtotal;
-        } else {
-            taxAmount = subtotal * (taxRate / 100);
-            total = subtotal + taxAmount;
-        }
+        if (taxIncluded) { taxAmount = subtotal - (subtotal / (1 + taxRate / 100)); total = subtotal; }
+        else { taxAmount = subtotal * (taxRate / 100); total = subtotal + taxAmount; }
     }
 
+    var discountAmount = 0;
+    if (CURRENT_DISCOUNT) {
+        if (CURRENT_DISCOUNT.type === 'percent') discountAmount = subtotal * (CURRENT_DISCOUNT.value / 100);
+        else discountAmount = Math.min(CURRENT_DISCOUNT.value, subtotal);
+    }
+
+    var grand = total - discountAmount;
+    if (grand < 0) grand = 0;
+
     var payload = {
-        items: BILL.map(function(l) {
-            return { name: l.name, quantity: l.quantity, price: l.price };
-        }),
-        total: roundToCurrency(total),
+        items: BILL.map(function(l) { return { name: l.name, quantity: l.quantity, price: l.price }; }),
+        total: roundToCurrency(grand),
         tax_amount: roundToCurrency(taxAmount),
-        payment_method: method
+        payment_method: method,
+        customer_name: CURRENT_CUSTOMER.name || null,
+        customer_phone: CURRENT_CUSTOMER.phone || null,
+        discount_type: CURRENT_DISCOUNT ? CURRENT_DISCOUNT.type : null,
+        discount_value: CURRENT_DISCOUNT ? CURRENT_DISCOUNT.value : null,
+        discount_amount: CURRENT_DISCOUNT ? roundToCurrency(discountAmount) : 0
     };
 
     var isCash = method.toLowerCase().indexOf('cash') !== -1;
-
-    if (isCash) {
-        openCashModal(roundToCurrency(total), payload);
-        return;
-    }
-
+    if (isCash) { openCashModal(roundToCurrency(grand), payload); return; }
     submitPosOrder(payload);
 }
 
@@ -2125,10 +2099,7 @@ function submitPosOrder(payload) {
 
     fetch(withRestaurant(API + '/pos/orders'), {
         method: 'POST',
-        headers: {
-            'Authorization': 'Bearer ' + getToken(),
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
     .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
@@ -2138,7 +2109,6 @@ function submitPosOrder(payload) {
             updatePayButtonsState();
             return;
         }
-
         var taxRate = parseFloat(RESTAURANT.tax_rate) || 0;
         var subtotal = payload.items.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
 
@@ -2152,6 +2122,10 @@ function submitPosOrder(payload) {
             method: payload.payment_method,
             cash_received: payload.cash_received || null,
             change_given: payload.change_given || null,
+            customer_name: payload.customer_name || null,
+            customer_phone: payload.customer_phone || null,
+            discount_code: payload.discount_type ? (payload.discount_type + ' ' + payload.discount_value) : null,
+            discount_amount: payload.discount_amount || 0,
             cashier: ADMIN.username,
             restaurantName: RESTAURANT.name || 'Receipt',
             currency: RESTAURANT.currency,
@@ -2161,15 +2135,65 @@ function submitPosOrder(payload) {
         document.getElementById('reprintBtn').disabled = false;
         showPaidModal(payload.total, payload.payment_method);
         BILL = [];
+        CURRENT_CUSTOMER = { name: '', phone: '' };
+        CURRENT_DISCOUNT = null;
         renderBill();
         updatePayButtonsState();
     })
     .catch(function(err) {
         console.error('POS order error:', err);
-        showToast('❌ Network error — order not saved', 'error');
+        // Save to offline queue
+        try {
+            var queue = JSON.parse(localStorage.getItem('posOfflineQueue') || '[]');
+            queue.push({ payload: payload, at: new Date().toISOString() });
+            localStorage.setItem('posOfflineQueue', JSON.stringify(queue));
+            showToast('⚠️ Offline — order saved locally, will sync', 'warn');
+            BILL = [];
+            CURRENT_CUSTOMER = { name: '', phone: '' };
+            CURRENT_DISCOUNT = null;
+            renderBill();
+        } catch (e) {
+            showToast('❌ Network error — order not saved', 'error');
+        }
         updatePayButtonsState();
     });
 }
+
+// ============================================================
+// OFFLINE QUEUE — sync when back online
+// ============================================================
+function syncOfflineQueue() {
+    var queue = [];
+    try { queue = JSON.parse(localStorage.getItem('posOfflineQueue') || '[]'); } catch (e) { return; }
+    if (queue.length === 0) return;
+    var remaining = [];
+    var promises = queue.map(function(item) {
+        return fetch(withRestaurant(API + '/pos/orders'), {
+            method: 'POST',
+            headers: { 'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'application/json' },
+            body: JSON.stringify(item.payload)
+        }).then(function(r) {
+            if (!r.ok) throw new Error('Sync failed');
+        }).catch(function() { remaining.push(item); });
+    });
+    Promise.all(promises).then(function() {
+        if (remaining.length > 0) {
+            localStorage.setItem('posOfflineQueue', JSON.stringify(remaining));
+        } else {
+            localStorage.removeItem('posOfflineQueue');
+            showToast('✅ Offline orders synced', 'success');
+        }
+    });
+}
+window.addEventListener('online', function() {
+    IS_OFFLINE = false;
+    syncOfflineQueue();
+});
+window.addEventListener('offline', function() {
+    IS_OFFLINE = true;
+    showToast('⚠️ You are offline', 'warn');
+});
+setTimeout(syncOfflineQueue, 3000);
 
 // ============================================================
 // PAID MODAL
@@ -2179,81 +2203,50 @@ function showPaidModal(total, method) {
     document.getElementById('paidMeta').textContent =
         method + ' · Order #' + LAST_RECEIPT.orderId + ' · ' + ADMIN.username;
     document.getElementById('paidModal').classList.add('open');
-
     setTimeout(function() {
         var btn = document.getElementById('nextOrderBtn');
         if (btn) btn.focus();
     }, 100);
 }
-
-function posCloseModal() {
-    document.getElementById('paidModal').classList.remove('open');
-}
+function posCloseModal() { document.getElementById('paidModal').classList.remove('open'); }
 
 // ============================================================
 // PRINT
 // ============================================================
 function posPrintReceipt() {
-    if (!LAST_RECEIPT) {
-        showToast('No receipt to print', 'error');
-        return;
-    }
-
-    console.log('🖨️ Print requested · order', LAST_RECEIPT.orderId, '· mode', PRINTER_MODE);
-
-    if (PRINTER_MODE === 'qz' && QZ_CONNECTED && typeof qz !== 'undefined') {
-        qzPrintReceipt();
-        return;
-    }
-
+    if (!LAST_RECEIPT) { showToast('No receipt to print', 'error'); return; }
+    if (PRINTER_MODE === 'qz' && QZ_CONNECTED && typeof qz !== 'undefined') { qzPrintReceipt(); return; }
     browserPrintReceipt();
 }
-
 function reprintLast() {
-    if (!LAST_RECEIPT) {
-        showToast('No recent receipt to reprint', 'error');
-        return;
-    }
+    if (!LAST_RECEIPT) { showToast('No recent receipt to reprint', 'error'); return; }
     posPrintReceipt();
 }
-
 function qzPrintReceipt() {
     if (!LAST_RECEIPT) return;
-
     var r = LAST_RECEIPT;
-
     qz.printers.find()
         .then(function(printers) {
             var name = null;
-            if (RESTAURANT && RESTAURANT.printer_name) {
-                name = RESTAURANT.printer_name;
-            } else if (Array.isArray(printers) && printers.length > 0) {
+            if (RESTAURANT && RESTAURANT.printer_name) name = RESTAURANT.printer_name;
+            else if (Array.isArray(printers) && printers.length > 0) {
                 for (var i = 0; i < printers.length; i++) {
                     var p = String(printers[i]).toLowerCase();
                     if (p.indexOf('thermal') !== -1 || p.indexOf('receipt') !== -1 ||
-                        p.indexOf('tm-') !== -1 || p.indexOf('xp-') !== -1 ||
-                        p.indexOf('pos') !== -1) {
-                        name = printers[i];
-                        break;
+                        p.indexOf('tm-') !== -1 || p.indexOf('xp-') !== -1 || p.indexOf('pos') !== -1) {
+                        name = printers[i]; break;
                     }
                 }
                 if (!name) name = printers[0];
             }
-
-            if (!name) {
-                throw new Error('No printer found on this system');
-            }
-
+            if (!name) throw new Error('No printer found on this system');
             var config = qz.configs.create(name);
             var data = buildEscPosReceipt(r);
             return qz.print(config, [{ type: 'raw', format: 'plain', data: data }]);
         })
         .then(function() {
             showToast('✅ Receipt printed', 'success');
-
-            if (r.method.toLowerCase().indexOf('cash') !== -1) {
-                popCashDrawer();
-            }
+            if (r.method.toLowerCase().indexOf('cash') !== -1) popCashDrawer();
         })
         .catch(function(err) {
             console.error('QZ print error:', err);
@@ -2261,7 +2254,6 @@ function qzPrintReceipt() {
             browserPrintReceipt();
         });
 }
-
 function popCashDrawer() {
     var kick = '\x1B\x70\x00\x19\xFA';
     qz.printers.find()
@@ -2269,22 +2261,14 @@ function popCashDrawer() {
             var name = (RESTAURANT && RESTAURANT.printer_name) || (printers && printers[0]);
             if (!name) return;
             var config = qz.configs.create(name);
-            return qz.print(config, [{
-                type: 'raw',
-                format: 'plain',
-                data: kick
-            }]);
+            return qz.print(config, [{ type: 'raw', format: 'plain', data: kick }]);
         })
-        .catch(function(err) {
-            console.warn('Cash drawer kick failed:', err);
-        });
+        .catch(function(err) { console.warn('Cash drawer kick failed:', err); });
 }
-
 function buildEscPosReceipt(r) {
     var W = 42;
     var line = '\n';
     var dashes = '------------------------------------------';
-
     function pad(left, right) {
         left = String(left); right = String(right);
         var space = W - left.length - right.length;
@@ -2297,12 +2281,14 @@ function buildEscPosReceipt(r) {
         if (pad < 0) pad = 0;
         return ' '.repeat(pad) + text;
     }
-
     var out = '';
     out += line;
     out += center(r.restaurantName) + line;
     out += center('Receipt #' + r.orderId) + line;
     out += center(r.date.toLocaleString()) + line;
+    if (r.customer_name || r.customer_phone) {
+        out += center((r.customer_name || '') + (r.customer_phone ? ' · ' + r.customer_phone : '')) + line;
+    }
     out += dashes + line;
 
     r.items.forEach(function(it) {
@@ -2317,6 +2303,10 @@ function buildEscPosReceipt(r) {
     if (r.tax > 0) {
         out += pad('VAT (' + r.taxRate + '%)', formatPlainMoney(r.tax, r.currency)) + line;
     }
+    if (r.discount_amount > 0) {
+        out += pad('Discount' + (r.discount_code ? ' (' + r.discount_code + ')' : ''),
+                   '-' + formatPlainMoney(r.discount_amount, r.currency)) + line;
+    }
 
     out += pad('TOTAL', formatPlainMoney(r.total, r.currency)) + line;
 
@@ -2324,35 +2314,25 @@ function buildEscPosReceipt(r) {
         out += pad('Cash received', formatPlainMoney(r.cash_received, r.currency)) + line;
         out += pad('Change', formatPlainMoney(r.change_given || 0, r.currency)) + line;
     }
-
     out += dashes + line;
     out += pad('Paid by', r.method) + line;
     out += pad('Cashier', r.cashier) + line;
     out += line;
     out += center('Thank you!') + line;
     out += line + line + line + line;
-
     return out;
 }
-
 function formatPlainMoney(amount, currency) {
     var n = parseFloat(amount) || 0;
     var c = currency || 'BD';
-    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') {
-        return c + ' ' + Math.round(n).toLocaleString('en-US');
-    }
-    if (c === 'BD' || c === 'KWD' || c === 'OMR') {
-        return c + ' ' + n.toFixed(3);
-    }
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') return c + ' ' + Math.round(n).toLocaleString('en-US');
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') return c + ' ' + n.toFixed(3);
     return c + ' ' + n.toFixed(2);
 }
-
 function browserPrintReceipt() {
     if (!LAST_RECEIPT) return;
-
     var r = LAST_RECEIPT;
     var lines = '';
-
     r.items.forEach(function(it) {
         lines +=
             '<tr>' +
@@ -2360,32 +2340,26 @@ function browserPrintReceipt() {
                 '<td style="text-align:right;padding:3px 0;">' + formatMoney(it.price * it.quantity) + '</td>' +
             '</tr>';
     });
-
     var taxLine = '';
     if (r.tax > 0) {
-        taxLine =
-            '<tr>' +
-                '<td style="padding:2px 0;color:#666;">VAT (' + r.taxRate + '%)</td>' +
-                '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.tax) + '</td>' +
-            '</tr>';
+        taxLine = '<tr><td style="padding:2px 0;color:#666;">VAT (' + r.taxRate + '%)</td><td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.tax) + '</td></tr>';
     }
-
+    var discountLine = '';
+    if (r.discount_amount > 0) {
+        discountLine = '<tr><td style="padding:2px 0;color:#8e44ad;">Discount' + (r.discount_code ? ' (' + escapeHtml(r.discount_code) + ')' : '') + '</td><td style="text-align:right;padding:2px 0;color:#8e44ad;">− ' + formatMoney(r.discount_amount) + '</td></tr>';
+    }
     var cashLine = '';
     if (r.cash_received != null && r.method.toLowerCase().indexOf('cash') !== -1) {
         cashLine =
-            '<tr>' +
-                '<td style="padding:2px 0;color:#666;">Cash received</td>' +
-                '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.cash_received) + '</td>' +
-            '</tr>' +
-            '<tr>' +
-                '<td style="padding:2px 0;color:#666;">Change</td>' +
-                '<td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.change_given || 0) + '</td>' +
-            '</tr>';
+            '<tr><td style="padding:2px 0;color:#666;">Cash received</td><td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.cash_received) + '</td></tr>' +
+            '<tr><td style="padding:2px 0;color:#666;">Change</td><td style="text-align:right;padding:2px 0;color:#666;">' + formatMoney(r.change_given || 0) + '</td></tr>';
     }
+    var customerLine = (r.customer_name || r.customer_phone)
+        ? '<div class="sub">' + escapeHtml(r.customer_name || '') + (r.customer_phone ? ' · ' + escapeHtml(r.customer_phone) : '') + '</div>'
+        : '';
 
     var html =
-        '<!DOCTYPE html>' +
-        '<html><head><meta charset="utf-8"><title>Receipt #' + r.orderId + '</title>' +
+        '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Receipt #' + r.orderId + '</title>' +
         '<style>' +
             'body { font-family: "Courier New", monospace; width: 280px; margin: 0 auto; padding: 10px; color: #000; }' +
             'h2 { text-align: center; font-size: 1.1em; margin: 0 0 4px; }' +
@@ -2398,10 +2372,11 @@ function browserPrintReceipt() {
         '</style></head><body>' +
         '<h2>' + escapeHtml(r.restaurantName) + '</h2>' +
         '<div class="sub">Receipt #' + r.orderId + '<br>' + r.date.toLocaleString() + '</div>' +
+        customerLine +
         '<table>' + lines + '</table>' +
         '<table class="totals">' +
             '<tr><td>Subtotal</td><td style="text-align:right;">' + formatMoney(r.subtotal) + '</td></tr>' +
-            taxLine +
+            taxLine + discountLine +
             '<tr class="grand"><td>TOTAL</td><td style="text-align:right;">' + formatMoney(r.total) + '</td></tr>' +
             cashLine +
             '<tr><td colspan="2" style="padding-top:8px;font-size:0.85em;color:#666;">Paid by: ' + escapeHtml(r.method) + '</td></tr>' +
@@ -2411,13 +2386,121 @@ function browserPrintReceipt() {
         '</body></html>';
 
     var w = window.open('', '_blank', 'width=320,height=600');
-    if (!w) {
-        showToast('Pop-up blocked — allow pop-ups to print', 'error');
-        return;
-    }
+    if (!w) { showToast('Pop-up blocked — allow pop-ups to print', 'error'); return; }
     w.document.write(html);
     w.document.close();
     setTimeout(function() { w.focus(); w.print(); }, 300);
+}
+
+// ============================================================
+// PRINTER SETTINGS
+// ============================================================
+function openPrinterSettings() {
+    var modal = document.getElementById('printerModal');
+    var select = document.getElementById('printerSelect');
+    select.innerHTML = '<option value="">— loading —</option>';
+    modal.classList.add('open');
+
+    if (QZ_CONNECTED && typeof qz !== 'undefined') {
+        qz.printers.find()
+            .then(function(printers) {
+                select.innerHTML = '';
+                if (!printers || printers.length === 0) {
+                    select.innerHTML = '<option value="">No printers detected</option>';
+                    return;
+                }
+                printers.forEach(function(p) {
+                    var opt = document.createElement('option');
+                    opt.value = p;
+                    opt.textContent = p;
+                    if (RESTAURANT && RESTAURANT.printer_name === p) opt.selected = true;
+                    select.appendChild(opt);
+                });
+            })
+            .catch(function() {
+                select.innerHTML = '<option value="">Could not list printers</option>';
+            });
+    } else {
+        select.innerHTML = '<option value="">QZ Tray not connected</option>';
+    }
+}
+function closePrinterModal() { document.getElementById('printerModal').classList.remove('open'); }
+function savePrinterName() {
+    var name = document.getElementById('printerSelect').value;
+    if (RESTAURANT) RESTAURANT.printer_name = name;
+    try { localStorage.setItem('posPrinterName', name); } catch (e) {}
+    closePrinterModal();
+    showToast('✅ Printer saved', 'success');
+}
+function testPrintPrinter() {
+    if (!QZ_CONNECTED) { showToast('QZ Tray not connected', 'error'); return; }
+    var name = document.getElementById('printerSelect').value;
+    if (!name) { showToast('Select a printer first', 'error'); return; }
+    var test = '\n\n       TEST PRINT OK\n\n     ' + (RESTAURANT ? RESTAURANT.name : 'POS') + '\n' +
+               new Date().toLocaleString() + '\n\n--------------------------------\n\n\n';
+    var config = qz.configs.create(name);
+    qz.print(config, [{ type: 'raw', format: 'plain', data: test }])
+        .then(function() { showToast('✅ Test printed', 'success'); })
+        .catch(function(err) { showToast('❌ Test print failed', 'error'); console.error(err); });
+}
+
+// ============================================================
+// CLOSE DAY
+// ============================================================
+function openCloseDay() {
+    var modal = document.getElementById('closeDayModal');
+    document.getElementById('closeDaySubtitle').textContent = 'Fetching today\'s totals…';
+    document.getElementById('cdTotalSales').textContent = '—';
+    document.getElementById('cdOrders').textContent = '—';
+    document.getElementById('cdCash').textContent = '—';
+    document.getElementById('cdOther').textContent = '—';
+    modal.classList.add('open');
+
+    var today = new Date().toISOString().slice(0, 10);
+    fetch(withRestaurant(API + '/analytics/summary?start=' + today + '&end=' + today), {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (!data || data.error) throw new Error('Failed');
+        document.getElementById('closeDaySubtitle').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('cdTotalSales').textContent = formatMoney(data.today_revenue || 0);
+        document.getElementById('cdOrders').textContent = data.today_orders || 0;
+        // We don't have a direct cash/card split from this endpoint
+        document.getElementById('cdCash').textContent = '—';
+        document.getElementById('cdOther').textContent = '—';
+    })
+    .catch(function() {
+        document.getElementById('closeDaySubtitle').textContent = 'Could not load report (offline?)';
+    });
+}
+function closeCloseDayModal() { document.getElementById('closeDayModal').classList.remove('open'); }
+function printCloseDayReport() {
+    if (!QZ_CONNECTED) { showToast('QZ Tray not connected', 'error'); return; }
+    var lines = [];
+    lines.push('');
+    lines.push('        DAILY SUMMARY');
+    lines.push('     ' + (RESTAURANT ? RESTAURANT.name : 'POS'));
+    lines.push('    ' + new Date().toLocaleString());
+    lines.push('--------------------------------');
+    lines.push('  Total Sales: ' + document.getElementById('cdTotalSales').textContent);
+    lines.push('  Total Orders: ' + document.getElementById('cdOrders').textContent);
+    lines.push('  Cash Collected: ' + document.getElementById('cdCash').textContent);
+    lines.push('  Card / Other: ' + document.getElementById('cdOther').textContent);
+    lines.push('--------------------------------');
+    lines.push('');
+    lines.push('     Cashier: ' + (ADMIN ? ADMIN.username : '—'));
+    lines.push('');
+    lines.push('');
+
+    qz.printers.find()
+        .then(function(printers) {
+            var name = (RESTAURANT && RESTAURANT.printer_name) || printers[0];
+            var config = qz.configs.create(name);
+            return qz.print(config, [{ type: 'raw', format: 'plain', data: lines.join('\n') }]);
+        })
+        .then(function() { showToast('✅ Report printed', 'success'); })
+        .catch(function(err) { showToast('❌ Print failed', 'error'); console.error(err); });
 }
 
 // ============================================================
@@ -2430,11 +2513,10 @@ function showToast(msg, type) {
     setTimeout(function() { el.classList.add('show'); }, 10);
     setTimeout(function() { el.classList.remove('show'); }, 2500);
 }
+
 function exitPos() {
-    // Show the custom logout modal instead of native confirm()
     var titleEl = document.getElementById('logoutTitle');
     var msgEl = document.getElementById('logoutMessage');
-
     if (BILL.length > 0) {
         titleEl.textContent = 'You have items on the bill.';
         msgEl.innerHTML = 'Logging out will <strong>clear the current bill</strong>. The next cashier will need to sign in.';
@@ -2442,56 +2524,87 @@ function exitPos() {
         titleEl.textContent = 'Log out of POS?';
         msgEl.textContent = 'The next cashier will need to sign in.';
     }
-
     document.getElementById('logoutModal').classList.add('open');
 }
-
-function closeLogoutModal() {
-    document.getElementById('logoutModal').classList.remove('open');
-}
-
+function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('open'); }
 function confirmLogout() {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
     localStorage.removeItem('adminLoggedIn');
     localStorage.removeItem('adminRestaurantSlug');
-
-    // Reload to show the login screen again
     window.location.reload();
 }
 
-document.getElementById('paidModal').addEventListener('click', function(e) {
-    if (e.target === this) posCloseModal();
+// ============================================================
+// MODAL BACKDROP CLICKS
+// ============================================================
+['paidModal','logoutModal','clearModal','heldModal','customerModal','discountModal','printerModal','closeDayModal'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('click', function(e) {
+        if (e.target === this) {
+            var fn = {
+                paidModal: posCloseModal,
+                logoutModal: closeLogoutModal,
+                clearModal: closeClearModal,
+                heldModal: closeHeldModal,
+                customerModal: closeCustomerModal,
+                discountModal: closeDiscountModal,
+                printerModal: closePrinterModal,
+                closeDayModal: closeCloseDayModal
+            }[id];
+            if (fn) fn();
+        }
+    });
 });
-document.getElementById('logoutModal').addEventListener('click', function(e) {
-    if (e.target === this) closeLogoutModal();
-});
-document.getElementById('clearModal').addEventListener('click', function(e) {
-    if (e.target === this) closeClearModal();
-});
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'F2') { e.preventDefault(); posClear(); }
-    if (e.key === 'F3') { e.preventDefault(); if (LAST_RECEIPT) posPrintReceipt(); }
-    if (e.key === 'Escape') {
-    posCloseModal();
-    closeLogoutModal();
-    closeClearModal();
-}
-    if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
-        e.preventDefault();
-        posCloseModal();
-    }
 
-    // ⚡ F1 or "/" jumps to the search box
-    if ((e.key === 'F1' || e.key === '/') && !e.ctrlKey && !e.metaKey) {
+// ============================================================
+// KEYBOARD SHORTCUTS
+// ============================================================
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'F1' || (e.key === '/' && !e.ctrlKey && !e.metaKey)) {
         var active = document.activeElement;
         if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
         e.preventDefault();
         document.getElementById('posSearch').focus();
         document.getElementById('posSearch').select();
+        return;
+    }
+    if (e.key === 'F2') { e.preventDefault(); posClear(); return; }
+    if (e.key === 'F3') { e.preventDefault(); if (LAST_RECEIPT) posPrintReceipt(); return; }
+    if (e.key === 'F4') { e.preventDefault(); payOrder('Cash'); return; }
+    if (e.key === 'F5') {
+        e.preventDefault();
+        var methods = (RESTAURANT && RESTAURANT.payment_methods)
+            ? RESTAURANT.payment_methods.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
+            : ['Cash'];
+        var card = methods.find(function(m) { return m.toLowerCase().indexOf('card') !== -1; });
+        if (card) payOrder(card); else if (methods[1]) payOrder(methods[1]);
+        return;
+    }
+    if (e.key === 'F6') { e.preventDefault(); posCloseModal(); return; }
+    if (e.key === 'F7') { e.preventDefault(); holdCurrentBill(); return; }
+    if (e.key === 'F8') { e.preventDefault(); openHeldBills(); return; }
+    if (e.key === 'Escape') {
+        posCloseModal();
+        closeLogoutModal();
+        closeClearModal();
+        closeHeldModal();
+        closeCustomerModal();
+        closeDiscountModal();
+        closePrinterModal();
+        closeCloseDayModal();
+        return;
+    }
+    if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
+        e.preventDefault();
+        posCloseModal();
     }
 });
 
+// ============================================================
+// BOOT
+// ============================================================
 init();
 </script>
 </body>
