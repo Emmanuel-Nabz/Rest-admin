@@ -210,6 +210,102 @@
         .stat-card .number { font-size: 2rem; font-weight: 700; color: var(--text); line-height: 1.1; word-break: break-word; }
         .stat-card .number.accent { color: var(--accent); }
         .stat-card .number.green { color: var(--success); }
+        /* POS vs Delivery split card */
+.split-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 24px;
+    margin-bottom: 18px;
+}
+.split-card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+}
+.split-card-title i { color: var(--accent); }
+.split-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.split-tile {
+    background: var(--surface-secondary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    transition: border-color 0.15s;
+}
+.split-tile.pos { border-left: 4px solid #10b981; }
+.split-tile.delivery { border-left: 4px solid #8b5cf6; }
+.split-tile .tile-label {
+    font-size: 0.78em;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.split-tile.pos .tile-label i { color: #10b981; }
+.split-tile.delivery .tile-label i { color: #8b5cf6; }
+.split-tile .tile-value {
+    font-size: 1.7em;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    word-break: break-word;
+}
+.split-tile .tile-sub {
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+.split-bar {
+    height: 10px;
+    background: var(--surface-secondary);
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    border: 1px solid var(--border);
+}
+.split-bar-pos {
+    background: linear-gradient(90deg, #10b981, #059669);
+    transition: width 0.5s ease;
+}
+.split-bar-delivery {
+    background: linear-gradient(90deg, #8b5cf6, #7c3aed);
+    transition: width 0.5s ease;
+}
+.split-legend {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 0.82em;
+    color: var(--text-muted);
+}
+.split-legend .dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+.split-legend .dot.pos { background: #10b981; }
+.split-legend .dot.delivery { background: #8b5cf6; }
+@media (max-width: 640px) {
+    .split-grid { grid-template-columns: 1fr; gap: 12px; }
+    .split-tile .tile-value { font-size: 1.5em; }
+}
 
         .filters { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; align-items: center; }
         .filters input, .filters select {
@@ -818,6 +914,51 @@
                             <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_active_sub">&nbsp;</div>
                         </div>
                     </div>
+
+                                        <div class="stat-card">
+                        <div class="label">Active Right Now</div>
+                        <div class="number accent" id="an_active">—</div>
+                        <div style="font-size:0.8rem;color:var(--text-muted);margin-top:4px;" id="an_active_sub">&nbsp;</div>
+                    </div>
+                </div>
+
+                <!-- ⚡ NEW — POS vs Delivery split -->
+                <div class="split-card">
+                    <div class="split-card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Counter vs Online Delivery
+                    </div>
+                    <div class="split-grid">
+                        <div class="split-tile pos">
+                            <div class="tile-label">
+                                <i class="fas fa-cash-register"></i> Counter (POS)
+                            </div>
+                            <div class="tile-value" id="splitPosRev">—</div>
+                            <div class="tile-sub" id="splitPosSub">—</div>
+                        </div>
+                        <div class="split-tile delivery">
+                            <div class="tile-label">
+                                <i class="fas fa-motorcycle"></i> Online Delivery
+                            </div>
+                            <div class="tile-value" id="splitDeliveryRev">—</div>
+                            <div class="tile-sub" id="splitDeliverySub">—</div>
+                        </div>
+                    </div>
+                    <div class="split-bar" id="splitBar">
+                        <div class="split-bar-pos" id="splitBarPos" style="width:50%;"></div>
+                        <div class="split-bar-delivery" id="splitBarDelivery" style="width:50%;"></div>
+                    </div>
+                    <div class="split-legend">
+                        <span><span class="dot pos"></span><span id="splitPosPct">—</span></span>
+                        <span><span class="dot delivery"></span><span id="splitDeliveryPct">—</span></span>
+                    </div>
+                </div>
+
+                <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
+                    <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+                        <i class="fas fa-chart-line" style="color:var(--success);"></i>
+                        Revenue & Orders
+                    </h3>
 
                     <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:18px;">
                         <h3 style="font-size:1rem;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
@@ -3077,12 +3218,64 @@ function loadAnalytics() {
 
 function renderAnalyticsStats(s) {
     if (!s || s.error) return;
+
+    document.getElementById('an_orders').textContent = s.total_orders;
+    document.getElementById('an_orders_sub').textContent =
+        s.delivered + ' delivered · ' + s.cancelled + ' cancelled';
+
+    document.getElementById('an_revenue').textContent = formatMoney(s.revenue);
+    document.getElementById('an_revenue_sub').textContent =
+        'Today: ' + formatMoney(s.today_revenue) + ' · ' + s.today_orders + ' orders';
+
+    document.getElementById('an_avg').textContent = formatMoney(s.avg_order_value);
+    document.getElementById('an_avg_sub').textContent = 'Per delivered order';
+
+    document.getElementById('an_active').textContent = s.active_now;
+    document.getElementById('an_active_sub').textContent =
+        s.active + ' in range · ' + s.active_now + ' right now';
+
+    // ⚡ NEW — POS vs Delivery split
+    var posRev = parseFloat(s.pos_revenue) || 0;
+    var delRev = parseFloat(s.delivery_revenue) || 0;
+    var posOrd = parseInt(s.pos_orders) || 0;
+    var delOrd = parseInt(s.delivery_orders) || 0;
+
+    document.getElementById('splitPosRev').textContent = formatMoney(posRev);
+    document.getElementById('splitPosSub').textContent =
+        posOrd + ' order' + (posOrd === 1 ? '' : 's');
+
+    document.getElementById('splitDeliveryRev').textContent = formatMoney(delRev);
+    document.getElementById('splitDeliverySub').textContent =
+        delOrd + ' order' + (delOrd === 1 ? '' : 's');
+
+    var total = posRev + delRev;
+    var posPct = total > 0 ? (posRev / total) * 100 : 50;
+    var delPct = total > 0 ? (delRev / total) * 100 : 50;
+
+    document.getElementById('splitBarPos').style.width = posPct + '%';
+    document.getElementById('splitBarDelivery').style.width = delPct + '%';
+    document.getElementById('splitPosPct').textContent =
+        (total > 0 ? posPct.toFixed(0) : '0') + '% of sales';
+    document.getElementById('splitDeliveryPct').textContent =
+        (total > 0 ? delPct.toFixed(0) : '0') + '% of sales';
+}
+function renderAnalyticsStats(s) {
+    if (!s || s.error) return;
     document.getElementById('an_orders').textContent = s.total_orders;
     document.getElementById('an_orders_sub').textContent =
         s.delivered + ' delivered · ' + s.cancelled + ' cancelled';
     document.getElementById('an_revenue').textContent = formatMoney(s.revenue);
+
+    // ⚡ NEW — Show POS vs delivery split in the sub-line
+    var posRev = parseFloat(s.pos_revenue) || 0;
+    var delRev = parseFloat(s.delivery_revenue) || 0;
+    var split = '';
+    if (posRev > 0 || delRev > 0) {
+        split = ' · 🏪 ' + formatMoney(posRev) + ' pos · 🛵 ' + formatMoney(delRev) + ' delivery';
+    }
     document.getElementById('an_revenue_sub').textContent =
-        'Today: ' + formatMoney(s.today_revenue) + ' · ' + s.today_orders + ' orders';
+        'Today: ' + formatMoney(s.today_revenue) + ' · ' + s.today_orders + ' orders' + split;
+
     document.getElementById('an_avg').textContent = formatMoney(s.avg_order_value);
     document.getElementById('an_avg_sub').textContent = 'Per delivered order';
     document.getElementById('an_active').textContent = s.active_now;
