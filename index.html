@@ -2085,6 +2085,7 @@ function renderOrders(orders) {
 
     var statusInfo = {
         'New':        { color: '#3b82f6', bg: 'rgba(59,130,246,0.15)', icon: 'New' },
+        'new':        { color: '#3b82f6', bg: 'rgba(59,130,246,0.15)', icon: 'New' },
         'Confirmed':  { color: '#10b981', bg: 'rgba(16,185,129,0.15)', icon: 'Confirmed' },
         'Preparing':  { color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', icon: 'Preparing' },
         'On the Way': { color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)', icon: 'On the Way' },
@@ -2098,7 +2099,7 @@ function renderOrders(orders) {
         var st = statusInfo[order.status] || statusInfo['New'];
 
         var actionButtons = '';
-        if (order.status === 'New' || !order.status) {
+        if (order.status === 'New' || !order.status || order.status === 'new') {
             actionButtons =
                 '<button class="btn btn-success" onclick="updateOrderStatus(' + originalIndex + ', \'Confirmed\')"><i class="fas fa-check"></i> Confirm</button>' +
                 '<button class="btn btn-danger" onclick="updateOrderStatus(' + originalIndex + ', \'Cancelled\')"><i class="fas fa-times"></i> Cancel</button>';
@@ -2122,6 +2123,34 @@ function renderOrders(orders) {
                 '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
         }
 
+        // ✅ SAFE: coerce items to an array, and support both item_name and name
+        var items = order.items;
+        if (typeof items === 'string') {
+            try { items = JSON.parse(items); } catch (e) { items = []; }
+        }
+        if (!Array.isArray(items)) items = [];
+
+        var itemsHtml = '';
+        if (items.length > 0) {
+            itemsHtml = items.map(function(it) {
+                var qty   = parseInt(it.quantity) || 0;
+                var price = parseFloat(it.price) || 0;
+                var name  = it.item_name || it.name || 'Item';
+                var lineTotal = price * qty;
+                return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);font-size:0.9rem;">' +
+                    '<span><strong style="color:var(--accent);">' + qty + '×</strong> ' + escapeHtml(name) + '</span>' +
+                    '<span style="color:var(--text-secondary);white-space:nowrap;">' + formatMoneyForRow(lineTotal, order) + '</span>' +
+                '</div>';
+            }).join('');
+            itemsHtml +=
+                '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
+                    '<span>Total</span>' +
+                    '<span>' + formatMoneyForRow(order.total, order) + '</span>' +
+                '</div>';
+        } else {
+            itemsHtml = '<div style="color:var(--text-muted);font-size:0.9rem;padding:6px 0;">No items recorded</div>';
+        }
+
         html += '<div class="order-card" style="border-left-color:' + st.color + ';">' +
             '<div class="order-header">' +
                 '<span class="order-id">Order #' + order.id + '</span>' +
@@ -2141,27 +2170,13 @@ function renderOrders(orders) {
                 '<div style="font-weight:600;font-size:0.85rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">' +
                     '<i class="fas fa-utensils"></i> Order Items' +
                 '</div>' +
-                (order.items && order.items.length > 0 ?
-                    order.items.map(function(it) {
-                        var lineTotal = parseFloat(it.price) * it.quantity;
-                        return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px dashed var(--border);font-size:0.9rem;">' +
-                            '<span><strong style="color:var(--accent);">' + escapeHtml(it.quantity) + '×</strong> ' + escapeHtml(it.item_name) + '</span>' +
-                            '<span style="color:var(--text-secondary);white-space:nowrap;">' + formatMoneyForRow(lineTotal, order) + '</span>' +
-                        '</div>';
-                    }).join('') +
-                    '<div style="display:flex;justify-content:space-between;padding:10px 0 2px;font-weight:700;color:var(--success);font-size:1.05rem;">' +
-                        '<span>Total</span>' +
-                        '<span>' + formatMoneyForRow(order.total, order) + '</span>' +
-                    '</div>'
-                    : '<div style="color:var(--text-muted);font-size:0.9rem;padding:6px 0;">No items recorded</div>'
-                ) +
+                itemsHtml +
             '</div>' +
             '<div class="order-actions">' + actionButtons + '</div>' +
         '</div>';
     });
     container.innerHTML = html;
 }
-
 function updateStats(orders) {
     var activeStatuses = ['New', 'Confirmed', 'Preparing', 'On the Way'];
     var active = orders.filter(function(o) { return activeStatuses.indexOf(o.status) !== -1; });
