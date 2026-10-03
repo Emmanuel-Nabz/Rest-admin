@@ -316,9 +316,24 @@ html, body {
 body.retail-mode .barcode-hint { display: flex; }
 
 /* Category tabs */
+.pos-tabs-wrap {
+    position: relative;
+    flex-shrink: 0;
+}
 .pos-tabs {
     display: flex; gap: 8px; padding-bottom: 14px;
     overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+}
+.pos-tabs-wrap::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 14px;
+    width: 40px;
+    background: linear-gradient(to right, transparent, var(--bg));
+    pointer-events: none;
+}
+@media (max-width: 900px) {
+    .pos-tabs-wrap::after { bottom: 14px; }
 }
 .pos-tabs::-webkit-scrollbar { display: none; }
 .pos-tabs .tab {
@@ -877,12 +892,14 @@ body.retail-mode .pos-item .item-stock.empty { background: rgba(239, 68, 68, 0.1
                 </button>
             </div>
 
-            <div class="barcode-hint" id="barcodeHint">
+                      <div class="barcode-hint" id="barcodeHint">
                 <i class="fas fa-barcode"></i>
                 <span>Scan barcode or type SKU, then press Enter</span>
             </div>
 
-            <div class="pos-tabs" id="posTabs"></div>
+            <div class="pos-tabs-wrap">
+                <div class="pos-tabs" id="posTabs"></div>
+            </div>
 
             <div class="pos-grid" id="posGrid">
                 <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
@@ -1691,15 +1708,26 @@ function updatePrinterStatus(state) {
 function renderTabs() {
     var wrap = document.getElementById('posTabs');
     wrap.innerHTML = '';
+
+    // Count items per category
+    var counts = {};
+    MENU_ITEMS.forEach(function(i) {
+        var c = i.category || 'Other';
+        counts[c] = (counts[c] || 0) + 1;
+    });
+
+    // All tab
     var allBtn = document.createElement('button');
     allBtn.className = 'tab' + (CURRENT_CAT === 'All' ? ' active' : '');
-    allBtn.textContent = 'All';
+    allBtn.innerHTML = 'All <span style="opacity:0.7;font-weight:500;font-size:0.85em;">(' + MENU_ITEMS.length + ')</span>';
     allBtn.onclick = function() { CURRENT_CAT = 'All'; clearSearch(); renderTabs(); renderGrid(); };
     wrap.appendChild(allBtn);
+
+    // Category tabs
     CATEGORIES.forEach(function(c) {
         var b = document.createElement('button');
         b.className = 'tab' + (CURRENT_CAT === c ? ' active' : '');
-        b.textContent = c;
+        b.innerHTML = escapeHtml(c) + ' <span style="opacity:0.7;font-weight:500;font-size:0.85em;">(' + (counts[c] || 0) + ')</span>';
         b.onclick = function() { CURRENT_CAT = c; clearSearch(); renderTabs(); renderGrid(); };
         wrap.appendChild(b);
     });
