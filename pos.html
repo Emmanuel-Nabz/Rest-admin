@@ -21,34 +21,94 @@
 </script>
 
 <style>
-#posLogin {
-    position: fixed;
-    inset: 0;
+/* ============================================================
+   THEME
+============================================================ */
+:root, [data-theme="light"] {
+    --bg: #f5f6f8;
+    --surface: #ffffff;
+    --surface-secondary: #f9fafb;
+    --border: #e5e7eb;
+    --text: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --accent: #e67e22;
+    --accent-hover: #d35400;
+    --accent-soft: #fef3e2;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --info: #3b82f6;
+    --purple: #8b5cf6;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
+    --radius: 8px;
+    --radius-lg: 12px;
+}
+[data-theme="dark"] {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-secondary: #263449;
+    --border: #334155;
+    --text: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --accent: #f97316;
+    --accent-hover: #ea580c;
+    --accent-soft: #2d1f0e;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --info: #60a5fa;
+    --purple: #a78bfa;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
+
+html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
     background: var(--bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 100000;
+    color: var(--text);
+    overflow: hidden;
+    -webkit-tap-highlight-color: transparent;
+    font-size: 15px;
+    transition: background 0.25s, color 0.25s;
+}
+
+/* ============================================================
+   LOGIN
+============================================================ */
+#posLogin {
+    position: fixed; inset: 0;
+    background: var(--bg);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px; z-index: 100000;
 }
 .pos-login-box {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 40px 36px;
-    width: 100%;
-    max-width: 420px;
+    width: 100%; max-width: 420px;
     box-shadow: var(--shadow-lg);
     text-align: center;
 }
 .pos-login-logo {
-    width: 72px; height: 72px;
-    border-radius: 50%;
-    background: var(--accent-soft);
-    color: var(--accent);
+    width: 72px; height: 72px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
     display: flex; align-items: center; justify-content: center;
-    font-size: 2em;
-    margin: 0 auto 20px;
+    font-size: 2em; margin: 0 auto 20px;
 }
 .pos-login-box h1 { font-size: 1.5em; font-weight: 800; color: var(--text); margin-bottom: 6px; }
 .pos-login-sub { color: var(--text-secondary); font-size: 0.95em; margin-bottom: 28px; }
@@ -90,78 +150,15 @@
 }
 .pos-login-pw-toggle:hover, .pos-login-pw-toggle.showing { color: var(--accent); background: var(--surface-secondary); }
 
-:root, [data-theme="light"] {
-    --bg: #f5f6f8;
-    --surface: #ffffff;
-    --surface-secondary: #f9fafb;
-    --border: #e5e7eb;
-    --text: #111827;
-    --text-secondary: #4b5563;
-    --text-muted: #9ca3af;
-    --accent: #e67e22;
-    --accent-hover: #d35400;
-    --accent-soft: #fef3e2;
-    --success: #10b981;
-    --warning: #f59e0b;
-    --danger: #ef4444;
-    --info: #3b82f6;
-    --purple: #8b5cf6;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.06);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.08);
-    --radius: 8px;
-    --radius-lg: 12px;
-}
-
-[data-theme="dark"] {
-    --bg: #0f172a;
-    --surface: #1e293b;
-    --surface-secondary: #263449;
-    --border: #334155;
-    --text: #f1f5f9;
-    --text-secondary: #cbd5e1;
-    --text-muted: #94a3b8;
-    --accent: #f97316;
-    --accent-hover: #ea580c;
-    --accent-soft: #2d1f0e;
-    --success: #34d399;
-    --warning: #fbbf24;
-    --danger: #f87171;
-    --info: #60a5fa;
-    --purple: #a78bfa;
-    --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
-    --shadow: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-    --shadow-lg: 0 10px 30px rgba(0,0,0,0.5);
-    --radius: 8px;
-    --radius-lg: 12px;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.5); }
-
-html, body {
-    height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow: hidden;
-    -webkit-tap-highlight-color: transparent;
-    font-size: 15px;
-    transition: background 0.25s, color 0.25s;
-}
-
+/* ============================================================
+   MAIN LAYOUT
+============================================================ */
 .pos-wrap {
     display: grid;
     grid-template-columns: 1fr 400px;
     height: 100vh;
     height: 100dvh;
 }
-
 .pos-topbar {
     grid-column: 1 / -1;
     background: var(--surface);
@@ -176,14 +173,18 @@ html, body {
     flex-shrink: 0;
     box-shadow: var(--shadow-sm);
 }
-.pos-topbar .topbar-btn span {
-    font-weight: 700;
-}
 .pos-topbar .brand {
     display: flex; align-items: center; gap: 10px;
     font-weight: 800; font-size: 1.05rem; color: var(--text);
 }
 .pos-topbar .brand i { color: var(--accent); font-size: 1.3rem; }
+.pos-topbar .brand .type-tag {
+    background: var(--accent-soft); color: var(--accent);
+    padding: 2px 8px; border-radius: 10px;
+    font-size: 0.7em; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.05em;
+    margin-left: 6px;
+}
 .pos-topbar .meta { display: flex; align-items: center; gap: 10px; font-size: 0.88em; }
 .pos-topbar .meta .who {
     background: var(--surface-secondary);
@@ -217,7 +218,7 @@ html, body {
 .pos-topbar .topbar-btn {
     background: var(--surface-secondary); border: 1px solid var(--border); color: var(--text);
     padding: 7px 16px; border-radius: 20px; cursor: pointer; font-family: inherit;
-    font-size: 0.85em; font-weight: 500;
+    font-size: 0.85em; font-weight: 700;
     display: inline-flex; align-items: center; gap: 6px;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
     position: relative;
@@ -232,6 +233,37 @@ html, body {
     margin-left: 2px;
 }
 
+/* Backup dropdown */
+#backupMenu {
+    display: none;
+    position: fixed;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    min-width: 250px;
+    z-index: 10000;
+    overflow: hidden;
+}
+.backup-menu-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    transition: background 0.15s;
+    font-weight: 500;
+}
+.backup-menu-item:hover { background: var(--surface-secondary); }
+.backup-menu-item i { width: 18px; text-align: center; font-size: 1em; }
+.backup-menu-item.danger { color: var(--danger); }
+.backup-menu-divider { height: 1px; background: var(--border); }
+
+/* ============================================================
+   BODY: MENU + BILL
+============================================================ */
 .pos-body {
     grid-column: 1 / -1;
     display: grid;
@@ -240,9 +272,9 @@ html, body {
     height: calc(100dvh - 60px);
     overflow: hidden;
 }
-
 .pos-menu { display: flex; flex-direction: column; overflow: hidden; padding: 16px; background: var(--bg); }
 
+/* Search / barcode */
 .pos-search-wrap { position: relative; margin-bottom: 12px; flex-shrink: 0; }
 .pos-search-wrap > i.fa-search {
     position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
@@ -266,6 +298,24 @@ html, body {
 }
 .pos-search-clear:hover { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 
+/* Retail barcode indicator */
+.barcode-hint {
+    display: none;
+    padding: 8px 14px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px dashed var(--success);
+    border-radius: var(--radius);
+    color: var(--success);
+    font-size: 0.82em;
+    font-weight: 600;
+    margin-bottom: 12px;
+    align-items: center;
+    gap: 8px;
+}
+.barcode-hint i { font-size: 1.1em; }
+body.retail-mode .barcode-hint { display: flex; }
+
+/* Category tabs */
 .pos-tabs {
     display: flex; gap: 8px; padding-bottom: 14px;
     overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
@@ -284,6 +334,7 @@ html, body {
     box-shadow: 0 4px 12px rgba(230,126,34,0.25);
 }
 
+/* Item grid */
 .pos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
@@ -298,9 +349,12 @@ html, body {
     min-height: 110px;
     display: flex; flex-direction: column; justify-content: space-between;
     user-select: none; box-shadow: var(--shadow-sm);
+    position: relative;
 }
 .pos-item:hover { border-color: var(--accent); box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .pos-item:active { transform: scale(0.97); }
+.pos-item.out-of-stock { opacity: 0.5; cursor: not-allowed; }
+.pos-item.out-of-stock:hover { transform: none; border-color: var(--danger); }
 .pos-item .item-name {
     font-weight: 600; font-size: 0.98em; color: var(--text); line-height: 1.3;
     display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
@@ -308,13 +362,29 @@ html, body {
 .pos-item .item-price {
     font-weight: 800; color: var(--success); font-size: 1.1em; margin-top: 10px; letter-spacing: -0.01em;
 }
+.pos-item .item-stock {
+    position: absolute;
+    top: 8px; right: 8px;
+    font-size: 0.7em;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--info);
+    display: none;
+}
+body.retail-mode .pos-item .item-stock { display: inline-block; }
+body.retail-mode .pos-item .item-stock.low { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+body.retail-mode .pos-item .item-stock.empty { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
 
+/* ============================================================
+   BILL PANEL
+============================================================ */
 .pos-bill {
     background: var(--surface);
     border-left: 1px solid var(--border);
     display: flex; flex-direction: column; overflow: hidden;
 }
-
 .bill-header {
     padding: 14px 20px;
     border-bottom: 1px solid var(--border);
@@ -331,9 +401,7 @@ html, body {
     border-radius: 20px; padding: 3px 11px;
     font-size: 0.75em; font-weight: 700;
 }
-.bill-header-actions {
-    display: flex; gap: 6px; align-items: center;
-}
+.bill-header-actions { display: flex; gap: 6px; align-items: center; }
 .bill-header-btn {
     background: var(--surface-secondary);
     border: 1px solid var(--border);
@@ -341,7 +409,7 @@ html, body {
     border-radius: 20px;
     padding: 6px 12px;
     font-size: 0.8em;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
@@ -421,9 +489,7 @@ html, body {
 .bill-line .bl-qty button:active { transform: scale(0.9); }
 .bill-line .bl-qty button.plus { background: var(--accent); color: #fff; border-color: var(--accent); }
 .bill-line .bl-qty button.plus:hover { background: var(--accent-hover); }
-.bill-line .bl-qty button.minus:hover {
-    background: rgba(239,68,68,0.15); color: var(--danger); border-color: var(--danger);
-}
+.bill-line .bl-qty button.minus:hover { background: rgba(239,68,68,0.15); color: var(--danger); border-color: var(--danger); }
 .bill-line .bl-qty .num {
     min-width: 22px; text-align: center;
     font-weight: 700; font-size: 0.95em; color: var(--text);
@@ -445,7 +511,6 @@ html, body {
     padding: 4px 0; font-size: 0.9em; color: var(--text-secondary);
 }
 .bill-summary .row.discount { color: var(--purple); font-weight: 600; }
-.bill-summary .row.discount .label i { color: var(--purple); }
 .bill-summary .row .label { display: flex; align-items: center; gap: 6px; }
 .bill-summary .row.total {
     font-size: 1.4em; font-weight: 800; color: var(--text);
@@ -460,14 +525,10 @@ html, body {
     border: 1px solid rgba(139, 92, 246, 0.3);
     border-radius: 20px;
     padding: 6px 12px;
-    font-size: 0.8em;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
+    font-size: 0.8em; font-weight: 700;
+    cursor: pointer; font-family: inherit;
     transition: background 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
+    display: inline-flex; align-items: center; gap: 5px;
 }
 .bill-discount-btn:hover:not(:disabled) { background: rgba(139, 92, 246, 0.2); }
 .bill-discount-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -495,21 +556,13 @@ html, body {
 .bill-payments .pay-benefit  { background: #8e44ad; }
 .bill-payments .pay-momo     { background: #ffcc00; color: #1e293b; }
 .bill-payments .pay-airtel   { background: #e30613; }
+.bill-payments .pay-benefitpay { background: #8e44ad; }
+.bill-payments .pay-mtnmomo  { background: #ffcc00; color: #1e293b; }
+.bill-payments .pay-airtelmoney { background: #e30613; }
 
-.pos-toast {
-    position: fixed; top: 80px; left: 50%;
-    transform: translateX(-50%) translateY(-20px);
-    padding: 14px 26px; border-radius: 30px;
-    color: white; font-weight: 700; font-size: 0.95em;
-    box-shadow: var(--shadow-lg); z-index: 99999;
-    opacity: 0; transition: opacity 0.3s, transform 0.3s;
-    pointer-events: none; max-width: 90vw; text-align: center;
-}
-.pos-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.pos-toast.success { background: #10b981; }
-.pos-toast.error   { background: #ef4444; }
-.pos-toast.info    { background: #3b82f6; }
-
+/* ============================================================
+   MODALS
+============================================================ */
 .pos-modal {
     position: fixed; inset: 0;
     background: rgba(15, 23, 42, 0.75);
@@ -548,15 +601,14 @@ html, body {
 .pos-modal-box .btn-next  { background: #10b981; color: white; }
 .pos-modal-box .btn-next:hover { background: #059669; }
 
+/* Cash modal */
 .cash-modal-box {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 20px 22px 22px; max-width: 440px; width: 100%;
     max-height: 95vh; overflow-y: auto; box-shadow: var(--shadow-lg);
 }
-.cash-header {
-    display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;
-}
+.cash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
 .cash-header h2 { font-size: 1.15em; font-weight: 700; color: var(--text); }
 .cash-close {
     background: none; border: none; font-size: 1.6em;
@@ -564,10 +616,7 @@ html, body {
     font-family: inherit; transition: color 0.15s;
 }
 .cash-close:hover { color: var(--text); }
-
-.cash-total-display,
-.cash-received-display,
-.cash-change-display {
+.cash-total-display, .cash-received-display, .cash-change-display {
     padding: 14px 18px; border-radius: var(--radius);
     margin-bottom: 10px;
     display: flex; justify-content: space-between; align-items: baseline;
@@ -584,10 +633,7 @@ html, body {
 .cash-received-value { font-size: 1.6em; font-weight: 800; color: #3b82f6; }
 .cash-change-value { font-size: 1.6em; font-weight: 800; color: #10b981; }
 .cash-change-display.negative .cash-change-value { color: #ef4444; }
-
-.cash-quick {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px;
-}
+.cash-quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 10px; }
 .cash-quick button {
     padding: 11px 4px;
     background: var(--surface-secondary); border: 1px solid var(--border);
@@ -596,10 +642,7 @@ html, body {
     transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .cash-quick button:hover { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
-
-.cash-keypad {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px;
-}
+.cash-keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 12px; }
 .cash-keypad button {
     padding: 14px 4px;
     background: var(--surface); border: 1px solid var(--border);
@@ -611,31 +654,22 @@ html, body {
 .cash-keypad button:hover { background: var(--surface-secondary); border-color: var(--accent); }
 .cash-keypad button:active { transform: scale(0.95); }
 .cash-keypad button.wide { grid-column: span 1; }
-.cash-keypad button.danger {
-    background: rgba(239,68,68,0.1); color: var(--danger);
-    border-color: rgba(239,68,68,0.3);
-}
+.cash-keypad button.danger { background: rgba(239,68,68,0.1); color: var(--danger); border-color: rgba(239,68,68,0.3); }
 .cash-keypad button.danger:hover { background: rgba(239,68,68,0.2); }
-
-.cash-actions {
-    display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px; margin-top: 4px;
-}
+.cash-actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 8px; margin-top: 4px; }
 .cash-btn-skip, .cash-btn-confirm {
     padding: 16px; border: none; border-radius: var(--radius);
     font-weight: 700; font-size: 0.95em; cursor: pointer; font-family: inherit;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     transition: background 0.15s, transform 0.1s;
 }
-.cash-btn-skip {
-    background: var(--surface-secondary); color: var(--text);
-    border: 1px solid var(--border);
-}
+.cash-btn-skip { background: var(--surface-secondary); color: var(--text); border: 1px solid var(--border); }
 .cash-btn-skip:hover { background: var(--border); }
 .cash-btn-confirm { background: #10b981; color: white; }
 .cash-btn-confirm:hover:not(:disabled) { background: #059669; }
 .cash-btn-confirm:disabled { background: #64748b; cursor: not-allowed; opacity: 0.5; }
 
-/* Form fields (used inside modals) */
+/* Form fields */
 .form-field { text-align: left; margin-bottom: 14px; }
 .form-field label { display: block; font-weight: 600; color: var(--text); margin-bottom: 6px; font-size: 0.9em; }
 .form-field input, .form-field select, .form-field textarea {
@@ -651,7 +685,7 @@ html, body {
 }
 .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-/* Held bills list */
+/* Held bills */
 .held-bills-list {
     display: flex; flex-direction: column; gap: 8px;
     margin-bottom: 18px; max-height: 300px; overflow-y: auto;
@@ -669,82 +703,82 @@ html, body {
     align-items: center;
     gap: 12px;
 }
-.held-bill-item:hover {
-    border-color: var(--accent);
-    background: var(--accent-soft);
-}
+.held-bill-item:hover { border-color: var(--accent); background: var(--accent-soft); }
 .held-bill-item .held-info { flex: 1; min-width: 0; }
 .held-bill-item .held-label {
     font-weight: 700; color: var(--text);
-    font-size: 0.95em;
-    margin-bottom: 2px;
+    font-size: 0.95em; margin-bottom: 2px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.held-bill-item .held-meta {
-    font-size: 0.8em; color: var(--text-muted);
-}
+.held-bill-item .held-meta { font-size: 0.8em; color: var(--text-muted); }
 .held-bill-item .held-total {
     font-weight: 800; color: var(--success);
     font-size: 1em; white-space: nowrap;
 }
-.held-bill-item .held-actions {
-    display: flex; gap: 6px;
-}
+.held-bill-item .held-actions { display: flex; gap: 6px; }
 
 /* Close day report */
 .close-day-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 18px;
-    text-align: left;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    margin-bottom: 18px; text-align: left;
 }
 .close-day-stat {
-    background: var(--surface-secondary);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 12px 14px;
+    background: var(--surface-secondary); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
 }
 .close-day-stat .label {
     font-size: 0.75em; color: var(--text-muted);
     font-weight: 600; text-transform: uppercase;
     letter-spacing: 0.04em; margin-bottom: 4px;
 }
-.close-day-stat .value {
-    font-size: 1.15em; font-weight: 800; color: var(--text);
-}
+.close-day-stat .value { font-size: 1.15em; font-weight: 800; color: var(--text); }
 .close-day-stat .value.green { color: var(--success); }
 .close-day-stat .value.purple { color: var(--purple); }
 
+/* Toast */
+.pos-toast {
+    position: fixed; top: 80px; left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    padding: 14px 26px; border-radius: 30px;
+    color: white; font-weight: 700; font-size: 0.95em;
+    box-shadow: var(--shadow-lg); z-index: 99999;
+    opacity: 0; transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; max-width: 90vw; text-align: center;
+}
+.pos-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.pos-toast.success { background: #10b981; }
+.pos-toast.error   { background: #ef4444; }
+.pos-toast.info    { background: #3b82f6; }
+.pos-toast.warn    { background: #f59e0b; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
 @media (max-width: 900px) {
     .pos-wrap { grid-template-columns: 1fr; }
-    .pos-body {
-        grid-template-columns: 1fr;
-        grid-template-rows: 1fr auto;
-    }
-    .pos-bill {
-        border-left: none;
-        border-top: 2px solid var(--accent);
-        max-height: 60vh;
-    }
+    .pos-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; }
+    .pos-bill { border-left: none; border-top: 2px solid var(--accent); max-height: 60vh; }
     .pos-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
     .pos-item { min-height: 95px; padding: 12px 10px; }
     .pos-item .item-name { font-size: 0.88em; }
     .pos-item .item-price { font-size: 0.95em; }
-    .pos-topbar { height: 56px; padding: 8px 14px; }
+    .pos-topbar { height: 56px; padding: 8px 14px; overflow-x: auto; }
     .pos-body { height: calc(100vh - 56px); height: calc(100dvh - 56px); }
     .pos-topbar .meta .who .role { display: none; }
     .pos-topbar .meta .currency { display: none; }
     .pos-topbar .meta .printer-status span.label { display: none; }
     .pos-topbar #posThemeLabel { display: none; }
-    .pos-topbar .brand span { display: none; }
+    .pos-topbar .brand span:not(.type-tag) { display: none; }
     .pos-topbar .topbar-btn span { display: none; }
+    .pos-topbar .topbar-btn .badge { display: inline-block !important; }
 }
 </style>
 </head>
 <body>
 
-<!-- ============ POS LOGIN ============ -->
+<!-- ============================================================
+     LOGIN
+============================================================ -->
 <div id="posLogin" style="display:none;">
     <div class="pos-login-box">
         <div class="pos-login-logo"><i class="fas fa-cash-register"></i></div>
@@ -779,12 +813,15 @@ html, body {
     </div>
 </div>
 
-<!-- ============ POS APP ============ -->
+<!-- ============================================================
+     MAIN POS
+============================================================ -->
 <div class="pos-wrap" id="posWrap" style="display:none;">
     <div class="pos-topbar">
         <div class="brand">
             <i class="fas fa-cash-register"></i>
-            <span>POS · Nabz</span>
+            <span id="brandName">POS · Nabz</span>
+            <span class="type-tag" id="businessTypeTag" style="display:none;"></span>
         </div>
         <div class="meta">
             <span class="who">
@@ -810,7 +847,12 @@ html, body {
                 <i class="fas fa-print"></i>
                 <span>Last</span>
             </button>
-            <button class="topbar-btn" id="posThemeToggle" onclick="togglePosTheme()" title="Toggle dark mode">
+            <button class="topbar-btn" id="backupMenuBtn" onclick="toggleBackupMenu(event)" style="display:none;position:relative;" title="Backup & export (Owner only)">
+                <i class="fas fa-database"></i>
+                <span>Backup</span>
+                <i class="fas fa-caret-down" style="font-size:0.75em;"></i>
+            </button>
+            <button class="topbar-btn" id="posThemeToggle" onclick="togglePosTheme()" title="Toggle theme">
                 <i class="fas fa-moon" id="posThemeIcon"></i>
                 <span id="posThemeLabel">Dark</span>
             </button>
@@ -826,16 +868,26 @@ html, body {
         <div class="pos-menu">
             <div class="pos-search-wrap">
                 <i class="fas fa-search"></i>
-                <input type="text" id="posSearch" class="pos-search-input" placeholder="Search items… (F1)" autocomplete="off" oninput="onSearchChange()">
+                <input type="text" id="posSearch" class="pos-search-input"
+                       placeholder="Search items… (F1)"
+                       autocomplete="off"
+                       oninput="onSearchChange()">
                 <button class="pos-search-clear" id="posSearchClear" onclick="clearSearch()" style="display:none;">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
+
+            <div class="barcode-hint" id="barcodeHint">
+                <i class="fas fa-barcode"></i>
+                <span>Scan barcode or type SKU, then press Enter</span>
+            </div>
+
             <div class="pos-tabs" id="posTabs"></div>
+
             <div class="pos-grid" id="posGrid">
                 <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
                     <i class="fas fa-spinner fa-spin" style="font-size: 2em; color: var(--accent);"></i>
-                    <div style="margin-top: 12px;">Loading menu…</div>
+                    <div style="margin-top: 12px;">Loading items…</div>
                 </div>
             </div>
         </div>
@@ -858,7 +910,6 @@ html, body {
                 </div>
             </div>
 
-            <!-- CUSTOMER STRIP -->
             <div class="bill-customer-strip" id="billCustomerStrip">
                 <i class="fas fa-user"></i>
                 <span id="billCustomerText">Walk-in customer</span>
@@ -869,7 +920,7 @@ html, body {
                 <div class="bill-empty">
                     <i class="fas fa-hand-pointer"></i>
                     <div>Tap items to add</div>
-                    <div class="bill-empty-hint">Or search above to find items faster</div>
+                    <div class="bill-empty-hint">Or search / scan above to find items faster</div>
                 </div>
             </div>
 
@@ -902,9 +953,36 @@ html, body {
     </div>
 </div>
 
-<!-- ============ MODALS ============ -->
+<!-- ============================================================
+     BACKUP DROPDOWN (Owner only)
+============================================================ -->
+<div id="backupMenu">
+    <div class="backup-menu-item" onclick="posExportJSON(); closeBackupMenu();">
+        <i class="fas fa-file-code" style="color:var(--success);"></i>
+        Create Full Backup (JSON)
+    </div>
+    <div class="backup-menu-item" onclick="document.getElementById('posRestoreFile').click(); closeBackupMenu();">
+        <i class="fas fa-upload" style="color:var(--info);"></i>
+        Restore from Backup
+    </div>
+    <div class="backup-menu-divider"></div>
+    <div class="backup-menu-item" onclick="posExportOrdersCSV(); closeBackupMenu();">
+        <i class="fas fa-receipt" style="color:var(--accent);"></i>
+        Export Orders (CSV)
+    </div>
+    <div class="backup-menu-item" onclick="posExportProductsCSV(); closeBackupMenu();">
+        <i class="fas fa-box" style="color:var(--accent);"></i>
+        Export Products (CSV)
+    </div>
+</div>
 
-<!-- PAID -->
+<input type="file" id="posRestoreFile" accept=".json,application/json" style="display:none;" onchange="posRestoreJSON(event)">
+
+<!-- ============================================================
+     MODALS
+============================================================ -->
+
+<!-- Paid -->
 <div class="pos-modal" id="paidModal">
     <div class="pos-modal-box">
         <div class="icon"><i class="fas fa-check"></i></div>
@@ -912,62 +990,49 @@ html, body {
         <div class="amount" id="paidAmount">—</div>
         <div class="meta" id="paidMeta">—</div>
         <div class="btns">
-            <button class="btn-print" onclick="posPrintReceipt()">
-                <i class="fas fa-print"></i> Print
-            </button>
-            <button class="btn-next" id="nextOrderBtn" onclick="posCloseModal()">
-                <i class="fas fa-arrow-right"></i> Next Order
-            </button>
+            <button class="btn-print" onclick="posPrintReceipt()"><i class="fas fa-print"></i> Print</button>
+            <button class="btn-next" id="nextOrderBtn" onclick="posCloseModal()"><i class="fas fa-arrow-right"></i> Next Order</button>
         </div>
     </div>
 </div>
 
-<!-- CASH PAYMENT -->
+<!-- Cash payment -->
 <div class="pos-modal" id="cashModal">
     <div class="cash-modal-box">
         <div class="cash-header">
             <h2><i class="fas fa-money-bill-wave" style="color:#10b981;"></i> Cash Payment</h2>
             <button class="cash-close" onclick="closeCashModal()">×</button>
         </div>
-
         <div class="cash-total-display">
             <div class="cash-label">Total Due</div>
             <div class="cash-total-value" id="cashTotalDue">—</div>
         </div>
-
         <div class="cash-received-display">
             <div class="cash-label">Cash Received</div>
             <div class="cash-received-value" id="cashReceived">0</div>
         </div>
-
         <div class="cash-quick" id="cashQuick"></div>
-
         <div class="cash-keypad">
             <button onclick="cashKey('7')">7</button>
             <button onclick="cashKey('8')">8</button>
             <button onclick="cashKey('9')">9</button>
             <button onclick="cashKey('back')" class="wide"><i class="fas fa-backspace"></i></button>
-
             <button onclick="cashKey('4')">4</button>
             <button onclick="cashKey('5')">5</button>
             <button onclick="cashKey('6')">6</button>
             <button onclick="cashKey('clear')" class="danger">C</button>
-
             <button onclick="cashKey('1')">1</button>
             <button onclick="cashKey('2')">2</button>
             <button onclick="cashKey('3')">3</button>
             <button onclick="cashKey('000')" class="wide">000</button>
-
             <button onclick="cashKey('0')" style="grid-column: span 2;">0</button>
             <button onclick="cashKey('.')">.</button>
             <button onclick="cashKey('00')">00</button>
         </div>
-
         <div class="cash-change-display" id="cashChangeDisplay">
             <div class="cash-label">Change</div>
             <div class="cash-change-value" id="cashChange">—</div>
         </div>
-
         <div class="cash-actions">
             <button class="cash-btn-skip" onclick="confirmCashExact()">
                 <i class="fas fa-equals"></i> Exact
@@ -979,14 +1044,14 @@ html, body {
     </div>
 </div>
 
-<!-- CLEAR BILL -->
+<!-- Clear bill -->
 <div class="pos-modal" id="clearModal">
     <div class="pos-modal-box">
         <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
             <i class="fas fa-trash-alt"></i>
         </div>
         <h2>Clear the current bill?</h2>
-        <div class="meta" id="clearMessage">All <strong>0</strong> items will be removed. This cannot be undone.</div>
+        <div class="meta" id="clearMessage">All items will be removed. This cannot be undone.</div>
         <div class="btns">
             <button class="btn-print" onclick="closeClearModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
                 <i class="fas fa-times"></i> Cancel
@@ -998,7 +1063,7 @@ html, body {
     </div>
 </div>
 
-<!-- LOGOUT -->
+<!-- Logout -->
 <div class="pos-modal" id="logoutModal">
     <div class="pos-modal-box">
         <div class="icon" style="background:rgba(239,68,68,0.15);color:var(--danger);">
@@ -1017,14 +1082,14 @@ html, body {
     </div>
 </div>
 
-<!-- HELD BILLS -->
+<!-- Held bills -->
 <div class="pos-modal" id="heldModal">
     <div class="pos-modal-box" style="max-width: 520px;">
         <div class="icon" style="background:rgba(59,130,246,0.15);color:var(--info);">
             <i class="fas fa-pause-circle"></i>
         </div>
         <h2>Held Bills</h2>
-        <div class="meta">Resume a bill to continue taking orders</div>
+        <div class="meta">Resume a bill to continue</div>
         <div class="held-bills-list" id="heldBillsList"></div>
         <div class="btns" style="grid-template-columns: 1fr;">
             <button class="btn-print" onclick="closeHeldModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
@@ -1034,15 +1099,14 @@ html, body {
     </div>
 </div>
 
-<!-- CUSTOMER INFO -->
+<!-- Customer info -->
 <div class="pos-modal" id="customerModal">
     <div class="pos-modal-box">
         <div class="icon" style="background:rgba(230,126,34,0.15);color:var(--accent);">
             <i class="fas fa-user"></i>
         </div>
-        <h2>Customer Info</h2>
-        <div class="meta">Optional — attach a name or phone to this order</div>
-
+        <h2 id="customerModalTitle">Customer Info</h2>
+        <div class="meta">Optional — attach a name or phone to this sale</div>
         <div class="form-field">
             <label>Name</label>
             <input type="text" id="custInfoName" placeholder="e.g. Ahmed" maxlength="80">
@@ -1051,7 +1115,6 @@ html, body {
             <label>Phone</label>
             <input type="tel" id="custInfoPhone" placeholder="e.g. 70012345" maxlength="20">
         </div>
-
         <div class="btns" style="grid-template-columns: 1fr 1fr;">
             <button class="btn-print" onclick="closeCustomerModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
                 Cancel
@@ -1063,7 +1126,7 @@ html, body {
     </div>
 </div>
 
-<!-- DISCOUNT -->
+<!-- Discount -->
 <div class="pos-modal" id="discountModal">
     <div class="pos-modal-box">
         <div class="icon" style="background:rgba(139,92,246,0.15);color:var(--purple);">
@@ -1071,7 +1134,6 @@ html, body {
         </div>
         <h2>Apply Discount</h2>
         <div class="meta">Add a percentage or fixed-amount discount</div>
-
         <div class="form-field">
             <label>Type</label>
             <select id="discountType">
@@ -1083,7 +1145,6 @@ html, body {
             <label id="discountValueLabel">Value</label>
             <input type="number" id="discountValue" placeholder="e.g. 10" min="0" step="0.01">
         </div>
-
         <div class="btns" style="grid-template-columns: 1fr 1fr;">
             <button class="btn-print" onclick="closeDiscountModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
                 Cancel
@@ -1095,7 +1156,7 @@ html, body {
     </div>
 </div>
 
-<!-- PRINTER SETTINGS -->
+<!-- Printer settings -->
 <div class="pos-modal" id="printerModal">
     <div class="pos-modal-box">
         <div class="icon" style="background:rgba(59,130,246,0.15);color:var(--info);">
@@ -1103,7 +1164,6 @@ html, body {
         </div>
         <h2>Printer Settings</h2>
         <div class="meta">Choose the receipt printer for this POS</div>
-
         <div class="form-field">
             <label>Detected printers</label>
             <select id="printerSelect">
@@ -1119,7 +1179,6 @@ html, body {
                 <i class="fas fa-print"></i> Print Test Receipt
             </button>
         </div>
-
         <div class="btns" style="grid-template-columns: 1fr 1fr;">
             <button class="btn-print" onclick="closePrinterModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
                 Cancel
@@ -1131,7 +1190,7 @@ html, body {
     </div>
 </div>
 
-<!-- CLOSE DAY REPORT -->
+<!-- Close day -->
 <div class="pos-modal" id="closeDayModal">
     <div class="pos-modal-box" style="max-width: 520px;">
         <div class="icon" style="background:rgba(16,185,129,0.15);color:var(--success);">
@@ -1139,34 +1198,32 @@ html, body {
         </div>
         <h2>Today's Summary</h2>
         <div class="meta" id="closeDaySubtitle">—</div>
-
-      <div class="close-day-grid">
-    <div class="close-day-stat">
-        <div class="label">Total Sales</div>
-        <div class="value green" id="cdTotalSales">—</div>
-    </div>
-    <div class="close-day-stat">
-        <div class="label">Total Orders</div>
-        <div class="value" id="cdOrders">—</div>
-    </div>
-    <div class="close-day-stat">
-        <div class="label">Counter (POS)</div>
-        <div class="value green" id="cdPos">—</div>
-    </div>
-    <div class="close-day-stat">
-        <div class="label">Online Delivery</div>
-        <div class="value purple" id="cdDelivery">—</div>
-    </div>
-    <div class="close-day-stat">
-        <div class="label">Cash Collected</div>
-        <div class="value" id="cdCash">—</div>
-    </div>
-    <div class="close-day-stat">
-        <div class="label">Card / Other</div>
-        <div class="value purple" id="cdOther">—</div>
-    </div>
-</div>
-
+        <div class="close-day-grid">
+            <div class="close-day-stat">
+                <div class="label">Total Sales</div>
+                <div class="value green" id="cdTotalSales">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Total Orders</div>
+                <div class="value" id="cdOrders">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Counter (POS)</div>
+                <div class="value green" id="cdPos">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Online Delivery</div>
+                <div class="value purple" id="cdDelivery">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Cash Collected</div>
+                <div class="value" id="cdCash">—</div>
+            </div>
+            <div class="close-day-stat">
+                <div class="label">Card / Other</div>
+                <div class="value purple" id="cdOther">—</div>
+            </div>
+        </div>
         <div class="btns" style="grid-template-columns: 1fr 1fr;">
             <button class="btn-print" onclick="closeCloseDayModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
                 Close
@@ -1180,6 +1237,9 @@ html, body {
 
 <div class="pos-toast" id="toast"></div>
 
+<!-- ============================================================
+     SCRIPT
+============================================================ -->
 <script>
 // ============================================================
 // CONFIG
@@ -1204,24 +1264,35 @@ var PRINTER_MODE = 'browser';
 var QZ_CONNECTED = false;
 var QZ_AVAILABLE = false;
 var IS_OFFLINE = false;
+var BUSINESS_TYPE = 'restaurant'; // 'restaurant' | 'retail' | 'hybrid' | 'salon'
 
 // ============================================================
 // HELPERS
 // ============================================================
 function getToken() {
-    return localStorage.getItem('adminToken') || localStorage.getItem('token') || localStorage.getItem('authToken') || '';
+    return localStorage.getItem('adminToken')
+        || localStorage.getItem('token')
+        || localStorage.getItem('authToken')
+        || '';
 }
 function withRestaurant(url) {
-    var slug = localStorage.getItem('adminRestaurantSlug') || localStorage.getItem('restaurantSlug') || '';
+    var slug = localStorage.getItem('adminRestaurantSlug')
+        || localStorage.getItem('restaurantSlug')
+        || '';
     if (!slug) return url;
-    return url + (url.indexOf('?') === -1 ? '?' : '&') + 'restaurant=' + encodeURIComponent(slug);
+    return url + (url.indexOf('?') === -1 ? '?' : '&')
+        + 'restaurant=' + encodeURIComponent(slug);
 }
 function formatMoney(amount) {
     if (!RESTAURANT) return amount;
     var n = parseFloat(amount) || 0;
     var c = RESTAURANT.currency || 'BD';
-    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') return c + ' ' + Math.round(n).toLocaleString('en-US');
-    if (c === 'BD' || c === 'KWD' || c === 'OMR') return c + ' ' + n.toFixed(3);
+    if (c === 'UGX' || c === 'TZS' || c === 'RWF' || c === 'KES') {
+        return c + ' ' + Math.round(n).toLocaleString('en-US');
+    }
+    if (c === 'BD' || c === 'KWD' || c === 'OMR') {
+        return c + ' ' + n.toFixed(3);
+    }
     return c + ' ' + n.toFixed(2);
 }
 function getCurrencyDecimals() {
@@ -1243,7 +1314,7 @@ function escapeHtml(s) {
 }
 
 // ============================================================
-// SOUND — tiny click on add
+// AUDIO
 // ============================================================
 var AUDIO_CTX = null;
 function getAudioCtx() {
@@ -1280,15 +1351,16 @@ function playTick() {
 // PAYMENT STYLES
 // ============================================================
 var PAYMENT_STYLES = {
-    'cash':            { icon: 'fa-money-bill-wave',  cls: 'pay-cash',    label: 'Cash' },
-    'card':            { icon: 'fa-credit-card',      cls: 'pay-card',    label: 'Card' },
-    'benefit pay':     { icon: 'fa-mobile-screen',    cls: 'pay-benefit', label: 'Benefit' },
-    'benefit':         { icon: 'fa-mobile-screen',    cls: 'pay-benefit', label: 'Benefit' },
-    'mtn mobile money':{ icon: 'fa-mobile-screen',    cls: 'pay-momo',    label: 'MTN MoMo' },
-    'mtn momo':        { icon: 'fa-mobile-screen',    cls: 'pay-momo',    label: 'MTN MoMo' },
-    'airtel money':    { icon: 'fa-mobile-screen',    cls: 'pay-airtel',  label: 'Airtel' },
-    'airtel':          { icon: 'fa-mobile-screen',    cls: 'pay-airtel',  label: 'Airtel' },
-    'cash on delivery':{ icon: 'fa-money-bill-wave',  cls: 'pay-cash',    label: 'Cash' }
+    'cash':             { icon: 'fa-money-bill-wave', cls: 'pay-cash',   label: 'Cash' },
+    'card':             { icon: 'fa-credit-card',     cls: 'pay-card',   label: 'Card' },
+    'benefit pay':      { icon: 'fa-mobile-screen',   cls: 'pay-benefit', label: 'Benefit' },
+    'benefit':          { icon: 'fa-mobile-screen',   cls: 'pay-benefit', label: 'Benefit' },
+    'benefitpay':       { icon: 'fa-mobile-screen',   cls: 'pay-benefitpay', label: 'Benefit' },
+    'mtn mobile money': { icon: 'fa-mobile-screen',   cls: 'pay-momo',   label: 'MTN MoMo' },
+    'mtn momo':         { icon: 'fa-mobile-screen',   cls: 'pay-mtnmomo', label: 'MTN MoMo' },
+    'airtel money':     { icon: 'fa-mobile-screen',   cls: 'pay-airtel', label: 'Airtel' },
+    'airtel':           { icon: 'fa-mobile-screen',   cls: 'pay-airtelmoney', label: 'Airtel' },
+    'cash on delivery': { icon: 'fa-money-bill-wave', cls: 'pay-cash',   label: 'Cash' }
 };
 function getPaymentStyle(name) {
     var key = String(name || '').toLowerCase().trim();
@@ -1424,20 +1496,33 @@ function posLogin() {
 }
 
 function bootPos(username) {
-    ADMIN = { username: username || 'Cashier', role: 'staff' };
+    // Read role from JWT
+    var role = 'staff';
+    try {
+        var token = getToken();
+        if (token) {
+            var payload = JSON.parse(atob(token.split('.')[1]));
+            role = payload.role || 'staff';
+        }
+    } catch (e) {}
+
+    ADMIN = { username: username || 'Cashier', role: role };
     console.log('✅ POS: admin loaded:', ADMIN);
 
     var currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
     updateThemeToggleUI(currentTheme);
 
     document.getElementById('cashierName').textContent = ADMIN.username || 'Unknown';
-    document.getElementById('cashierRole').textContent = '(staff)';
+    document.getElementById('cashierRole').textContent = '(' + role + ')';
     document.getElementById('posWrap').style.display = '';
     document.getElementById('posLogin').style.display = 'none';
 
-    // Load held bills from localStorage
-    loadHeldBills();
+    // Show backup button only for owners
+    if (role === 'owner') {
+        document.getElementById('backupMenuBtn').style.display = 'inline-flex';
+    }
 
+    loadHeldBills();
     detectQzTray();
 
     loadRestaurantConfig()
@@ -1461,6 +1546,20 @@ function loadRestaurantConfig() {
     .then(function(data) {
         if (!data || data.error) throw new Error(data.error || 'Config failed');
         RESTAURANT = data;
+        BUSINESS_TYPE = data.business_type || 'restaurant';
+
+        // Set business type tag + body class
+        if (BUSINESS_TYPE && BUSINESS_TYPE !== 'restaurant') {
+            var tag = document.getElementById('businessTypeTag');
+            tag.textContent = BUSINESS_TYPE;
+            tag.style.display = 'inline-block';
+        }
+        if (BUSINESS_TYPE === 'retail' || BUSINESS_TYPE === 'hybrid') {
+            document.body.classList.add('retail-mode');
+        }
+        // Customize labels based on business type
+        applyBusinessLabels();
+
         if (RESTAURANT.pos_enabled === 0 || RESTAURANT.pos_enabled === '0') {
             document.body.innerHTML =
                 '<div style="display:flex;align-items:center;justify-content:center;height:100vh;' +
@@ -1469,8 +1568,8 @@ function loadRestaurantConfig() {
                         '<div style="font-size:4em;margin-bottom:16px;">🚫</div>' +
                         '<h2 style="color:var(--text);margin-bottom:12px;">POS Not Enabled</h2>' +
                         '<p style="color:var(--text-secondary);max-width:400px;margin:0 auto 24px;">' +
-                            'This restaurant is set up for online ordering only. ' +
-                            'Contact Nabz support if you want to enable POS for counter sales.' +
+                            'This business is set up for online ordering only. ' +
+                            'Contact Nabz support if you want to enable POS.' +
                         '</p>' +
                         '<a href="index.html" style="display:inline-block;padding:12px 24px;' +
                         'background:var(--accent);color:white;text-decoration:none;border-radius:30px;' +
@@ -1485,17 +1584,39 @@ function loadRestaurantConfig() {
     });
 }
 
+function applyBusinessLabels() {
+    var isRetail = (BUSINESS_TYPE === 'retail' || BUSINESS_TYPE === 'hybrid');
+    var brandName = document.getElementById('brandName');
+    if (brandName) {
+        brandName.textContent = isRetail ? 'Retail POS · Nabz' : 'POS · Nabz';
+    }
+    var searchInput = document.getElementById('posSearch');
+    if (searchInput) {
+        searchInput.placeholder = isRetail
+            ? 'Scan barcode / SKU or search products… (F1)'
+            : 'Search items… (F1)';
+    }
+    // Update document title
+    document.title = isRetail ? 'Retail POS' : 'POS';
+}
+
 function loadMenu() {
-    // Try network first, fall back to cached menu
     return fetch(withRestaurant(API + '/admin/menu'), {
         headers: { 'Authorization': 'Bearer ' + getToken() }
     })
     .then(function(r) { return r.json(); })
     .then(function(items) {
         MENU_ITEMS = items.map(function(i) {
-            return { id: i.id, name: i.name, price: parseFloat(i.price), category: i.category || 'Other' };
+            return {
+                id: i.id,
+                name: i.name,
+                price: parseFloat(i.price),
+                category: i.category || 'Other',
+                barcode: i.barcode || null,
+                sku: i.sku || null,
+                stock_qty: i.stock_qty != null ? parseInt(i.stock_qty) : null
+            };
         });
-        // Cache menu for offline
         try { localStorage.setItem('posCachedMenu', JSON.stringify(MENU_ITEMS)); } catch (e) {}
         IS_OFFLINE = false;
         buildCategoriesAndRender();
@@ -1591,10 +1712,16 @@ function renderGrid() {
     if (CURRENT_CAT !== 'All') list = list.filter(function(i) { return i.category === CURRENT_CAT; });
     if (CURRENT_SEARCH) {
         var q = CURRENT_SEARCH.toLowerCase();
-        list = list.filter(function(i) { return i.name.toLowerCase().indexOf(q) !== -1; });
+        list = list.filter(function(i) {
+            return i.name.toLowerCase().indexOf(q) !== -1
+                || (i.barcode && String(i.barcode).toLowerCase().indexOf(q) !== -1)
+                || (i.sku && String(i.sku).toLowerCase().indexOf(q) !== -1);
+        });
     }
     if (list.length === 0) {
-        var emptyMsg = CURRENT_SEARCH ? 'No items match "' + escapeHtml(CURRENT_SEARCH) + '"' : 'No items in this category';
+        var emptyMsg = CURRENT_SEARCH
+            ? 'No items match "' + escapeHtml(CURRENT_SEARCH) + '"'
+            : 'No items in this category';
         grid.innerHTML =
             '<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);">' +
                 '<i class="fas fa-search" style="font-size:2.5em;opacity:0.3;display:block;margin-bottom:14px;"></i>' +
@@ -1603,10 +1730,22 @@ function renderGrid() {
         return;
     }
     list.forEach(function(item) {
+        var outOfStock = (item.stock_qty !== null && item.stock_qty <= 0);
+        var stockClass = '';
+        if (item.stock_qty !== null) {
+            if (item.stock_qty <= 0) stockClass = 'empty';
+            else if (item.stock_qty <= 5) stockClass = 'low';
+        }
         var btn = document.createElement('button');
-        btn.className = 'pos-item';
-        btn.onclick = function() { addToBill(item); };
+        btn.className = 'pos-item' + (outOfStock ? ' out-of-stock' : '');
+        btn.onclick = function() {
+            if (outOfStock) { showToast('Out of stock', 'error'); return; }
+            addToBill(item);
+        };
         btn.innerHTML =
+            (item.stock_qty !== null
+                ? '<span class="item-stock ' + stockClass + '">' + item.stock_qty + '</span>'
+                : '') +
             '<div class="item-name">' + escapeHtml(item.name) + '</div>' +
             '<div class="item-price">' + formatMoney(item.price) + '</div>';
         grid.appendChild(btn);
@@ -1614,7 +1753,7 @@ function renderGrid() {
 }
 
 // ============================================================
-// SEARCH
+// SEARCH / BARCODE
 // ============================================================
 function onSearchChange() {
     var input = document.getElementById('posSearch');
@@ -1630,6 +1769,67 @@ function clearSearch() {
     document.getElementById('posSearchClear').style.display = 'none';
     renderGrid();
     input.focus();
+}
+
+// Barcode scanner: if Enter is pressed and text looks like a code, try match
+document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Enter') return;
+    var active = document.activeElement;
+    if (!active || active.id !== 'posSearch') return;
+
+    var val = active.value.trim();
+    if (!val || val.length < 4) return;
+
+    // Try exact match on barcode or SKU first
+    var found = MENU_ITEMS.find(function(i) {
+        return (i.barcode && String(i.barcode).toLowerCase() === val.toLowerCase())
+            || (i.sku && String(i.sku).toLowerCase() === val.toLowerCase());
+    });
+
+    if (found) {
+        e.preventDefault();
+        addToBill(found);
+        active.value = '';
+        CURRENT_SEARCH = '';
+        document.getElementById('posSearchClear').style.display = 'none';
+        renderGrid();
+        showToast('✓ ' + found.name, 'success');
+        // Inventory: try to fetch from server if not in menu
+    } else if (/^\d{6,}$/.test(val) && BUSINESS_TYPE !== 'restaurant') {
+        // Looks like a barcode → try server lookup
+        e.preventDefault();
+        lookupBarcodeOnServer(val);
+    }
+});
+
+function lookupBarcodeOnServer(code) {
+    fetch(withRestaurant(API + '/menu/barcode/' + encodeURIComponent(code)), {
+        headers: { 'Authorization': 'Bearer ' + getToken() }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(item) {
+        if (item && item.id) {
+            addToBill({
+                id: item.id,
+                name: item.name,
+                price: parseFloat(item.price),
+                barcode: item.barcode || null,
+                sku: item.sku || null,
+                stock_qty: item.stock_qty != null ? parseInt(item.stock_qty) : null
+            });
+            showToast('✓ ' + item.name, 'success');
+        } else {
+            showToast('Barcode not found: ' + code, 'error');
+        }
+        var searchInput = document.getElementById('posSearch');
+        searchInput.value = '';
+        CURRENT_SEARCH = '';
+        document.getElementById('posSearchClear').style.display = 'none';
+        renderGrid();
+    })
+    .catch(function() {
+        showToast('Could not look up barcode', 'error');
+    });
 }
 
 // ============================================================
@@ -1655,7 +1855,7 @@ function renderBill() {
             '<div class="bill-empty">' +
                 '<i class="fas fa-hand-pointer"></i>' +
                 '<div>Tap items to add</div>' +
-                '<div class="bill-empty-hint">Or search above to find items faster</div>' +
+                '<div class="bill-empty-hint">Or search / scan above to find items faster</div>' +
             '</div>';
         document.getElementById('billSubtotal').textContent = formatMoney(0);
         document.getElementById('billTotal').textContent = formatMoney(0);
@@ -1729,7 +1929,6 @@ function updateTotals() {
         taxRow.style.display = 'none';
     }
 
-    // Apply discount
     var discountAmount = 0;
     var discountRow = document.getElementById('discountRow');
     if (CURRENT_DISCOUNT) {
@@ -1911,7 +2110,6 @@ function saveCustomerInfo() {
 function openDiscount() {
     if (BILL.length === 0) return;
     if (CURRENT_DISCOUNT) {
-        // Already applied — offer to remove
         if (confirm('Remove current discount?')) {
             CURRENT_DISCOUNT = null;
             renderBill();
@@ -1929,14 +2127,8 @@ function closeDiscountModal() { document.getElementById('discountModal').classLi
 function applyDiscount() {
     var type = document.getElementById('discountType').value;
     var value = parseFloat(document.getElementById('discountValue').value);
-    if (isNaN(value) || value <= 0) {
-        showToast('Enter a valid discount value', 'error');
-        return;
-    }
-    if (type === 'percent' && value > 100) {
-        showToast('Percentage cannot exceed 100', 'error');
-        return;
-    }
+    if (isNaN(value) || value <= 0) { showToast('Enter a valid discount value', 'error'); return; }
+    if (type === 'percent' && value > 100) { showToast('Percentage cannot exceed 100', 'error'); return; }
     CURRENT_DISCOUNT = { type: type, value: value };
     closeDiscountModal();
     renderBill();
@@ -1997,10 +2189,12 @@ function buildQuickAmounts(total) {
     wrap.innerHTML = '';
     var currency = RESTAURANT.currency || 'BD';
     var suggestions;
-    if (currency === 'UGX') suggestions = [5000, 10000, 20000, 50000];
-    else if (currency === 'BD') suggestions = [1, 5, 10, 20];
-    else {
-        var base = Math.pow(10, Math.floor(Math.log10(total)));
+    if (currency === 'UGX' || currency === 'TZS' || currency === 'RWF' || currency === 'KES') {
+        suggestions = [5000, 10000, 20000, 50000];
+    } else if (currency === 'BD' || currency === 'KWD' || currency === 'OMR') {
+        suggestions = [1, 5, 10, 20];
+    } else {
+        var base = Math.pow(10, Math.floor(Math.log10(total || 1)));
         suggestions = [base, base * 2, base * 5, base * 10];
     }
     var shown = [total];
@@ -2153,7 +2347,6 @@ function submitPosOrder(payload) {
     })
     .catch(function(err) {
         console.error('POS order error:', err);
-        // Save to offline queue
         try {
             var queue = JSON.parse(localStorage.getItem('posOfflineQueue') || '[]');
             queue.push({ payload: payload, at: new Date().toISOString() });
@@ -2171,7 +2364,7 @@ function submitPosOrder(payload) {
 }
 
 // ============================================================
-// OFFLINE QUEUE — sync when back online
+// OFFLINE QUEUE
 // ============================================================
 function syncOfflineQueue() {
     var queue = [];
@@ -2482,13 +2675,14 @@ function openCloseDay() {
         var deliveryRev = parseFloat(data.delivery_revenue) || 0;
         var total = posRev + deliveryRev;
         var cashCollected = parseFloat(data.cash_collected) || 0;
+        var other = Math.max(0, total - cashCollected);
 
         document.getElementById('cdTotalSales').textContent = formatMoney(total);
-        document.getElementById('cdOrders').textContent     = data.total_orders || 0;
-        document.getElementById('cdPos').textContent        = formatMoney(posRev);
-        document.getElementById('cdDelivery').textContent   = formatMoney(deliveryRev);
-        document.getElementById('cdCash').textContent       = formatMoney(cashCollected);
-        document.getElementById('cdOther').textContent      = formatMoney(Math.max(0, total - cashCollected));
+        document.getElementById('cdOrders').textContent = data.total_orders || 0;
+        document.getElementById('cdPos').textContent = formatMoney(posRev);
+        document.getElementById('cdDelivery').textContent = formatMoney(deliveryRev);
+        document.getElementById('cdCash').textContent = formatMoney(cashCollected);
+        document.getElementById('cdOther').textContent = formatMoney(other);
     })
     .catch(function() {
         document.getElementById('closeDaySubtitle').textContent = 'Could not load report (offline?)';
@@ -2521,6 +2715,208 @@ function printCloseDayReport() {
         })
         .then(function() { showToast('✅ Report printed', 'success'); })
         .catch(function(err) { showToast('❌ Print failed', 'error'); console.error(err); });
+}
+
+// ============================================================
+// BACKUP / RESTORE / EXPORT
+// ============================================================
+function toggleBackupMenu(e) {
+    if (e) e.stopPropagation();
+    var menu = document.getElementById('backupMenu');
+    var btn = document.getElementById('backupMenuBtn');
+    if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+        return;
+    }
+    var rect = btn.getBoundingClientRect();
+    menu.style.top = (rect.bottom + 6) + 'px';
+    menu.style.right = Math.max(10, window.innerWidth - rect.right) + 'px';
+    menu.style.display = 'block';
+}
+function closeBackupMenu() {
+    document.getElementById('backupMenu').style.display = 'none';
+}
+document.addEventListener('click', function(e) {
+    var menu = document.getElementById('backupMenu');
+    var btn = document.getElementById('backupMenuBtn');
+    if (menu && menu.style.display === 'block'
+        && !menu.contains(e.target)
+        && btn && !btn.contains(e.target)) {
+        closeBackupMenu();
+    }
+});
+
+function posExportJSON() {
+    if (!confirm('📦 Create full backup?\n\nThis downloads ALL orders, customers, and products.\n\nContinue?')) return;
+    showToast('Fetching data…', 'info');
+
+    Promise.all([
+        fetch(withRestaurant(API + '/orders'), { headers: { 'Authorization': 'Bearer ' + getToken() } })
+            .then(function(r) { return r.json(); }).catch(function() { return []; }),
+        fetch(withRestaurant(API + '/customers'), { headers: { 'Authorization': 'Bearer ' + getToken() } })
+            .then(function(r) { return r.json(); }).catch(function() { return []; }),
+        fetch(withRestaurant(API + '/admin/menu'), { headers: { 'Authorization': 'Bearer ' + getToken() } })
+            .then(function(r) { return r.json(); }).catch(function() { return []; })
+    ])
+    .then(function(results) {
+        var backup = {
+            meta: {
+                app: RESTAURANT ? RESTAURANT.name : 'POS',
+                format: 'harvest-backup-v1',
+                exportedAt: new Date().toISOString(),
+                version: 1,
+                currency: RESTAURANT ? RESTAURANT.currency : 'UGX',
+                counts: {
+                    orders: Array.isArray(results[0]) ? results[0].length : 0,
+                    customers: Array.isArray(results[1]) ? results[1].length : 0,
+                    menu: Array.isArray(results[2]) ? results[2].length : 0
+                }
+            },
+            data: {
+                orders: Array.isArray(results[0]) ? results[0] : [],
+                customers: Array.isArray(results[1]) ? results[1] : [],
+                menu: Array.isArray(results[2]) ? results[2] : []
+            }
+        };
+        var json = JSON.stringify(backup, null, 2);
+        var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+        downloadJSONFile(json, 'pos-backup-' + stamp + '.json');
+        showToast('✅ Backup created', 'success');
+    })
+    .catch(function(err) {
+        showToast('❌ Backup failed', 'error');
+        console.error(err);
+    });
+}
+
+function posRestoreJSON(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    event.target.value = '';
+
+    if (!confirm('⚠️ RESTORE FROM BACKUP?\n\nThis will ADD data to your current database.\n\nAre you the owner? Only proceed if you are 100% sure.\n\nContinue?')) return;
+    if (!confirm('🛑 FINAL WARNING\n\nThis cannot be undone.\n\nRestore now?')) return;
+
+    showToast('Reading file…', 'info');
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var parsed;
+        try { parsed = JSON.parse(e.target.result); }
+        catch (err) { showToast('❌ Invalid JSON file', 'error'); return; }
+
+        var orders, customers, menu;
+        if (parsed && parsed.data) {
+            orders = parsed.data.orders || [];
+            customers = parsed.data.customers || [];
+            menu = parsed.data.menu || [];
+        } else if (parsed && (parsed.orders || parsed.customers || parsed.menu)) {
+            orders = parsed.orders || [];
+            customers = parsed.customers || [];
+            menu = parsed.menu || [];
+        } else {
+            showToast('❌ Invalid backup file', 'error');
+            return;
+        }
+
+        showToast('Restoring… please wait', 'info');
+
+        fetch(withRestaurant(API + '/admin/restore'), {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + getToken(),
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ orders: orders, customers: customers, menu: menu })
+        })
+        .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+        .then(function(result) {
+            if (!result.ok) {
+                showToast('❌ ' + (result.data.error || 'Restore failed'), 'error');
+                return;
+            }
+            var s = result.data.summary || {};
+            showToast('✅ Restored: ' + (s.orders || 0) + ' orders, '
+                + (s.customers || 0) + ' customers, '
+                + (s.menu || 0) + ' products', 'success');
+        })
+        .catch(function(err) {
+            showToast('❌ Network error', 'error');
+            console.error(err);
+        });
+    };
+    reader.readAsText(file);
+}
+
+function posExportOrdersCSV() {
+    showToast('Fetching orders…', 'info');
+    fetch(withRestaurant(API + '/orders'), { headers: { 'Authorization': 'Bearer ' + getToken() } })
+        .then(function(r) { return r.json(); })
+        .then(function(orders) {
+            if (!Array.isArray(orders) || orders.length === 0) {
+                showToast('No orders to export', 'error');
+                return;
+            }
+            var csv = 'Order #,Date,Customer,Phone,Address,Payment,Driver,Total,Status\n';
+            orders.forEach(function(o) {
+                csv += o.id + ',"' + (o.created_at || '') + '","'
+                    + (o.customer_name || '').replace(/"/g, '""') + '","'
+                    + (o.customer_phone || '') + '","'
+                    + (o.customer_address || '').replace(/"/g, '""') + '","'
+                    + (o.payment_method || '') + '","'
+                    + (o.driver_name || '') + '",'
+                    + (o.total || 0) + ',"'
+                    + (o.status || '') + '"\n';
+            });
+            var stamp = new Date().toISOString().split('T')[0];
+            downloadCSVFile(csv, 'orders-' + stamp + '.csv');
+            showToast('✅ Exported ' + orders.length + ' orders', 'success');
+        })
+        .catch(function() { showToast('❌ Export failed', 'error'); });
+}
+
+function posExportProductsCSV() {
+    showToast('Fetching products…', 'info');
+    fetch(withRestaurant(API + '/admin/menu'), { headers: { 'Authorization': 'Bearer ' + getToken() } })
+        .then(function(r) { return r.json(); })
+        .then(function(items) {
+            if (!Array.isArray(items) || items.length === 0) {
+                showToast('No products to export', 'error');
+                return;
+            }
+            var csv = 'ID,Category,Name,Description,Price,Barcode,SKU,Stock\n';
+            items.forEach(function(m) {
+                csv += m.id + ',"' + (m.category || '') + '","'
+                    + (m.name || '').replace(/"/g, '""') + '","'
+                    + (m.description || '').replace(/"/g, '""') + '",'
+                    + (m.price || 0) + ',"'
+                    + (m.barcode || '') + '","'
+                    + (m.sku || '') + '",'
+                    + (m.stock_qty != null ? m.stock_qty : '') + '\n';
+            });
+            var stamp = new Date().toISOString().split('T')[0];
+            downloadCSVFile(csv, 'products-' + stamp + '.csv');
+            showToast('✅ Exported ' + items.length + ' products', 'success');
+        })
+        .catch(function() { showToast('❌ Export failed', 'error'); });
+}
+
+function downloadCSVFile(csv, filename) {
+    var blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+}
+function downloadJSONFile(json, filename) {
+    var blob = new Blob([json], { type: 'application/json;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
 }
 
 // ============================================================
@@ -2614,6 +3010,7 @@ document.addEventListener('keydown', function(e) {
         closeDiscountModal();
         closePrinterModal();
         closeCloseDayModal();
+        closeBackupMenu();
         return;
     }
     if (e.key === 'Enter' && document.getElementById('paidModal').classList.contains('open')) {
