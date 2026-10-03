@@ -625,14 +625,16 @@ body.retail-mode .pos-item .item-stock.empty { background: rgba(239, 68, 68, 0.1
 .bill-payments .pay-btn:disabled { opacity: 0.4; cursor: not-allowed; filter: grayscale(0.5); }
 .bill-payments .pay-btn:not(:disabled):hover { filter: brightness(1.08); }
 .bill-payments .pay-btn i { font-size: 1em; }
-.bill-payments .pay-cash     { background: #16a34a; }
-.bill-payments .pay-card     { background: #2563eb; }
-.bill-payments .pay-benefit  { background: #8e44ad; }
-.bill-payments .pay-momo     { background: #ffcc00; color: #1e293b; }
-.bill-payments .pay-airtel   { background: #e30613; }
-.bill-payments .pay-benefitpay { background: #8e44ad; }
-.bill-payments .pay-mtnmomo  { background: #ffcc00; color: #1e293b; }
-.bill-payments .pay-airtelmoney { background: #e30613; }
+.bill-payments .pay-cash          { background: #16a34a; color: #fff; }
+.bill-payments .pay-card          { background: #2563eb; color: #fff; }
+.bill-payments .pay-benefit       { background: #8e44ad; color: #fff; }
+.bill-payments .pay-benefitpay    { background: #8e44ad; color: #fff; }
+.bill-payments .pay-momo          { background: #ffcc00; color: #1e293b; }
+.bill-payments .pay-mtnmomo       { background: #ffcc00; color: #1e293b; }
+.bill-payments .pay-airtel        { background: #e30613; color: #fff; }
+.bill-payments .pay-airtelmoney   { background: #e30613; color: #fff; }
+/* Fallback for any method name we don't recognize */
+.bill-payments .pay-default       { background: #64748b; color: #fff; }
 
 /* ============================================================
    MODALS
@@ -1449,7 +1451,35 @@ var PAYMENT_STYLES = {
 };
 function getPaymentStyle(name) {
     var key = String(name || '').toLowerCase().trim();
-    return PAYMENT_STYLES[key] || { icon: 'fa-circle-dollar-to-slot', cls: 'pay-card', label: name };
+
+    // Direct match first
+    if (PAYMENT_STYLES[key]) return PAYMENT_STYLES[key];
+
+    // Fuzzy match: if the key contains a known token, use that style
+    // (handles "MTN", "MTN Mobile Money", "mtn-momo", "Airtel Money UG", etc.)
+    var fuzzy = [
+        { test: /mtn|momo|mobile\s*money/, style: PAYMENT_STYLES['mtn momo'], label: 'MTN MoMo' },
+        { test: /airtel/,                   style: PAYMENT_STYLES['airtel'],   label: 'Airtel' },
+        { test: /benefit/,                  style: PAYMENT_STYLES['benefit'],  label: 'Benefit' },
+        { test: /card|visa|master/,         style: PAYMENT_STYLES['card'],     label: 'Card' },
+        { test: /cash/,                     style: PAYMENT_STYLES['cash'],     label: 'Cash' }
+    ];
+    for (var i = 0; i < fuzzy.length; i++) {
+        if (fuzzy[i].test.test(key)) {
+            return {
+                icon:  fuzzy[i].style.icon,
+                cls:   fuzzy[i].style.cls,
+                label: fuzzy[i].label
+            };
+        }
+    }
+
+    // Unknown method → generic slate button, but keep the original label
+    return {
+        icon:  'fa-circle-dollar-to-slot',
+        cls:   'pay-default',
+        label: name
+    };
 }
 
 // ============================================================
@@ -2348,7 +2378,10 @@ function renderPaymentButtons() {
     var wrap = document.getElementById('billPayments');
     wrap.innerHTML = '';
     var methods = getPaymentMethods();
+    console.log('💳 Backend payment_methods →', methods);
     methods.forEach(function(m) {
+        var style = getPaymentStyle(m);
+        console.log('   →', JSON.stringify(m), '→ class:', style.cls, '| label:', style.label);
         var style = getPaymentStyle(m);
         var btn = document.createElement('button');
         btn.className = 'pay-btn ' + style.cls;
