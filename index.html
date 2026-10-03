@@ -2585,17 +2585,31 @@ function exportJSONBackup() {
             );
             if (!proceed) return;
         }
-        var backup = {
-            meta: {
-                app: RESTAURANT.name,
-                format: 'harvest-backup-v1',
-                exportedAt: new Date().toISOString(),
-                version: 1,
-                currency: RESTAURANT.currency,
-                counts: { orders: orders.length, customers: customers.length, menu: menu.length }
-            },
-            data: { orders: orders, customers: customers, menu: menu }
-        };
+       // Strip base64 image data to keep backup small (images can be re-uploaded)
+var menuLight = menu.map(function(m) {
+    var copy = Object.assign({}, m);
+    if (copy.image_url && String(copy.image_url).startsWith('data:image')) {
+        copy.image_url = '';   // drop giant base64 blobs
+    }
+    return copy;
+});
+
+var backup = {
+    meta: {
+        app: RESTAURANT.name,
+        format: 'harvest-backup-v1',
+        exportedAt: new Date().toISOString(),
+        version: 1,
+        currency: RESTAURANT.currency,
+        imagesStripped: true,
+        counts: {
+            orders: orders.length,
+            customers: customers.length,
+            menu: menuLight.length
+        }
+    },
+    data: { orders: orders, customers: customers, menu: menuLight }
+};
         var json = JSON.stringify(backup, null, 2);
         var stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
         downloadJSON(json, 'harvest-backup-' + stamp + '.json');
