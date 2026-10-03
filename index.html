@@ -1493,13 +1493,14 @@ function applyBusinessTypeUI() {
         if (formTitle && formTitle.textContent === 'Add New Item') {
             formTitle.textContent = 'Add New Product';
         }
-        document.querySelectorAll('.btn-save').forEach(function(b) {
+           document.querySelectorAll('.btn-save').forEach(function(b) {
             if (b.textContent.trim() === 'Save Item') b.innerHTML = '<i class="fas fa-save"></i> Save Product';
         });
     }
-}
+
     // ⚡ Rebuild category dropdown for this business type
     populateCategoryDropdown();
+}
 
 /**
  * Format money based on the restaurant's currency.
