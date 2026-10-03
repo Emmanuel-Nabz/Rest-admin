@@ -2540,22 +2540,51 @@ function exportMenuCSV() {
 function exportJSONBackup() {
     if (!confirm('📦 Create full JSON backup?\n\nThis downloads ALL orders, customers, and menu items.\n\nContinue?')) return;
     showNotification('Fetching all data…');
-    Promise.all([
-        authFetch(withRestaurantFilter(API + '/orders')).then(function(r){return r.json();}).catch(function(){return [];}),
-        authFetch(withRestaurantFilter(API + '/customers')).then(function(r){return r.json();}).catch(function(){return [];}),
-               authFetch(withRestaurantFilter(API + '/admin/menu'))
+       Promise.all([
+        authFetch(withRestaurantFilter(API + '/orders'))
+            .then(function(r){ return r.ok ? r.json() : []; })
+            .catch(function(){ return allOrders || []; }),
+        authFetch(withRestaurantFilter(API + '/customers'))
+            .then(function(r){ return r.ok ? r.json() : []; })
+            .catch(function(){ return window.allCustomers || []; }),
+        authFetch(withRestaurantFilter(API + '/admin/menu'))
             .then(function(r) {
-                if (!r.ok) throw new Error('menu fetch failed: ' + r.status);
+                if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.json();
             })
             .catch(function(err) {
-                console.error('Backup: menu fetch failed', err);
-                return [];
+                console.warn('Backup: /admin/menu failed (' + err.message + '), trying /menu');
+                // Fallback 1: try the public /menu endpoint
+                return authFetch(withRestaurantFilter(API + '/menu'))
+                    .then(function(r){ return r.ok ? r.json() : []; })
+                    .catch(function(){ return allMenuItems || []; }); // Fallback 2: in-memory
             })
     ]).then(function(results) {
-        var orders = Array.isArray(results[0]) ? results[0] : [];
-        var customers = Array.isArray(results[1]) ? results[1] : [];
-        var menu = Array.isArray(results[2]) ? results[2] : [];
+        // Normalize: accept array OR {items:[...]} / {menu:[...]} / {data:[...]}
+        function toArray(x) {
+            if (Array.isArray(x)) return x;
+            if (x && Array.isArray(x.items)) return x.items;
+            if (x && Array.isArray(x.menu)) return x.menu;
+            if (x && Array.isArray(x.data)) return x.data;
+            return [];
+        }
+        var orders    = toArray(results[0]);
+        var customers = toArray(results[1]);
+        var menu      = toArray(results[2]);
+
+        // ⚠️ Warn if any dataset came back empty but we know there should be data
+        var warnings = [];
+        if (menu.length === 0 && (allMenuItems || []).length > 0)
+            warnings.push('• Menu is empty but you have ' + allMenuItems.length + ' items loaded on screen.');
+        if (customers.length === 0 && (window.allCustomers || []).length > 0)
+            warnings.push('• Customers is empty but you have ' + window.allCustomers.length + ' loaded on screen.');
+        if (warnings.length > 0) {
+            var proceed = confirm(
+                '⚠️ PARTIAL BACKUP\n\n' + warnings.join('\n') +
+                '\n\nDownload anyway?'
+            );
+            if (!proceed) return;
+        }
         var backup = {
             meta: {
                 app: RESTAURANT.name,
@@ -2622,9 +2651,13 @@ function performRestore(orders, customers, menu) {
             alert('❌ Restore failed:\n\n' + msg);
             return;
         }
-        var summary = result.data.summary || result.data;
-        var restored = (summary.orders || 0) + (summary.customers || 0) + (summary.menu || 0);
-        showNotification('✅ Restore complete (' + restored + ' records)');
+                var summary = result.data.summary || result.data;
+        var o = summary.orders || 0;
+        var c = summary.customers || 0;
+        var m = summary.menu || 0;
+        var total = o + c + m;
+        showNotification('✅ Restored: ' + o + ' orders, ' + c + ' customers, ' + m + ' menu items');
+        console.log('Restore summary:', { orders: o, customers: c, menu: m });
         loadOrders(); loadMenu(); loadCustomers();
     })
     .catch(function(err) { alert('❌ Network error: ' + err.message); });
