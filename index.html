@@ -882,16 +882,44 @@
                                 <textarea id="menuDesc" placeholder="Describe the item..."></textarea>
                             </div>
                         </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label id="menuPriceLabel">Price</label>
-                                <input type="number" id="menuPrice" placeholder="25000" step="1" min="0">
-                            </div>
-                            <div class="form-group">
-                                <label>Image (Optional)</label>
-                                <input type="file" id="menuImageFile" accept="image/*" onchange="previewImage(event)" style="padding: 8px;">
-                            </div>
-                        </div>
+<div class="form-row">
+    <div class="form-group">
+        <label id="menuPriceLabel">Price</label>
+        <input type="number" id="menuPrice" placeholder="25000" step="1" min="0">
+    </div>
+    <div class="form-group">
+        <label>Image (Optional)</label>
+        <input type="file" id="menuImageFile" accept="image/*" onchange="previewImage(event)" style="padding: 8px;">
+    </div>
+</div>
+
+<!-- ⚡ Retail fields (barcode / SKU / stock) -->
+<div class="form-row" id="retailFieldsRow" style="display:none;">
+    <div class="form-group">
+        <label><i class="fas fa-barcode"></i> Barcode</label>
+        <input type="text" id="menuBarcode" placeholder="e.g. 8901234567890" autocomplete="off">
+        <div style="font-size:0.78em;color:var(--text-muted);margin-top:4px;">
+            Scan or type the manufacturer's barcode (optional)
+        </div>
+    </div>
+    <div class="form-group">
+        <label><i class="fas fa-tag"></i> SKU / Code</label>
+        <input type="text" id="menuSku" placeholder="e.g. COKE-500" autocomplete="off">
+        <div style="font-size:0.78em;color:var(--text-muted);margin-top:4px;">
+            Your own code for products without a barcode
+        </div>
+    </div>
+</div>
+
+<div class="form-row" id="stockFieldRow" style="display:none;">
+    <div class="form-group">
+        <label><i class="fas fa-cubes"></i> Stock Quantity</label>
+        <input type="number" id="menuStockQty" placeholder="e.g. 48" min="0" step="1">
+        <div style="font-size:0.78em;color:var(--text-muted);margin-top:4px;">
+            Leave empty for unlimited (services, made-to-order)
+        </div>
+    </div>
+</div>
                         <div class="form-row">
                             <div class="form-group form-row-full">
                                 <label style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:10px;background:var(--accent-soft);border-radius:8px;border:1px dashed var(--accent);">
@@ -1160,10 +1188,13 @@
         <button class="modal-close" onclick="closeImportModal()">×</button>
         <h2><i class="fas fa-file-import"></i> Import Menu from CSV</h2>
 
-        <div style="background:var(--surface-secondary);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">
-            <strong style="color:var(--text);">Columns:</strong>
-            <code>category</code> <code>name</code> <code>description</code> <code>price</code> <code>is_popular</code>
-        </div>
+       <div style="background:var(--surface-secondary);border-radius:var(--radius);padding:10px 12px;margin-bottom:12px;font-size:0.82rem;color:var(--text-secondary);line-height:1.5;">
+    <strong style="color:var(--text);">Restaurant:</strong>
+    <code>category</code> <code>name</code> <code>description</code> <code>price</code> <code>is_popular</code>
+    <br>
+    <strong style="color:var(--text);">Retail (optional):</strong>
+    <code>barcode</code> <code>sku</code> <code>stock_qty</code>
+</div>
 
         <div style="border:2px dashed var(--border);border-radius:var(--radius);padding:18px;text-align:center;margin-bottom:12px;cursor:pointer;" onclick="document.getElementById('csvFileInput').click()" id="csvDropZone">
             <input type="file" id="csvFileInput" accept=".csv,text/csv" style="display:none;" onchange="handleCsvFile(event)">
@@ -1223,14 +1254,15 @@ var RESTAURANT = {
     delivery_fee: 0.500,
     min_order: 3.000,
     logo_url: 'logo.png',
-    pos_enabled: 0
+    pos_enabled: 0,
+    business_type: 'restaurant'   // ⚡ NEW
 };
 
 function loadRestaurantInfo() {
     return authFetch(API + '/admin/restaurant-info')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-           if (data && !data.error) {
+        if (data && !data.error) {
     RESTAURANT.id = data.id;
     RESTAURANT.name = data.name || RESTAURANT.name;
     RESTAURANT.currency = data.currency || RESTAURANT.currency;
@@ -1238,6 +1270,7 @@ function loadRestaurantInfo() {
     RESTAURANT.min_order = parseFloat(data.min_order) || RESTAURANT.min_order;
     RESTAURANT.logo_url = data.logo_url || RESTAURANT.logo_url;
     RESTAURANT.pos_enabled = parseInt(data.pos_enabled) || 0;
+    RESTAURANT.business_type = data.business_type || 'restaurant';   // ⚡ NEW
     applyRestaurantBranding();
 }
             return RESTAURANT;
@@ -1335,7 +1368,7 @@ function applyRestaurantBranding() {
     var priceLabel = document.getElementById('menuPriceLabel');
     if (priceLabel) priceLabel.textContent = 'Price (' + RESTAURANT.currency + ')';
 
-    var priceInput = document.getElementById('menuPrice');
+       var priceInput = document.getElementById('menuPrice');
     if (priceInput) {
         if (RESTAURANT.currency === 'UGX') {
             priceInput.placeholder = '25000';
@@ -1348,8 +1381,39 @@ function applyRestaurantBranding() {
             priceInput.step = '0.01';
         }
     }
+
+    // ⚡ Retail mode adjustments
+    applyBusinessTypeUI();
 }
 
+function applyBusinessTypeUI() {
+    var isRetail = (RESTAURANT.business_type === 'retail' || RESTAURANT.business_type === 'hybrid');
+
+    // Show/hide retail fields in the form
+    var retailFieldsRow = document.getElementById('retailFieldsRow');
+    var stockFieldRow = document.getElementById('stockFieldRow');
+    if (retailFieldsRow) retailFieldsRow.style.display = isRetail ? '' : 'none';
+    if (stockFieldRow) stockFieldRow.style.display = isRetail ? '' : 'none';
+
+    // Rename "Menu" → "Products" for retail
+    if (isRetail) {
+        var menuTab = document.getElementById('tabMenu');
+        if (menuTab) {
+            menuTab.querySelector('span').textContent = 'Products';
+        }
+        var menuHeader = document.querySelector('#tabMenuContent .orders-header h2');
+        if (menuHeader) {
+            menuHeader.innerHTML = '<i class="fas fa-box"></i> Product Management';
+        }
+        var formTitle = document.getElementById('menuFormTitle');
+        if (formTitle && formTitle.textContent === 'Add New Item') {
+            formTitle.textContent = 'Add New Product';
+        }
+        document.querySelectorAll('.btn-save').forEach(function(b) {
+            if (b.textContent.trim() === 'Save Item') b.innerHTML = '<i class="fas fa-save"></i> Save Product';
+        });
+    }
+}
 /**
  * Format money based on the restaurant's currency.
  *  - UGX: no decimals, integer with thousands separators (e.g. "UGX 25,000")
@@ -2477,27 +2541,49 @@ function renderMenu() {
     var container = document.getElementById('menuList');
     if (!container) return;
     if (allMenuItems.length === 0) {
-        container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No menu items yet. Add one above!</p></div>';
+        container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No items yet. Add one above!</p></div>';
         return;
     }
     var catIcons = { 'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦' };
+    var isRetail = (RESTAURANT && RESTAURANT.business_type === 'retail') 
+                || (RESTAURANT && RESTAURANT.business_type === 'hybrid');
     var html = '';
     allMenuItems.forEach(function(item) {
         var icon = catIcons[item.category] || '🍽️';
         var imageHtml = (item.image_url && item.image_url.startsWith('data:image'))
             ? '<img src="' + item.image_url + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">'
             : '<span class="item-icon">' + icon + '</span>';
+
+        // ⚡ Retail info (barcode / SKU / stock)
+        var retailMeta = '';
+        if (isRetail) {
+            var parts = [];
+            if (item.barcode) parts.push('<i class="fas fa-barcode"></i> ' + escapeHtml(item.barcode));
+            if (item.sku) parts.push('<i class="fas fa-tag"></i> ' + escapeHtml(item.sku));
+            if (item.stock_qty != null) {
+                var stockColor = item.stock_qty <= 0 ? 'var(--danger)' 
+                                : item.stock_qty <= 5 ? 'var(--warning)' 
+                                : 'var(--success)';
+                parts.push('<span style="color:' + stockColor + ';font-weight:700;"><i class="fas fa-cubes"></i> ' + item.stock_qty + ' in stock</span>');
+            }
+            if (parts.length > 0) {
+                retailMeta = '<div style="font-size:0.78em;color:var(--text-muted);margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;">' 
+                    + parts.join(' · ') + '</div>';
+            }
+        }
+
         html += '<div class="menu-item-row">' +
             '<div class="item-info">' + imageHtml +
-                              '<div class="item-details">' +
+                '<div class="item-details">' +
                     '<div class="item-name">#' + item.id + ' · ' + escapeHtml(item.name) + '</div>' +
                     '<div class="item-desc">' + escapeHtml(item.category) + ' · ' + escapeHtml(item.description || '') + '</div>' +
+                    retailMeta +
                     (item.restaurant_name
                         ? '<div style="font-size:0.72em;color:var(--accent);font-weight:700;margin-top:2px;">🏪 ' + escapeHtml(item.restaurant_name) + '</div>'
                         : '') +
                 '</div>' +
             '</div>' +
-                        '<div class="item-price">' + formatMoneyForRow(item.price, item) + '</div>' +
+            '<div class="item-price">' + formatMoneyForRow(item.price, item) + '</div>' +
             '<div class="item-actions">' +
                 '<button class="btn-edit" onclick="editMenuItem(' + item.id + ')"><i class="fas fa-edit"></i></button>' +
                 '<button class="btn-delete-item" onclick="deleteMenuItem(' + item.id + ')"><i class="fas fa-trash"></i></button>' +
@@ -2516,11 +2602,34 @@ function saveMenuItem() {
     var editId = document.getElementById('editItemId').value;
     var isPopular = document.getElementById('menuIsPopular').checked ? 1 : 0;
 
-    if (!name) { alert('Please enter an item name.'); return; }
-    if (!desc) { alert('Please enter a description.'); return; }
-    if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
+    // ⚡ Retail fields
+    var barcodeEl = document.getElementById('menuBarcode');
+    var skuEl = document.getElementById('menuSku');
+    var stockEl = document.getElementById('menuStockQty');
+    var barcode = barcodeEl ? barcodeEl.value.trim() : '';
+    var sku = skuEl ? skuEl.value.trim() : '';
+    var stockRaw = stockEl ? stockEl.value.trim() : '';
+    var stock_qty = stockRaw === '' ? null : parseInt(stockRaw);
 
-    var itemData = { category: category, name: name, description: desc, price: price, image_url: image, is_popular: isPopular };
+    if (!name) { alert('Please enter an item name.'); return; }
+    if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
+    if (stock_qty !== null && (isNaN(stock_qty) || stock_qty < 0)) {
+        alert('Stock quantity must be a positive number or empty');
+        return;
+    }
+
+    var itemData = {
+        category: category,
+        name: name,
+        description: desc,
+        price: price,
+        image_url: image,
+        is_popular: isPopular,
+        barcode: barcode || null,
+        sku: sku || null,
+        stock_qty: stock_qty
+    };
+
     var url = editId ? (API + '/menu/' + editId) : (API + '/menu');
     var method = editId ? 'PUT' : 'POST';
 
@@ -2529,15 +2638,21 @@ function saveMenuItem() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(itemData)
     })
-      .then(function() {
+    .then(function(res) {
+        return res.json().then(function(d) { return { ok: res.ok, data: d }; });
+    })
+    .then(function(result) {
+        if (!result.ok) {
+            alert('❌ ' + (result.data.error || 'Failed to save'));
+            return;
+        }
         showNotification('Item saved!');
         cancelEdit();
-        _menuCache = { data: null, time: 0, key: '' };   // bust the cache
+        _menuCache = { data: null, time: 0, key: '' };
         loadMenu();
     })
     .catch(function(error) { alert('Failed: ' + error.message); });
 }
-
 function editMenuItem(id) {
     var item = allMenuItems.find(function(i) { return i.id === id; });
     if (!item) return;
@@ -2547,6 +2662,19 @@ function editMenuItem(id) {
     document.getElementById('menuPrice').value = item.price;
     document.getElementById('menuImage').value = item.image_url || '';
     document.getElementById('menuIsPopular').checked = (item.is_popular === 1 || item.is_popular === '1' || item.is_popular === true);
+
+    // ⚡ Retail fields
+    if (document.getElementById('menuBarcode')) {
+        document.getElementById('menuBarcode').value = item.barcode || '';
+    }
+    if (document.getElementById('menuSku')) {
+        document.getElementById('menuSku').value = item.sku || '';
+    }
+    if (document.getElementById('menuStockQty')) {
+        document.getElementById('menuStockQty').value = 
+            (item.stock_qty != null && item.stock_qty !== '') ? item.stock_qty : '';
+    }
+
     if (item.image_url && item.image_url.startsWith('data:image')) {
         document.getElementById('imagePreview').src = item.image_url;
         document.getElementById('imagePreviewContainer').style.display = 'block';
@@ -2571,6 +2699,11 @@ function cancelEdit() {
     document.getElementById('editItemId').value = '';
     document.getElementById('menuFormTitle').textContent = 'Add New Item';
     document.querySelector('.btn-save').textContent = 'Save Item';
+
+    // ⚡ Reset retail fields
+    if (document.getElementById('menuBarcode')) document.getElementById('menuBarcode').value = '';
+    if (document.getElementById('menuSku')) document.getElementById('menuSku').value = '';
+    if (document.getElementById('menuStockQty')) document.getElementById('menuStockQty').value = '';
 }
 
 function deleteMenuItem(id) {
@@ -2644,6 +2777,9 @@ function parseCsv(text) {
     var idxDesc = headers.indexOf('description');
     var idxPrice = headers.indexOf('price');
     var idxPopular = headers.indexOf('is_popular');
+    var idxBarcode = headers.indexOf('barcode');
+    var idxSku = headers.indexOf('sku');
+    var idxStock = headers.indexOf('stock_qty');
     if (idxName === -1 || idxPrice === -1) throw new Error('CSV must have "name" and "price" columns');
     var items = [];
     for (var i = 1; i < lines.length; i++) {
@@ -2657,12 +2793,16 @@ function parseCsv(text) {
             name: name,
             description: idxDesc !== -1 ? (cells[idxDesc] || '').trim() : '',
             price: price,
-            is_popular: idxPopular !== -1 ? (cells[idxPopular] || '0').trim() === '1' : false
+            is_popular: idxPopular !== -1 ? (cells[idxPopular] || '0').trim() === '1' : false,
+            barcode: idxBarcode !== -1 ? (cells[idxBarcode] || '').trim() : null,
+            sku: idxSku !== -1 ? (cells[idxSku] || '').trim() : null,
+            stock_qty: idxStock !== -1 && (cells[idxStock] || '').trim() !== ''
+                ? parseInt((cells[idxStock] || '').trim())
+                : null
         });
     }
     return items;
 }
-
 function parseCsvLine(line) {
     var cells = [];
     var current = '';
@@ -2733,22 +2873,32 @@ function confirmImport() {
 }
 
 function downloadMenuTemplate() {
-    // Prices scale depends on currency
+    var isRetail = (RESTAURANT.business_type === 'retail' || RESTAURANT.business_type === 'hybrid');
     var rows;
-    if (RESTAURANT.currency === 'UGX') {
-        rows = 'Burgers,Classic Beef Burger,Grilled beef patty with lettuce tomato,25000,1\n' +
+    if (isRetail) {
+        rows = 'barcode,sku,category,name,description,price,stock_qty,is_popular\n' +
+               '8901234567890,,Drinks,Coca Cola 500ml,Chilled soft drink,2000,48,0\n' +
+               ',,Snacks,Lays Chips,Crunchy potato chips,1500,60,1\n' +
+               ',,Own Brand,Shop T-Shirt Red M,Cotton t-shirt,30000,12,0\n';
+    } else if (RESTAURANT.currency === 'UGX') {
+        rows = 'category,name,description,price,is_popular\n' +
+               'Burgers,Classic Beef Burger,Grilled beef patty with lettuce tomato,25000,1\n' +
                'Burgers,Chicken Burger,Crispy chicken fillet with mayo,22000,0\n' +
                'Pizzas,Margherita Pizza,Fresh mozzarella and basil,30000,0\n' +
                'Drinks,Coca-Cola,Chilled soft drink,3000,0\n' +
                'Desserts,Chocolate Cake,Rich chocolate slice,12000,0\n';
     } else {
-        rows = 'Burgers,Classic Beef Burger,Grilled beef patty with lettuce tomato,3.50,1\n' +
+        rows = 'category,name,description,price,is_popular\n' +
+               'Burgers,Classic Beef Burger,Grilled beef patty with lettuce tomato,3.50,1\n' +
                'Burgers,Chicken Burger,Crispy chicken fillet with mayo,3.00,0\n' +
                'Pizzas,Margherita Pizza,Fresh mozzarella and basil,4.00,0\n' +
                'Drinks,Coca-Cola,Chilled soft drink,0.80,0\n' +
                'Desserts,Chocolate Cake,Rich chocolate slice,2.50,0\n';
     }
-    var template = 'category,name,description,price,is_popular\n' + rows;
+    var header = isRetail
+        ? 'barcode,sku,category,name,description,price,stock_qty,is_popular\n'
+        : 'category,name,description,price,is_popular\n';
+    var template = header + rows;
     var blob = new Blob(['\uFEFF' + template], { type: 'text/csv;charset=utf-8;' });
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
@@ -2756,7 +2906,6 @@ function downloadMenuTemplate() {
     URL.revokeObjectURL(url);
     showNotification('📥 Template downloaded');
 }
-
 // ============================================================
 // CUSTOMERS
 // ============================================================
