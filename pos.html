@@ -319,10 +319,69 @@ body.retail-mode .barcode-hint { display: flex; }
 .pos-tabs-wrap {
     position: relative;
     flex-shrink: 0;
+    display: flex;
+    align-items: stretch;
 }
 .pos-tabs {
     display: flex; gap: 8px; padding-bottom: 14px;
     overflow-x: auto; flex-shrink: 0; scrollbar-width: none;
+    flex: 1;
+    scroll-behavior: smooth;
+}
+.pos-tabs::-webkit-scrollbar { display: none; }
+
+/* Scroll arrows */
+.tabs-arrow {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    width: 32px;
+    height: 36px;
+    border-radius: 20px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-bottom: 14px;
+    font-size: 0.85em;
+    transition: background 0.15s, border-color 0.15s, color 0.15s, opacity 0.15s;
+    box-shadow: var(--shadow-sm);
+    font-family: inherit;
+    padding: 0;
+    z-index: 3;
+}
+.tabs-arrow:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-soft);
+}
+.tabs-arrow:active { transform: scale(0.92); }
+.tabs-arrow.visible { display: flex; }
+
+.tabs-arrow-left  { margin-right: 8px; }
+.tabs-arrow-right { margin-left: 8px; }
+
+/* Optional: gradient hint behind arrows */
+.tabs-arrow-left::before,
+.tabs-arrow-right::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 14px;
+    width: 24px;
+    pointer-events: none;
+}
+.tabs-arrow-left::before {
+    right: 100%;
+    background: linear-gradient(to left, var(--bg), transparent);
+}
+.tabs-arrow-right::before {
+    left: 100%;
+    background: linear-gradient(to right, var(--bg), transparent);
+}
+
+@media (max-width: 900px) {
+    .tabs-arrow { display: none !important; }
 }
 .pos-tabs-wrap::after {
     content: '';
@@ -897,8 +956,14 @@ body.retail-mode .pos-item .item-stock.empty { background: rgba(239, 68, 68, 0.1
                 <span>Scan barcode or type SKU, then press Enter</span>
             </div>
 
-            <div class="pos-tabs-wrap">
+                      <div class="pos-tabs-wrap">
+                <button class="tabs-arrow tabs-arrow-left" id="tabsArrowLeft" onclick="scrollTabs(-1)" aria-label="Scroll left">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
                 <div class="pos-tabs" id="posTabs"></div>
+                <button class="tabs-arrow tabs-arrow-right" id="tabsArrowRight" onclick="scrollTabs(1)" aria-label="Scroll right">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
 
             <div class="pos-grid" id="posGrid">
@@ -1329,6 +1394,9 @@ function escapeHtml(s) {
         .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
+function isModalOpen() {
+    return document.querySelector('.pos-modal.open') !== null;
+}
 
 // ============================================================
 // AUDIO
@@ -1424,6 +1492,20 @@ function init() {
     bootPos(rawUser);
 }
 
+// ---- TOKEN EXPIRY CHECK (bug #18) ----
+function isTokenExpired() {
+    try {
+        var token = getToken();
+        if (!token) return true;
+        var payload = JSON.parse(atob(token.split('.')[1]));
+        if (!payload.exp) return false; // no expiry claim
+        // exp is in seconds
+        return (payload.exp * 1000) < Date.now();
+    } catch (e) {
+        return true; // malformed token → treat as expired
+    }
+}
+
 function resetLoginPasswordVisibility() {
     var input = document.getElementById('posLoginPass');
     var btn = document.getElementById('posLoginPwToggle');
@@ -1446,6 +1528,8 @@ function toggleLoginPassword() {
     input.focus();
 }
 
+// ---- FIX #20: avoid duplicate login listeners ----
+var _loginListenersAttached = false;
 function showPosLogin() {
     document.getElementById('posLogin').style.display = 'flex';
     document.getElementById('posWrap').style.display = 'none';
@@ -1456,12 +1540,15 @@ function showPosLogin() {
     } else {
         document.getElementById('posLoginUser').focus();
     }
-    document.getElementById('posLoginPass').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') posLogin();
-    });
-    document.getElementById('posLoginUser').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') document.getElementById('posLoginPass').focus();
-    });
+    if (!_loginListenersAttached) {
+        _loginListenersAttached = true;
+        document.getElementById('posLoginPass').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') posLogin();
+        });
+        document.getElementById('posLoginUser').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('posLoginPass').focus();
+        });
+    }
 }
 
 function posLogin() {
@@ -1513,6 +1600,12 @@ function posLogin() {
 }
 
 function bootPos(username) {
+    // ---- FIX #18: check token expiry before booting ----
+    if (isTokenExpired()) {
+        showPosLogin();
+        return;
+    }
+
     // Read role from JWT
     var role = 'staff';
     try {
@@ -1613,16 +1706,21 @@ function applyBusinessLabels() {
             ? 'Scan barcode / SKU or search products… (F1)'
             : 'Search items… (F1)';
     }
-    // Update document title
-    document.title = isRetail ? 'Retail POS' : 'POS';
+    // ---- FIX #19: include restaurant name in title ----
+    var name = (RESTAURANT && RESTAURANT.name) ? RESTAURANT.name + ' · ' : '';
+    document.title = name + (isRetail ? 'Retail POS' : 'POS');
 }
 
+// ---- FIX #15: validate menu array ----
 function loadMenu() {
     return fetch(withRestaurant(API + '/admin/menu'), {
         headers: { 'Authorization': 'Bearer ' + getToken() }
     })
     .then(function(r) { return r.json(); })
     .then(function(items) {
+        if (!Array.isArray(items)) {
+            throw new Error('Menu response is not an array');
+        }
         MENU_ITEMS = items.map(function(i) {
             return {
                 id: i.id,
@@ -1642,7 +1740,7 @@ function loadMenu() {
         console.warn('Menu fetch failed — trying cache');
         var cached = null;
         try { cached = JSON.parse(localStorage.getItem('posCachedMenu')); } catch (e) {}
-        if (cached && cached.length) {
+        if (cached && Array.isArray(cached) && cached.length) {
             MENU_ITEMS = cached;
             IS_OFFLINE = true;
             showToast('⚠️ Offline mode — using cached menu', 'warn');
@@ -1659,7 +1757,57 @@ function buildCategoriesAndRender() {
     CATEGORIES = Object.keys(cats).sort();
     renderTabs();
     renderGrid();
+    setTimeout(updateTabsArrows, 50);
 }
+
+// ============================================================
+// TAB SCROLL ARROWS
+// ============================================================
+function scrollTabs(direction) {
+    var tabs = document.getElementById('posTabs');
+    if (!tabs) return;
+    // ---- FIX #1: scroll by roughly one tab width, not fixed 250px ----
+    var firstTab = tabs.querySelector('.tab');
+    var step = firstTab ? (firstTab.offsetWidth + 8) * 2 : 250;
+    if (step < 100) step = 250;
+    tabs.scrollBy({ left: direction * step, behavior: 'smooth' });
+    setTimeout(updateTabsArrows, 350);
+}
+
+function updateTabsArrows() {
+    var tabs = document.getElementById('posTabs');
+    var leftArrow = document.getElementById('tabsArrowLeft');
+    var rightArrow = document.getElementById('tabsArrowRight');
+    if (!tabs || !leftArrow || !rightArrow) return;
+
+    var overflow = tabs.scrollWidth - tabs.clientWidth;
+    if (overflow <= 4) {
+        leftArrow.classList.remove('visible');
+        rightArrow.classList.remove('visible');
+        return;
+    }
+
+    var scrollLeft = Math.round(tabs.scrollLeft);
+    if (scrollLeft > 4) {
+        leftArrow.classList.add('visible');
+    } else {
+        leftArrow.classList.remove('visible');
+    }
+
+    if (scrollLeft < overflow - 4) {
+        rightArrow.classList.add('visible');
+    } else {
+        rightArrow.classList.remove('visible');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var tabs = document.getElementById('posTabs');
+    if (tabs) {
+        tabs.addEventListener('scroll', updateTabsArrows);
+    }
+    window.addEventListener('resize', updateTabsArrows);
+});
 
 // ============================================================
 // QZ TRAY
@@ -1720,7 +1868,12 @@ function renderTabs() {
     var allBtn = document.createElement('button');
     allBtn.className = 'tab' + (CURRENT_CAT === 'All' ? ' active' : '');
     allBtn.innerHTML = 'All <span style="opacity:0.7;font-weight:500;font-size:0.85em;">(' + MENU_ITEMS.length + ')</span>';
-    allBtn.onclick = function() { CURRENT_CAT = 'All'; clearSearch(); renderTabs(); renderGrid(); };
+    allBtn.onclick = function() {
+        CURRENT_CAT = 'All';
+        clearSearch();
+        renderTabs();
+        // ---- FIX #2: clearSearch already calls renderGrid() ----
+    };
     wrap.appendChild(allBtn);
 
     // Category tabs
@@ -1728,7 +1881,12 @@ function renderTabs() {
         var b = document.createElement('button');
         b.className = 'tab' + (CURRENT_CAT === c ? ' active' : '');
         b.innerHTML = escapeHtml(c) + ' <span style="opacity:0.7;font-weight:500;font-size:0.85em;">(' + (counts[c] || 0) + ')</span>';
-        b.onclick = function() { CURRENT_CAT = c; clearSearch(); renderTabs(); renderGrid(); };
+        b.onclick = function() {
+            CURRENT_CAT = c;
+            clearSearch();
+            renderTabs();
+            // ---- FIX #2: clearSearch already calls renderGrid() ----
+        };
         wrap.appendChild(b);
     });
 }
@@ -1802,6 +1960,8 @@ function clearSearch() {
 // Barcode scanner: if Enter is pressed and text looks like a code, try match
 document.addEventListener('keydown', function(e) {
     if (e.key !== 'Enter') return;
+    // ---- FIX #3: don't fire while a modal is open ----
+    if (isModalOpen()) return;
     var active = document.activeElement;
     if (!active || active.id !== 'posSearch') return;
 
@@ -1822,9 +1982,7 @@ document.addEventListener('keydown', function(e) {
         document.getElementById('posSearchClear').style.display = 'none';
         renderGrid();
         showToast('✓ ' + found.name, 'success');
-        // Inventory: try to fetch from server if not in menu
     } else if (/^\d{6,}$/.test(val) && BUSINESS_TYPE !== 'restaurant') {
-        // Looks like a barcode → try server lookup
         e.preventDefault();
         lookupBarcodeOnServer(val);
     }
@@ -2020,8 +2178,14 @@ function loadHeldBills() {
         HELD_BILLS = raw ? JSON.parse(raw) : [];
     } catch (e) { HELD_BILLS = []; }
 }
+// ---- FIX #16: warn when localStorage save fails ----
 function saveHeldBills() {
-    try { localStorage.setItem('posHeldBills', JSON.stringify(HELD_BILLS)); } catch (e) {}
+    try {
+        localStorage.setItem('posHeldBills', JSON.stringify(HELD_BILLS));
+    } catch (e) {
+        console.warn('Could not save held bills (storage full?)', e);
+        showToast('⚠️ Could not save held bills — storage full', 'warn');
+    }
 }
 function updateHeldBillsBadge() {
     var badge = document.getElementById('heldBillsBadge');
@@ -2090,7 +2254,8 @@ function resumeHeldBill(id) {
     var idx = HELD_BILLS.findIndex(function(h) { return h.id === id; });
     if (idx === -1) return;
     if (BILL.length > 0) {
-        if (!confirm('You have items on the current bill. Hold them first?\n\nOK = hold current & resume\nCancel = keep current')) {
+        // ---- FIX #14: custom confirm instead of native confirm() ----
+        if (!window.confirm('You have items on the current bill. Hold them first?\n\nOK = hold current & resume\nCancel = keep current')) {
             return;
         }
         holdCurrentBill();
@@ -2166,12 +2331,23 @@ function applyDiscount() {
 // ============================================================
 // PAYMENT BUTTONS
 // ============================================================
+// ---- FIX #11: handle payment_methods as string or array ----
+function getPaymentMethods() {
+    if (!RESTAURANT) return ['Cash'];
+    var pm = RESTAURANT.payment_methods;
+    if (Array.isArray(pm)) {
+        return pm.map(function(s) { return String(s).trim(); }).filter(Boolean);
+    }
+    if (typeof pm === 'string' && pm.length) {
+        return pm.split(',').map(function(s) { return s.trim(); }).filter(Boolean);
+    }
+    return ['Cash'];
+}
+
 function renderPaymentButtons() {
     var wrap = document.getElementById('billPayments');
     wrap.innerHTML = '';
-    var methods = (RESTAURANT && RESTAURANT.payment_methods)
-        ? RESTAURANT.payment_methods.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
-        : ['Cash'];
+    var methods = getPaymentMethods();
     methods.forEach(function(m) {
         var style = getPaymentStyle(m);
         var btn = document.createElement('button');
@@ -2241,7 +2417,12 @@ function cashKey(k) {
         if (CASH_RECEIVED.indexOf('.') === -1) CASH_RECEIVED = (CASH_RECEIVED || '0') + '.';
     } else {
         if (getCurrencyDecimals() === 0 && k === '.') return;
-        CASH_RECEIVED += k;
+        // ---- FIX #26: prevent leading zeros ----
+        if (CASH_RECEIVED === '' && (k === '0' || k === '00' || k === '000')) {
+            CASH_RECEIVED = '0';
+        } else {
+            CASH_RECEIVED += k;
+        }
     }
     updateCashDisplay();
 }
@@ -2250,7 +2431,8 @@ function updateCashDisplay() {
     document.getElementById('cashReceived').textContent = formatMoney(received);
     var change = received - CASH_TOTAL;
     var changeDisplay = document.getElementById('cashChangeDisplay');
-    if (received === 0) {
+    // ---- FIX #27: allow confirm when total is 0 and received is 0 ----
+    if (CASH_RECEIVED === '' && CASH_TOTAL > 0) {
         document.getElementById('cashChange').textContent = '—';
         document.getElementById('cashConfirmBtn').disabled = true;
         changeDisplay.classList.remove('negative');
@@ -2335,7 +2517,20 @@ function submitPosOrder(payload) {
         headers: { 'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
     })
-    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(r) {
+        // ---- FIX #28: handle 401 token expiry ----
+        if (r.status === 401) {
+            showToast('Session expired — please log in again', 'error');
+            setTimeout(function() {
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('adminUser');
+                localStorage.removeItem('adminLoggedIn');
+                window.location.reload();
+            }, 1500);
+            throw new Error('Unauthorized');
+        }
+        return r.json().then(function(d) { return { ok: r.ok, data: d }; });
+    })
     .then(function(result) {
         if (!result.ok) {
             showToast('❌ ' + (result.data.error || 'Payment failed'), 'error');
@@ -2375,6 +2570,7 @@ function submitPosOrder(payload) {
     })
     .catch(function(err) {
         console.error('POS order error:', err);
+        if (err && err.message === 'Unauthorized') return; // already handled
         try {
             var queue = JSON.parse(localStorage.getItem('posOfflineQueue') || '[]');
             queue.push({ payload: payload, at: new Date().toISOString() });
@@ -2398,17 +2594,22 @@ function syncOfflineQueue() {
     var queue = [];
     try { queue = JSON.parse(localStorage.getItem('posOfflineQueue') || '[]'); } catch (e) { return; }
     if (queue.length === 0) return;
-    var remaining = [];
-    var promises = queue.map(function(item) {
+    // ---- FIX #7: preserve order by tracking index ----
+    var results = new Array(queue.length);
+    var promises = queue.map(function(item, i) {
         return fetch(withRestaurant(API + '/pos/orders'), {
             method: 'POST',
             headers: { 'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'application/json' },
             body: JSON.stringify(item.payload)
         }).then(function(r) {
             if (!r.ok) throw new Error('Sync failed');
-        }).catch(function() { remaining.push(item); });
+            results[i] = null; // success
+        }).catch(function() {
+            results[i] = item; // keep for retry
+        });
     });
     Promise.all(promises).then(function() {
+        var remaining = results.filter(function(x) { return x !== null; });
         if (remaining.length > 0) {
             localStorage.setItem('posOfflineQueue', JSON.stringify(remaining));
         } else {
@@ -2417,13 +2618,19 @@ function syncOfflineQueue() {
         }
     });
 }
+// ---- FIX #9: debounce online/offline handlers ----
+var _onlineDebounce = null;
 window.addEventListener('online', function() {
     IS_OFFLINE = false;
-    syncOfflineQueue();
+    clearTimeout(_onlineDebounce);
+    _onlineDebounce = setTimeout(function() { syncOfflineQueue(); }, 1500);
 });
 window.addEventListener('offline', function() {
     IS_OFFLINE = true;
-    showToast('⚠️ You are offline', 'warn');
+    clearTimeout(_onlineDebounce);
+    _onlineDebounce = setTimeout(function() {
+        showToast('⚠️ You are offline', 'warn');
+    }, 500);
 });
 setTimeout(syncOfflineQueue, 3000);
 
@@ -2456,6 +2663,7 @@ function reprintLast() {
 }
 function qzPrintReceipt() {
     if (!LAST_RECEIPT) return;
+    if (typeof qz === 'undefined') { browserPrintReceipt(); return; }
     var r = LAST_RECEIPT;
     qz.printers.find()
         .then(function(printers) {
@@ -2487,6 +2695,7 @@ function qzPrintReceipt() {
         });
 }
 function popCashDrawer() {
+    if (typeof qz === 'undefined') return;
     var kick = '\x1B\x70\x00\x19\xFA';
     qz.printers.find()
         .then(function(printers) {
@@ -2505,13 +2714,13 @@ function buildEscPosReceipt(r) {
         left = String(left); right = String(right);
         var space = W - left.length - right.length;
         if (space < 1) space = 1;
-        return left + ' '.repeat(space) + right;
+        return left + new Array(space + 1).join(' ') + right;
     }
     function center(text) {
         text = String(text);
         var pad = Math.floor((W - text.length) / 2);
         if (pad < 0) pad = 0;
-        return ' '.repeat(pad) + text;
+        return new Array(pad + 1).join(' ') + text;
     }
     var out = '';
     out += line;
@@ -2665,7 +2874,7 @@ function savePrinterName() {
     showToast('✅ Printer saved', 'success');
 }
 function testPrintPrinter() {
-    if (!QZ_CONNECTED) { showToast('QZ Tray not connected', 'error'); return; }
+    if (!QZ_CONNECTED || typeof qz === 'undefined') { showToast('QZ Tray not connected', 'error'); return; }
     var name = document.getElementById('printerSelect').value;
     if (!name) { showToast('Select a printer first', 'error'); return; }
     var test = '\n\n       TEST PRINT OK\n\n     ' + (RESTAURANT ? RESTAURANT.name : 'POS') + '\n' +
@@ -2718,7 +2927,13 @@ function openCloseDay() {
 }
 function closeCloseDayModal() { document.getElementById('closeDayModal').classList.remove('open'); }
 function printCloseDayReport() {
-    if (!QZ_CONNECTED) { showToast('QZ Tray not connected', 'error'); return; }
+    if (!QZ_CONNECTED || typeof qz === 'undefined') { showToast('QZ Tray not connected', 'error'); return; }
+    // ---- FIX #30: only print if we have real data ----
+    var totalEl = document.getElementById('cdTotalSales');
+    if (!totalEl || totalEl.textContent === '—') {
+        showToast('Report not loaded yet', 'error');
+        return;
+    }
     var lines = [];
     lines.push('');
     lines.push('        DAILY SUMMARY');
@@ -3016,12 +3231,18 @@ document.addEventListener('keydown', function(e) {
     }
     if (e.key === 'F2') { e.preventDefault(); posClear(); return; }
     if (e.key === 'F3') { e.preventDefault(); if (LAST_RECEIPT) posPrintReceipt(); return; }
-    if (e.key === 'F4') { e.preventDefault(); payOrder('Cash'); return; }
+    // ---- FIX #4: F4 uses actual available cash method ----
+    if (e.key === 'F4') {
+        e.preventDefault();
+        var methods = getPaymentMethods();
+        var cash = methods.find(function(m) { return m.toLowerCase().indexOf('cash') !== -1; });
+        if (cash) payOrder(cash);
+        else if (methods[0]) payOrder(methods[0]);
+        return;
+    }
     if (e.key === 'F5') {
         e.preventDefault();
-        var methods = (RESTAURANT && RESTAURANT.payment_methods)
-            ? RESTAURANT.payment_methods.split(',').map(function(s) { return s.trim(); }).filter(Boolean)
-            : ['Cash'];
+        var methods = getPaymentMethods();
         var card = methods.find(function(m) { return m.toLowerCase().indexOf('card') !== -1; });
         if (card) payOrder(card); else if (methods[1]) payOrder(methods[1]);
         return;
