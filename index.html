@@ -2543,7 +2543,15 @@ function exportJSONBackup() {
     Promise.all([
         authFetch(withRestaurantFilter(API + '/orders')).then(function(r){return r.json();}).catch(function(){return [];}),
         authFetch(withRestaurantFilter(API + '/customers')).then(function(r){return r.json();}).catch(function(){return [];}),
-        authFetch(withRestaurantFilter(API + '/menu')).then(function(r){return r.json();}).catch(function(){return [];})
+               authFetch(withRestaurantFilter(API + '/admin/menu'))
+            .then(function(r) {
+                if (!r.ok) throw new Error('menu fetch failed: ' + r.status);
+                return r.json();
+            })
+            .catch(function(err) {
+                console.error('Backup: menu fetch failed', err);
+                return [];
+            })
     ]).then(function(results) {
         var orders = Array.isArray(results[0]) ? results[0] : [];
         var customers = Array.isArray(results[1]) ? results[1] : [];
