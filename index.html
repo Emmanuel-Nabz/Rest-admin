@@ -1288,21 +1288,21 @@ function loadMasterRestaurantFilter() {
         .then(function(r) { return r.json(); })
         .then(function(list) {
             if (!Array.isArray(list)) return;
-            var sel = document.getElementById('restaurantFilter');
-            if (!sel) return;
+            var selEl = document.getElementById('restaurantFilter');
+            if (!selEl) return;
 
             // Clear existing options (keep the "All" option)
-            while (sel.options.length > 1) sel.remove(1);
+            while (selEl.options.length > 1) selEl.remove(1);
 
             list.forEach(function(r) {
                 var opt = document.createElement('option');
                 opt.value = r.id;
                 opt.textContent = r.name + ' (' + r.currency + ')';
-                sel.appendChild(opt);
+                selEl.appendChild(opt);
             });
 
-            sel.style.display = 'inline-block';
-            sel.value = CURRENT_FILTER_RESTAURANT || '';
+            selEl.style.display = 'inline-block';
+            selEl.value = CURRENT_FILTER_RESTAURANT || '';
         })
         .catch(function(err) { console.warn('Restaurant filter load failed:', err); });
 }
@@ -1510,7 +1510,7 @@ function applyBusinessTypeUI() {
  */
 function formatMoney(amount) {
     var n = parseFloat(amount) || 0;
-    var c = RESTAURANT.currency || 'BD';
+    var c = (RESTAURANT && RESTAURANT.currency) ? RESTAURANT.currency : 'BD';
 
     if (c === 'UGX' || c === 'TZS' || c === 'RWF') {
         return c + ' ' + Math.round(n).toLocaleString('en-US');
@@ -1521,7 +1521,7 @@ function formatMoney(amount) {
     return c + ' ' + n.toFixed(2);
 }
 function formatMoneyForRow(amount, row) {
-    var c = (row && row.restaurant_currency) ? row.restaurant_currency : RESTAURANT.currency;
+    var c = (row && row.restaurant_currency) ? row.restaurant_currency : ((RESTAURANT && RESTAURANT.currency) || 'BD');
     var n = parseFloat(amount) || 0;
 
     if (c === 'UGX' || c === 'TZS' || c === 'RWF') {
@@ -1532,6 +1532,19 @@ function formatMoneyForRow(amount, row) {
     }
     return c + ' ' + n.toFixed(2);
 }
+
+// ============================================================
+// LOCAL DATE HELPERS (fix for timezone off-by-one)
+// ============================================================
+function localDateKey(dateInput) {
+    var d = (dateInput instanceof Date) ? dateInput : new Date(dateInput);
+    if (isNaN(d.getTime())) return '';
+    var y = d.getFullYear();
+    var m = String(d.getMonth() + 1).padStart(2, '0');
+    var day = String(d.getDate()).padStart(2, '0');
+    return y + '-' + m + '-' + day;
+}
+
 // ============================================================
 // THEME
 // ============================================================
@@ -1646,7 +1659,24 @@ function authFetch(url, options) {
     options.headers = options.headers || {};
     var token = localStorage.getItem('adminToken');
     if (token) options.headers['Authorization'] = 'Bearer ' + token;
-    return fetch(url, options);
+    return fetch(url, options).then(function(res) {
+        // Global 401 handler — force re-login when the token expires
+        if (res.status === 401) {
+            console.warn('Session expired — logging out');
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            localStorage.removeItem('adminLoggedIn');
+            if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
+            if (window.analyticsInterval) { clearInterval(window.analyticsInterval); window.analyticsInterval = null; }
+            if (window._reportsInterval) { clearInterval(window._reportsInterval); window._reportsInterval = null; }
+            document.getElementById('dashboardPage').style.display = 'none';
+            document.getElementById('loginPage').style.display = 'flex';
+            var errEl = document.getElementById('loginError');
+            if (errEl) errEl.textContent = 'Your session has expired. Please log in again.';
+            throw new Error('Unauthorized');
+        }
+        return res;
+    });
 }
 function currentUserRole() {
     try {
@@ -1838,6 +1868,7 @@ function doLogout() {
         localStorage.removeItem('adminLoggedIn');
         if (ordersInterval) { clearInterval(ordersInterval); ordersInterval = null; }
         if (window.analyticsInterval) { clearInterval(window.analyticsInterval); window.analyticsInterval = null; }
+        if (window._reportsInterval) { clearInterval(window._reportsInterval); window._reportsInterval = null; }
         document.getElementById('dashboardPage').style.display = 'none';
         document.getElementById('loginPage').style.display = 'flex';
         document.getElementById('loginPassword').value = '';
@@ -1962,6 +1993,7 @@ function showTrialBanner() {
     if (payload.trial_ends_at) {
         var endsAt = new Date(payload.trial_ends_at);
         var daysLeft = Math.ceil((endsAt - new Date()) / (1000 * 60 * 60 * 24));
+        if (isNaN(daysLeft)) daysLeft = 0;
         var subEl = banner.querySelector('.sub');
 
         if (subEl) {
@@ -2131,7 +2163,10 @@ function loadOrders() {
     authFetch(withRestaurantFilter(API + '/orders'))
         .then(function(response) { return response.json(); })
         .then(function(data) {
-            allOrders = (Array.isArray(data) ? data : []).map(function(order) {
+            var raw = Array.isArray(data) ? data : [];
+            // Sort by id desc so allOrders[0] is the newest
+            raw.sort(function(a, b) { return (b.id || 0) - (a.id || 0); });
+            allOrders = raw.map(function(order) {
                 return {
                     id: order.id,
                     date: order.created_at,
@@ -2143,6 +2178,7 @@ function loadOrders() {
                     status: order.status || 'New',
                     driver_id: order.driver_id,
                     driver_name: order.driver_name,
+                    restaurant_currency: order.restaurant_currency || null,
                     items: order.items || []
                 };
             });
@@ -2154,7 +2190,7 @@ function loadOrders() {
                 var latest = allOrders[0];
                 sendBrowserNotification(
                     newCount === 1 ? '🔔 New Order #' + latest.id : '🔔 ' + newCount + ' New Orders',
-                    (latest.name || 'Customer') + ' · ' + formatMoney(latest.total)
+                    (latest.name || 'Customer') + ' · ' + formatMoneyForRow(latest.total, latest)
                 );
                 flashTitle(newCount);
             }
@@ -2189,19 +2225,19 @@ function applyFilters() {
     var customDate = document.getElementById('customDate').value;
 
     var today = new Date();
-    var todayStr = today.toISOString().split('T')[0];
+    var todayKey = localDateKey(today);
     var rangeStart = null, rangeEnd = null;
 
-    if (quickDate === 'today') { rangeStart = rangeEnd = todayStr; }
+    if (quickDate === 'today') { rangeStart = rangeEnd = todayKey; }
     else if (quickDate === 'yesterday') {
         var y = new Date(today); y.setDate(y.getDate() - 1);
-        rangeStart = rangeEnd = y.toISOString().split('T')[0];
+        rangeStart = rangeEnd = localDateKey(y);
     } else if (quickDate === 'week') {
         var w = new Date(today); w.setDate(w.getDate() - 6);
-        rangeStart = w.toISOString().split('T')[0]; rangeEnd = todayStr;
+        rangeStart = localDateKey(w); rangeEnd = todayKey;
     } else if (quickDate === 'month') {
         var m = new Date(today.getFullYear(), today.getMonth(), 1);
-        rangeStart = m.toISOString().split('T')[0]; rangeEnd = todayStr;
+        rangeStart = localDateKey(m); rangeEnd = todayKey;
     } else if (quickDate === 'custom' && customDate) {
         rangeStart = rangeEnd = customDate;
     }
@@ -2216,8 +2252,8 @@ function applyFilters() {
         var matchStatus = statusFilter === 'all' || order.status === statusFilter;
         var matchDate = true;
         if (rangeStart && rangeEnd && order.date) {
-            var orderDate = new Date(order.date).toISOString().split('T')[0];
-            if (orderDate < rangeStart || orderDate > rangeEnd) matchDate = false;
+            var orderKey = localDateKey(order.date);
+            if (orderKey && (orderKey < rangeStart || orderKey > rangeEnd)) matchDate = false;
         }
         return matchSearch && matchStatus && matchDate;
     });
@@ -2247,32 +2283,33 @@ function renderOrders(orders) {
 
     var html = '';
     orders.forEach(function(order) {
-        var originalIndex = allOrders.indexOf(order);
         var st = statusInfo[order.status] || statusInfo['New'];
 
+        // Use order.id for all actions so a background refresh can never
+        // point an action at the wrong order.
         var actionButtons = '';
         if (order.status === 'New' || !order.status || order.status === 'new') {
             actionButtons =
-                '<button class="btn btn-success" onclick="updateOrderStatus(' + originalIndex + ', \'Confirmed\')"><i class="fas fa-check"></i> Confirm</button>' +
-                '<button class="btn btn-danger" onclick="updateOrderStatus(' + originalIndex + ', \'Cancelled\')"><i class="fas fa-times"></i> Cancel</button>';
+                '<button class="btn btn-success" onclick="updateOrderStatus(' + order.id + ', \'Confirmed\')"><i class="fas fa-check"></i> Confirm</button>' +
+                '<button class="btn btn-danger" onclick="updateOrderStatus(' + order.id + ', \'Cancelled\')"><i class="fas fa-times"></i> Cancel</button>';
         } else if (order.status === 'Confirmed') {
             actionButtons =
-                '<button class="btn btn-primary" onclick="updateOrderStatus(' + originalIndex + ', \'Preparing\')"><i class="fas fa-fire"></i> Start Preparing</button>';
+                '<button class="btn btn-primary" onclick="updateOrderStatus(' + order.id + ', \'Preparing\')"><i class="fas fa-fire"></i> Start Preparing</button>';
         } else if (order.status === 'Preparing') {
             actionButtons =
                 '<button class="btn" style="background:var(--purple);color:#fff;border-color:var(--purple);" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-motorcycle"></i> Assign Driver</button>';
         } else if (order.status === 'On the Way') {
             actionButtons =
-                '<button class="btn btn-success" onclick="updateOrderStatus(' + originalIndex + ', \'Delivered\')"><i class="fas fa-check"></i> Mark Delivered</button>' +
+                '<button class="btn btn-success" onclick="updateOrderStatus(' + order.id + ', \'Delivered\')"><i class="fas fa-check"></i> Mark Delivered</button>' +
                 '<button class="btn btn-primary" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-sync"></i> Reassign Driver</button>';
         } else if (order.status === 'Delivered') {
             actionButtons =
                 '<span style="color: var(--success); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-check-circle"></i> Completed</span>' +
-                '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
+                '<button class="btn btn-danger" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>';
         } else if (order.status === 'Cancelled') {
             actionButtons =
                 '<span style="color: var(--danger); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-times-circle"></i> Cancelled</span>' +
-                '<button class="btn btn-danger" onclick="deleteOrder(' + originalIndex + ')"><i class="fas fa-trash"></i></button>';
+                '<button class="btn btn-danger" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>';
         }
 
         // ✅ SAFE: coerce items to an array, and support both item_name and name
@@ -2346,9 +2383,17 @@ function updateStats(orders) {
     document.getElementById('totalRevenue').textContent = formatMoney(revenue);
 }
 
-function updateOrderStatus(index, newStatus) {
-    var order = allOrders[index];
-    if (!order) return;
+// findOrderById replaces the fragile index-based lookup
+function findOrderById(id) {
+    for (var i = 0; i < allOrders.length; i++) {
+        if (allOrders[i].id === id) return allOrders[i];
+    }
+    return null;
+}
+
+function updateOrderStatus(orderId, newStatus) {
+    var order = findOrderById(orderId);
+    if (!order) { showNotification('Order not found (it may have been removed)'); return; }
 
     if (newStatus === 'Cancelled') {
         showConfirm({
@@ -2381,9 +2426,9 @@ function doUpdateOrderStatus(order, newStatus) {
     .catch(function(error) { alert('Failed to update status'); });
 }
 
-function deleteOrder(index) {
-    var order = allOrders[index];
-    if (!order) return;
+function deleteOrder(orderId) {
+    var order = findOrderById(orderId);
+    if (!order) { showNotification('Order not found (it may have been removed)'); return; }
     showConfirm({
         title: 'Delete this order?',
         message: 'Order <span class="order-ref">#' + order.id + '</span> will be permanently removed.',
@@ -2414,13 +2459,16 @@ function clearAllOrders() {
         requireTyping: 'DELETE'
     }).then(function(confirmed) {
         if (!confirmed) return;
-        var promises = allOrders.map(function(o) {
-            return authFetch(API + '/orders/' + o.id, { method: 'DELETE' }).catch(function(){});
-        });
-        Promise.all(promises).then(function() {
+        // Sequential deletes to avoid hammering the server with N parallel requests
+        (async function() {
+            for (var i = 0; i < allOrders.length; i++) {
+                try {
+                    await authFetch(API + '/orders/' + allOrders[i].id, { method: 'DELETE' });
+                } catch (e) { /* keep going */ }
+            }
             showNotification('All orders cleared');
             loadOrders();
-        });
+        })();
     });
 }
 
@@ -2458,7 +2506,9 @@ function exportCSV() {
     if (allOrders.length === 0) { alert('No orders to export.'); return; }
     var csv = 'Order #,Date,Customer,Phone,Address,Payment,Driver,Total (' + RESTAURANT.currency + '),Status\n';
     allOrders.forEach(function(o) {
-        csv += o.id + ',"' + (o.date || '') + '","' + (o.name || '').replace(/"/g, '""') + '","' + (o.phone || '') + '","' + (o.address || '').replace(/"/g, '""') + '","' + (o.payment || '') + '","' + (o.driver_name || '') + '",' + o.total.toFixed(2) + ',"' + (o.status || '') + '"\n';
+        var total = parseFloat(o.total);
+        if (isNaN(total)) total = 0;
+        csv += o.id + ',"' + (o.date || '') + '","' + (o.name || '').replace(/"/g, '""') + '","' + (o.phone || '') + '","' + (o.address || '').replace(/"/g, '""') + '","' + (o.payment || '') + '","' + (o.driver_name || '') + '",' + total.toFixed(2) + ',"' + (o.status || '') + '"\n';
     });
     downloadCSV(csv, 'orders-' + new Date().toISOString().split('T')[0] + '.csv');
     showNotification('Exported ' + allOrders.length + ' orders');
@@ -2479,7 +2529,9 @@ function exportMenuCSV() {
     if (allMenuItems.length === 0) { alert('No menu items to export.'); return; }
     var csv = 'ID,Category,Name,Description,Price (' + RESTAURANT.currency + ')\n';
     allMenuItems.forEach(function(m) {
-        csv += m.id + ',"' + (m.category || '') + '","' + (m.name || '').replace(/"/g, '""') + '","' + (m.description || '').replace(/"/g, '""') + '",' + parseFloat(m.price).toFixed(2) + '\n';
+        var p = parseFloat(m.price);
+        if (isNaN(p)) p = 0;
+        csv += m.id + ',"' + (m.category || '') + '","' + (m.name || '').replace(/"/g, '""') + '","' + (m.description || '').replace(/"/g, '""') + '",' + p.toFixed(2) + '\n';
     });
     downloadCSV(csv, 'menu-' + new Date().toISOString().split('T')[0] + '.csv');
     showNotification('Exported ' + allMenuItems.length + ' menu items');
@@ -2489,9 +2541,9 @@ function exportJSONBackup() {
     if (!confirm('📦 Create full JSON backup?\n\nThis downloads ALL orders, customers, and menu items.\n\nContinue?')) return;
     showNotification('Fetching all data…');
     Promise.all([
-        authFetch(API + '/orders').then(function(r){return r.json();}).catch(function(){return [];}),
-        authFetch(API + '/customers').then(function(r){return r.json();}).catch(function(){return [];}),
-        authFetch(API + '/menu').then(function(r){return r.json();}).catch(function(){return [];})
+        authFetch(withRestaurantFilter(API + '/orders')).then(function(r){return r.json();}).catch(function(){return [];}),
+        authFetch(withRestaurantFilter(API + '/customers')).then(function(r){return r.json();}).catch(function(){return [];}),
+        authFetch(withRestaurantFilter(API + '/menu')).then(function(r){return r.json();}).catch(function(){return [];})
     ]).then(function(results) {
         var orders = Array.isArray(results[0]) ? results[0] : [];
         var customers = Array.isArray(results[1]) ? results[1] : [];
@@ -2548,7 +2600,7 @@ function importJSONBackup(event) {
 
 function performRestore(orders, customers, menu) {
     showNotification('Restoring… do not close this tab');
-    authFetch(API + '/admin/restore', {
+    authFetch(withRestaurantFilter(API + '/admin/restore'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orders: orders, customers: customers, menu: menu })
@@ -2576,7 +2628,9 @@ function performRestore(orders, customers, menu) {
 var _menuCache = { data: null, time: 0, key: '' };
 
 function loadMenu() {
-    var cacheKey = String(CURRENT_FILTER_RESTAURANT || 'all');
+    // Include RESTAURANT.id in the cache key so switching users/restaurants
+    // never serves stale data from a previous session.
+    var cacheKey = String(CURRENT_FILTER_RESTAURANT || 'all') + '::' + String(RESTAURANT.id || 'noid');
     var now = Date.now();
 
     // Serve from cache for 60 seconds if same restaurant
@@ -2602,6 +2656,12 @@ function loadMenu() {
 function previewImage(event) {
     var file = event.target.files[0];
     if (!file) return;
+    // Validate that this is actually an image
+    if (!file.type || file.type.indexOf('image/') !== 0) {
+        alert('❌ Please choose an image file (JPG, PNG, etc.)');
+        event.target.value = '';
+        return;
+    }
     var reader = new FileReader();
     reader.onload = function(e) {
         var img = new Image();
@@ -2620,6 +2680,10 @@ function previewImage(event) {
             document.getElementById('imagePreviewContainer').style.display = 'block';
             document.getElementById('menuImage').value = compressed;
         };
+        img.onerror = function() {
+            alert('❌ Could not read that image file.');
+            event.target.value = '';
+        };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
@@ -2632,13 +2696,17 @@ function renderMenu() {
         container.innerHTML = '<div class="empty"><i class="fas fa-utensils"></i><p>No items yet. Add one above!</p></div>';
         return;
     }
-    var catIcons = { 'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦' };
+    var catIcons = {
+        'Burgers':'🍔','Pizzas':'🍕','Wraps':'🌯','Sides':'🍟','Drinks':'🥤','Desserts':'🍦',
+        'Electronics':'📱','Clothing':'👕','Shoes':'👟','Accessories':'👜','Groceries':'🛒',
+        'Household':'🏠','Cosmetics':'💄','Toys':'🧸','Stationery':'✏️','Sports':'⚽','Snacks':'🍿'
+    };
     var isRetail = (RESTAURANT && RESTAURANT.business_type === 'retail') 
                 || (RESTAURANT && RESTAURANT.business_type === 'hybrid');
     var html = '';
     allMenuItems.forEach(function(item) {
         var icon = catIcons[item.category] || '🍽️';
-        var imageHtml = (item.image_url && item.image_url.startsWith('data:image'))
+        var imageHtml = (typeof item.image_url === 'string' && item.image_url.startsWith('data:image'))
             ? '<img src="' + item.image_url + '" style="width:44px;height:44px;border-radius:8px;object-fit:cover;">'
             : '<span class="item-icon">' + icon + '</span>';
 
@@ -2699,6 +2767,7 @@ function saveMenuItem() {
     var stockRaw = stockEl ? stockEl.value.trim() : '';
     var stock_qty = stockRaw === '' ? null : parseInt(stockRaw);
 
+    if (!category) { alert('Please choose a category.'); return; }
     if (!name) { alert('Please enter an item name.'); return; }
     if (isNaN(price) || price <= 0) { alert('Please enter a valid price.'); return; }
     if (stock_qty !== null && (isNaN(stock_qty) || stock_qty < 0)) {
@@ -2763,7 +2832,7 @@ function editMenuItem(id) {
             (item.stock_qty != null && item.stock_qty !== '') ? item.stock_qty : '';
     }
 
-    if (item.image_url && item.image_url.startsWith('data:image')) {
+    if (typeof item.image_url === 'string' && item.image_url.startsWith('data:image')) {
         document.getElementById('imagePreview').src = item.image_url;
         document.getElementById('imagePreviewContainer').style.display = 'block';
     } else {
@@ -2796,7 +2865,7 @@ function cancelEdit() {
 
 function deleteMenuItem(id) {
     var item = allMenuItems.find(function(i) { return i.id === id; });
-    if (!item) return;
+    if (!item) { showNotification('Item not found (it may have been removed)'); return; }
     showConfirm({
         title: 'Delete this item?',
         message: '<strong>' + escapeHtml(item.name) + '</strong> will be permanently removed from the menu.',
@@ -2808,6 +2877,7 @@ function deleteMenuItem(id) {
         authFetch(API + '/menu/' + id, { method: 'DELETE' })
             .then(function() {
                 showNotification('Item deleted');
+                _menuCache = { data: null, time: 0, key: '' };
                 loadMenu();
             })
             .catch(function(error) { alert('Failed to delete item'); });
@@ -2838,6 +2908,13 @@ function closeImportModal() {
 function handleCsvFile(event) {
     var file = event.target.files[0];
     if (!file) return;
+    // Validate file type
+    var nameOk = /\.csv$/i.test(file.name);
+    var typeOk = !file.type || file.type.indexOf('csv') !== -1 || file.type.indexOf('text') === 0;
+    if (!nameOk && !typeOk) {
+        document.getElementById('importError').textContent = '❌ Please choose a .csv file';
+        return;
+    }
     if (file.size > 5 * 1024 * 1024) { document.getElementById('importError').textContent = '❌ File too large'; return; }
     var reader = new FileReader();
     reader.onload = function(e) {
@@ -2857,6 +2934,8 @@ function handleCsvFile(event) {
 }
 
 function parseCsv(text) {
+    // Strip UTF-8 BOM if present (Excel adds one)
+    text = String(text).replace(/^\uFEFF/, '');
     var lines = text.split(/\r?\n/).filter(function(l) { return l.trim(); });
     if (lines.length < 2) return [];
     var headers = parseCsvLine(lines[0]).map(function(h) { return h.toLowerCase().trim().replace(/^["']|["']$/g, ''); });
@@ -2876,17 +2955,21 @@ function parseCsv(text) {
         var name = (cells[idxName] || '').trim();
         var price = parseFloat((cells[idxPrice] || '').replace(/[^\d.\-]/g, ''));
         if (!name || isNaN(price)) continue;
+        // Accept 1, true, yes, y for is_popular
+        var popularRaw = idxPopular !== -1 ? String(cells[idxPopular] || '').trim().toLowerCase() : '';
+        var isPopular = (popularRaw === '1' || popularRaw === 'true' || popularRaw === 'yes' || popularRaw === 'y');
+        var stockRaw = idxStock !== -1 ? String(cells[idxStock] || '').trim() : '';
+        var stockVal = (stockRaw === '') ? null : parseInt(stockRaw);
+        if (stockVal !== null && isNaN(stockVal)) stockVal = null;
         items.push({
             category: idxCategory !== -1 ? (cells[idxCategory] || 'Other').trim() : 'Other',
             name: name,
             description: idxDesc !== -1 ? (cells[idxDesc] || '').trim() : '',
             price: price,
-            is_popular: idxPopular !== -1 ? (cells[idxPopular] || '0').trim() === '1' : false,
+            is_popular: isPopular,
             barcode: idxBarcode !== -1 ? (cells[idxBarcode] || '').trim() : null,
             sku: idxSku !== -1 ? (cells[idxSku] || '').trim() : null,
-            stock_qty: idxStock !== -1 && (cells[idxStock] || '').trim() !== ''
-                ? parseInt((cells[idxStock] || '').trim())
-                : null
+            stock_qty: stockVal
         });
     }
     return items;
@@ -2951,6 +3034,7 @@ function confirmImport() {
         }
         showNotification('✅ Imported ' + result.data.inserted + ' items');
         closeImportModal();
+        _menuCache = { data: null, time: 0, key: '' };
         loadMenu();
     })
     .catch(function(err) {
@@ -2994,6 +3078,7 @@ function downloadMenuTemplate() {
     URL.revokeObjectURL(url);
     showNotification('📥 Template downloaded');
 }
+
 // ============================================================
 // CUSTOMERS
 // ============================================================
@@ -3006,11 +3091,11 @@ function loadCustomers() {
             var countEl = document.getElementById('customerCount');
             if (countEl) countEl.textContent = '(' + customers.length + ')';
             if (!container) return;
+            window.allCustomers = customers;
             if (customers.length === 0) {
                 container.innerHTML = '<div class="empty"><i class="fas fa-users"></i><p>No customers registered yet</p></div>';
                 return;
             }
-            window.allCustomers = customers;
             var html = '<table class="data-table"><thead><tr>' +
                 '<th>#</th><th>Name</th><th>Phone</th><th>Address</th><th>Registered</th><th>Actions</th>' +
                 '</tr></thead><tbody>';
@@ -3030,7 +3115,10 @@ function loadCustomers() {
             html += '</tbody></table>';
             container.innerHTML = html;
         })
-        .catch(function(error) {});
+        .catch(function(error) {
+            // Clear stale cache on error so exports don't include old data
+            window.allCustomers = [];
+        });
 }
 
 function editCustomer(id) {
@@ -3208,7 +3296,7 @@ function loadAdmins() {
                 }
                 var isMe = a.id === myId;
                 var deleteBtn = isMe ? '<span style="color:var(--text-muted);font-size:0.9rem;">(you)</span>'
-                    : '<button onclick="deleteAdmin(' + a.id + ', \'' + a.username.replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>';
+                    : '<button onclick="deleteAdmin(' + a.id + ', \'' + String(a.username).replace(/'/g, "\\'") + '\')" style="background:none;border:none;color:var(--danger);cursor:pointer;padding:4px 8px;font-size:1rem;"><i class="fas fa-trash"></i></button>';
                 html += '<tr>' +
                     '<td>' + (i + 1) + '</td>' +
                     '<td style="font-weight:600;">' + escapeHtml(a.username) + trialBadge + '</td>' +
@@ -3265,6 +3353,26 @@ function createAdmin() {
 }
 
 function deleteAdmin(id, username) {
+    // Guard: prevent removing the last remaining owner
+    authFetch(withRestaurantFilter(API + '/admins'))
+        .then(function(r) { return r.json(); })
+        .then(function(admins) {
+            if (!Array.isArray(admins)) admins = [];
+            var ownerCount = admins.filter(function(a) { return a.role === 'owner'; }).length;
+            var target = admins.find(function(a) { return a.id === id; });
+            if (target && target.role === 'owner' && ownerCount <= 1) {
+                alert('❌ Cannot delete the last owner account. Create another owner first.');
+                return;
+            }
+            proceedDeleteAdmin(id, username);
+        })
+        .catch(function() {
+            // If we can't check, fall through to the confirm dialog
+            proceedDeleteAdmin(id, username);
+        });
+}
+
+function proceedDeleteAdmin(id, username) {
     showConfirm({
         title: 'Remove this admin?',
         message: '<strong>' + escapeHtml(username) + '</strong> will lose access immediately.',
@@ -3289,7 +3397,7 @@ function deleteAdmin(id, username) {
 // ============================================================
 function openAssignDriverModal(orderId) {
     currentAssigningOrderId = orderId;
-    var order = allOrders.find(function(o) { return o.id === orderId; });
+    var order = findOrderById(orderId);
     var currentDriverId = order && order.driver_id ? order.driver_id : null;
     var modal = document.getElementById('assignDriverModal');
     var select = document.getElementById('assignDriverSelect');
@@ -3312,7 +3420,7 @@ function openAssignDriverModal(orderId) {
             drivers.forEach(function(d) {
                 var label = d.username;
                 if (currentDriverId === d.id) label += ' (currently assigned)';
-                html += '<option value="' + d.id + '">' + label + '</option>';
+                html += '<option value="' + d.id + '">' + escapeHtml(label) + '</option>';
             });
             select.innerHTML = html;
             if (currentDriverId) select.value = currentDriverId;
@@ -3326,13 +3434,15 @@ function closeAssignDriverModal() {
 }
 
 function submitAssignDriver() {
-    var driverId = document.getElementById('assignDriverSelect').value;
+    var driverIdRaw = document.getElementById('assignDriverSelect').value;
     var errorEl = document.getElementById('assignDriverError');
-    if (!driverId) { errorEl.textContent = 'Please select a driver'; return; }
+    if (!driverIdRaw) { errorEl.textContent = 'Please select a driver'; return; }
+    var driverId = parseInt(driverIdRaw, 10);
+    if (isNaN(driverId) || driverId <= 0) { errorEl.textContent = 'Invalid driver selected'; return; }
     authFetch(API + '/orders/' + currentAssigningOrderId + '/assign', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ driver_id: parseInt(driverId) })
+        body: JSON.stringify({ driver_id: driverId })
     })
     .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
     .then(function(result) {
@@ -3407,40 +3517,44 @@ function exportAnalyticsCSV() {
         authFetch(base + 'top-items?' + query).then(function(r){ return r.json(); }),
         authFetch(base + 'drivers?' + query).then(function(r){ return r.json(); })
     ]).then(function(results) {
-        var s = results[0], daily = results[1], items = results[2], drivers = results[3];
+        var s = results[0] || {}, daily = results[1] || [], items = results[2] || [], drivers = results[3] || [];
         var cur = RESTAURANT.currency;
 
         var csv = '';
         csv += RESTAURANT.name.toUpperCase() + ' — ANALYTICS REPORT\n';
         csv += 'Generated,' + new Date().toLocaleString() + '\n';
-        csv += 'Range,' + (s.range && s.range.isCustom ? 'Custom' : 'Last ' + s.range.days + ' days') + '\n\n';
+        var rangeDesc = 'Unknown';
+        if (s.range) {
+            rangeDesc = s.range.isCustom ? 'Custom' : ('Last ' + (s.range.days || '?') + ' days');
+        }
+        csv += 'Range,' + rangeDesc + '\n\n';
 
         csv += 'SUMMARY\n';
-        csv += 'Total Orders,' + s.total_orders + '\n';
-        csv += 'Delivered,' + s.delivered + '\n';
-        csv += 'Cancelled,' + s.cancelled + '\n';
-        csv += 'Revenue (' + cur + '),' + s.revenue.toFixed(2) + '\n';
-        csv += 'Avg Order Value (' + cur + '),' + s.avg_order_value.toFixed(2) + '\n';
-        csv += 'Active Now,' + s.active_now + '\n\n';
+        csv += 'Total Orders,' + (s.total_orders || 0) + '\n';
+        csv += 'Delivered,' + (s.delivered || 0) + '\n';
+        csv += 'Cancelled,' + (s.cancelled || 0) + '\n';
+        csv += 'Revenue (' + cur + '),' + (parseFloat(s.revenue) || 0).toFixed(2) + '\n';
+        csv += 'Avg Order Value (' + cur + '),' + (parseFloat(s.avg_order_value) || 0).toFixed(2) + '\n';
+        csv += 'Active Now,' + (s.active_now || 0) + '\n\n';
 
         csv += 'DAILY BREAKDOWN\n';
         csv += 'Date,Orders,Delivered,Revenue\n';
         (daily || []).forEach(function(d) {
-            csv += d.day + ',' + d.orders + ',' + d.delivered + ',' + d.revenue.toFixed(2) + '\n';
+            csv += d.day + ',' + d.orders + ',' + d.delivered + ',' + (parseFloat(d.revenue) || 0).toFixed(2) + '\n';
         });
         csv += '\n';
 
         csv += 'TOP ITEMS\n';
         csv += 'Item,Quantity Sold,Revenue (' + cur + ')\n';
         (items || []).forEach(function(it) {
-            csv += '"' + it.name.replace(/"/g, '""') + '",' + it.quantity + ',' + it.revenue.toFixed(2) + '\n';
+            csv += '"' + String(it.name).replace(/"/g, '""') + '",' + it.quantity + ',' + (parseFloat(it.revenue) || 0).toFixed(2) + '\n';
         });
         csv += '\n';
 
         csv += 'DRIVER PERFORMANCE\n';
         csv += 'Driver,Deliveries,Active,Cash Collected (' + cur + '),Avg Minutes\n';
         (drivers || []).forEach(function(d) {
-            csv += '"' + d.driver_name + '",' + d.delivered + ',' + d.active + ',' + d.cash_collected.toFixed(2) + ',' + (d.avg_minutes || '') + '\n';
+            csv += '"' + String(d.driver_name) + '",' + d.delivered + ',' + d.active + ',' + (parseFloat(d.cash_collected) || 0).toFixed(2) + ',' + (d.avg_minutes || '') + '\n';
         });
 
         var stamp = new Date().toISOString().slice(0, 10);
@@ -3466,13 +3580,13 @@ function getAnalyticsQuery() {
         return 'start=' + encodeURIComponent(start) + '&end=' + encodeURIComponent(end);
     }
     if (val === 'today') {
-        var today = new Date().toISOString().slice(0, 10);
+        var today = localDateKey(new Date());
         return 'start=' + today + '&end=' + today;
     }
     if (val === 'month') {
         var now = new Date();
         var first = new Date(now.getFullYear(), now.getMonth(), 1);
-        return 'start=' + first.toISOString().slice(0, 10) + '&end=' + now.toISOString().slice(0, 10);
+        return 'start=' + localDateKey(first) + '&end=' + localDateKey(now);
     }
     return 'days=' + val;
 }
@@ -3488,10 +3602,10 @@ function onAnalyticsRangeChange() {
         if (!startInput.value) {
             var d = new Date();
             d.setDate(d.getDate() - 30);
-            startInput.value = d.toISOString().slice(0, 10);
+            startInput.value = localDateKey(d);
         }
         if (!endInput.value) {
-            endInput.value = new Date().toISOString().slice(0, 10);
+            endInput.value = localDateKey(new Date());
         }
     } else {
         custom.style.display = 'none';
@@ -3503,25 +3617,44 @@ function loadAnalytics() {
     var query = getAnalyticsQuery();
     if (!query) return;
     var base = API + '/analytics/';
+    // Use allSettled-style handling so one failing endpoint doesn't blank the whole page
     Promise.all([
-        authFetch(base + 'summary?' + query).then(function(r){ return r.json(); }),
-        authFetch(base + 'daily?' + query).then(function(r){ return r.json(); }),
-        authFetch(base + 'hourly?' + query).then(function(r){ return r.json(); }),
-        authFetch(base + 'top-items?' + query).then(function(r){ return r.json(); }),
-        authFetch(base + 'drivers?' + query).then(function(r){ return r.json(); })
+        authFetch(base + 'summary?' + query).then(function(r){ return r.json(); }).catch(function(){ return null; }),
+        authFetch(base + 'daily?' + query).then(function(r){ return r.json(); }).catch(function(){ return null; }),
+        authFetch(base + 'hourly?' + query).then(function(r){ return r.json(); }).catch(function(){ return null; }),
+        authFetch(base + 'top-items?' + query).then(function(r){ return r.json(); }).catch(function(){ return null; }),
+        authFetch(base + 'drivers?' + query).then(function(r){ return r.json(); }).catch(function(){ return null; })
     ]).then(function(results) {
-        renderAnalyticsStats(results[0]);
+        if (results[0]) renderAnalyticsStats(results[0]);
         renderDailyChart(results[1]);
         renderHourlyChart(results[2]);
         renderTopItems(results[3]);
         renderDriversTable(results[4]);
-   }).catch(function(err) {
+        if (!results[0] && !results[1] && !results[2] && !results[3] && !results[4]) {
+            showNotification('Failed to load analytics');
+        }
+    }).catch(function(err) {
         console.error('Analytics load error:', err);
         showNotification('Failed to load analytics');
     });
 }
 
 function renderAnalyticsStats(s) {
+    if (!s) return;
+    // Fill the four top stat cards too
+    var totalOrders = parseInt(s.total_orders) || 0;
+    var revenue = parseFloat(s.revenue) || 0;
+    var avg = parseFloat(s.avg_order_value) || 0;
+    var activeNow = parseInt(s.active_now) || 0;
+    var an_orders = document.getElementById('an_orders');
+    var an_revenue = document.getElementById('an_revenue');
+    var an_avg = document.getElementById('an_avg');
+    var an_active = document.getElementById('an_active');
+    if (an_orders) an_orders.textContent = totalOrders;
+    if (an_revenue) an_revenue.textContent = formatMoney(revenue);
+    if (an_avg) an_avg.textContent = formatMoney(avg);
+    if (an_active) an_active.textContent = activeNow;
+
     // ⚡ POS vs Delivery split
     var posRev = parseFloat(s.pos_revenue) || 0;
     var delRev = parseFloat(s.delivery_revenue) || 0;
@@ -3567,6 +3700,11 @@ function renderDailyChart(data) {
         }
         return;
     }
+
+    // Sort ascending by day so the line is monotonic
+    data = data.slice().sort(function(a, b) {
+        return String(a.day).localeCompare(String(b.day));
+    });
 
     var parentEl = canvas.parentNode;
     if (parentEl) {
@@ -3686,6 +3824,8 @@ function renderHourlyChart(data) {
 
     var labels = data.map(function(d) { return d.hour + ':00'; });
     var orders = data.map(function(d) { return d.orders; });
+    // Compute max once
+    var maxVal = orders.length ? Math.max.apply(null, orders) : 0;
 
     if (analyticsCharts.hourly) analyticsCharts.hourly.destroy();
 
@@ -3700,8 +3840,7 @@ function renderHourlyChart(data) {
                 label: 'Orders',
                 data: orders,
                 backgroundColor: orders.map(function(v) {
-                    var max = Math.max.apply(null, orders);
-                    return (v === max && v > 0) ? 'rgba(230, 126, 34, 0.85)' : 'rgba(59, 130, 246, 0.7)';
+                    return (v === maxVal && v > 0) ? 'rgba(230, 126, 34, 0.85)' : 'rgba(59, 130, 246, 0.7)';
                 }),
                 borderRadius: 4,
                 borderSkipped: false
