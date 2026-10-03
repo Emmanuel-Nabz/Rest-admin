@@ -849,28 +849,12 @@
                         <h3 id="menuFormTitle">Add New Item</h3>
                         <input type="hidden" id="editItemId" value="">
                         <div class="form-row">
-                            <div class="form-group">
-                                <label>Category</label>
-                                <select id="menuCategory">
-    <option value="Main Dishes">Main Dishes</option>
-    <option value="Breakfast">Breakfast</option>
-    <option value="Snacks">Snacks</option>
-    <option value="Grills">Grills</option>
-    <option value="Sides">Sides</option>
-    <option value="Drinks">Drinks</option>
-    <option value="Desserts">Desserts</option>
-    <option value="Vegetarian">Vegetarian</option>
-    <option value="Salads">Salads</option>
-    <option value="Fish">Fish</option>
-    <option value="Chicken">Chicken</option>
-    <option value="Beef">Beef</option>
-    <option value="Burgers">Burgers</option>
-    <option value="Pizzas">Pizzas</option>
-    <option value="Wraps">Wraps</option>
-    <option value="Juices">Juices</option>
-    <option value="Coffee & Tea">Coffee &amp; Tea</option>
-</select>
-                            </div>
+                           <div class="form-group">
+    <label>Category</label>
+    <select id="menuCategory">
+        <!-- Options populated by JS based on business_type -->
+    </select>
+</div>
                             <div class="form-group">
                                 <label>Item Name</label>
                                 <input type="text" id="menuName" placeholder="e.g. Classic Burger">
@@ -1385,6 +1369,106 @@ function applyRestaurantBranding() {
     // ⚡ Retail mode adjustments
     applyBusinessTypeUI();
 }
+// ============================================================
+// CATEGORY OPTIONS by business type
+// ============================================================
+function getCategoriesForBusinessType() {
+    var bt = RESTAURANT.business_type || 'restaurant';
+
+    if (bt === 'retail') {
+        return [
+            'Electronics',
+            'Clothing',
+            'Shoes',
+            'Accessories',
+            'Groceries',
+            'Household',
+            'Cosmetics',
+            'Toys',
+            'Stationery',
+            'Sports',
+            'Drinks',
+            'Snacks',
+            'Other'
+        ];
+    }
+
+    if (bt === 'salon') {
+        return [
+            'Haircuts',
+            'Coloring',
+            'Styling',
+            'Manicure',
+            'Pedicure',
+            'Facial',
+            'Massage',
+            'Waxing',
+            'Packages',
+            'Products',
+            'Other'
+        ];
+    }
+
+    if (bt === 'hybrid') {
+        return [
+            // Restaurant
+            'Main Dishes', 'Breakfast', 'Snacks', 'Grills', 'Sides',
+            'Burgers', 'Pizzas', 'Wraps', 'Salads', 'Desserts',
+            // Retail
+            'Electronics', 'Clothing', 'Groceries', 'Household', 'Cosmetics',
+            // Common
+            'Drinks', 'Juices', 'Coffee & Tea', 'Other'
+        ];
+    }
+
+    // Default: restaurant
+    return [
+        'Main Dishes',
+        'Breakfast',
+        'Snacks',
+        'Grills',
+        'Sides',
+        'Drinks',
+        'Desserts',
+        'Vegetarian',
+        'Salads',
+        'Fish',
+        'Chicken',
+        'Beef',
+        'Burgers',
+        'Pizzas',
+        'Wraps',
+        'Juices',
+        'Coffee & Tea'
+    ];
+}
+
+// Rebuild the category dropdown for the current business type
+function populateCategoryDropdown(selectedValue) {
+    var select = document.getElementById('menuCategory');
+    if (!select) return;
+
+    var cats = getCategoriesForBusinessType();
+    select.innerHTML = '';
+
+    cats.forEach(function(c) {
+        var opt = document.createElement('option');
+        opt.value = c;
+        opt.textContent = c;
+        select.appendChild(opt);
+    });
+
+    // If editing and the item's category isn't in our list, add it
+    if (selectedValue && cats.indexOf(selectedValue) === -1) {
+        var opt = document.createElement('option');
+        opt.value = selectedValue;
+        opt.textContent = selectedValue + ' (existing)';
+        select.appendChild(opt);
+    }
+
+    // Select the right option
+    if (selectedValue) select.value = selectedValue;
+}
 
 function applyBusinessTypeUI() {
     var isRetail = (RESTAURANT.business_type === 'retail' || RESTAURANT.business_type === 'hybrid');
@@ -1414,6 +1498,9 @@ function applyBusinessTypeUI() {
         });
     }
 }
+    // ⚡ Rebuild category dropdown for this business type
+    populateCategoryDropdown();
+
 /**
  * Format money based on the restaurant's currency.
  *  - UGX: no decimals, integer with thousands separators (e.g. "UGX 25,000")
@@ -2656,7 +2743,7 @@ function saveMenuItem() {
 function editMenuItem(id) {
     var item = allMenuItems.find(function(i) { return i.id === id; });
     if (!item) return;
-    document.getElementById('menuCategory').value = item.category;
+    populateCategoryDropdown(item.category);
     document.getElementById('menuName').value = item.name;
     document.getElementById('menuDesc').value = item.description || '';
     document.getElementById('menuPrice').value = item.price;
@@ -2688,7 +2775,7 @@ function editMenuItem(id) {
 }
 
 function cancelEdit() {
-    document.getElementById('menuCategory').value = 'Burgers';
+    populateCategoryDropdown();
     document.getElementById('menuName').value = '';
     document.getElementById('menuDesc').value = '';
     document.getElementById('menuPrice').value = '';
