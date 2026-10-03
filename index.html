@@ -1187,7 +1187,7 @@
         </div>
 
         <div id="importPreview" style="display:none;margin-bottom:12px;"></div>
-        <div id="importError" style="color:var(--danger);font-size:0.85rem;min-height:18px;margin-bottom:8px;"></div>
+       <div id="importError" style="display:none;color:var(--danger);font-size:0.85rem;padding:10px 12px;margin-bottom:10px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.25);border-radius:var(--radius);line-height:1.4;"></div>
 
         <div id="importActions" style="display:none;">
             <button class="modal-btn-primary" onclick="confirmImport()" style="background:var(--success);" id="importConfirmSticky">
@@ -2948,42 +2948,82 @@ function openImportModal() {
     document.getElementById('importCsvModal').style.display = 'flex';
     document.getElementById('csvFileInput').value = '';
     document.getElementById('importPreview').style.display = 'none';
-    document.getElementById('importActions').style.display = 'none';
-    document.getElementById('importError').textContent = '';
+    setImportActionsVisible(false);
+    setImportError('');
     parsedCsvItems = [];
     var stickyBtn = document.getElementById('importConfirmSticky');
-    if (stickyBtn) { stickyBtn.disabled = true; stickyBtn.innerHTML = '<i class="fas fa-check"></i> Import Items'; }
+    if (stickyBtn) {
+        stickyBtn.disabled = true;
+        stickyBtn.innerHTML = '<i class="fas fa-check"></i> Import Items';
+    }
 }
 
 function closeImportModal() {
     document.getElementById('importCsvModal').style.display = 'none';
+    document.getElementById('csvFileInput').value = '';
+    document.getElementById('importPreview').style.display = 'none';
+    setImportActionsVisible(false);
+    setImportError('');
     parsedCsvItems = [];
+}
+
+// Helper: show/hide the import error box
+function setImportError(msg) {
+    var el = document.getElementById('importError');
+    if (!el) return;
+    if (!msg) {
+        el.textContent = '';
+        el.style.display = 'none';
+    } else {
+        el.textContent = msg;
+        el.style.display = 'block';
+    }
+}
+
+// Helper: show/hide the import actions row
+function setImportActionsVisible(visible) {
+    var el = document.getElementById('importActions');
+    if (el) el.style.display = visible ? 'block' : 'none';
 }
 
 function handleCsvFile(event) {
     var file = event.target.files[0];
     if (!file) return;
+
+    // Reset UI state every time a new file is chosen
+    setImportError('');
+    setImportActionsVisible(false);
+    document.getElementById('importPreview').style.display = 'none';
+    parsedCsvItems = [];
+
     // Validate file type
     var nameOk = /\.csv$/i.test(file.name);
     var typeOk = !file.type || file.type.indexOf('csv') !== -1 || file.type.indexOf('text') === 0;
     if (!nameOk && !typeOk) {
-        document.getElementById('importError').textContent = '❌ Please choose a .csv file';
+        setImportError('❌ Please choose a .csv file');
         return;
     }
-    if (file.size > 5 * 1024 * 1024) { document.getElementById('importError').textContent = '❌ File too large'; return; }
+    if (file.size > 5 * 1024 * 1024) {
+        setImportError('❌ File too large (max 5 MB)');
+        return;
+    }
+
     var reader = new FileReader();
     reader.onload = function(e) {
         try {
             parsedCsvItems = parseCsv(e.target.result);
             if (parsedCsvItems.length === 0) {
-                document.getElementById('importError').textContent = '❌ No valid items found';
+                setImportError('❌ No valid items found. Check that the CSV has "name" and "price" columns with data.');
                 return;
             }
             showImportPreview();
-            document.getElementById('importError').textContent = '';
+            setImportError('');
         } catch (err) {
-            document.getElementById('importError').textContent = '❌ ' + err.message;
+            setImportError('❌ ' + err.message);
         }
+    };
+    reader.onerror = function() {
+        setImportError('❌ Could not read the file');
     };
     reader.readAsText(file);
 }
@@ -3062,6 +3102,10 @@ function showImportPreview() {
     html += '</div></div>';
     preview.innerHTML = html;
     preview.style.display = 'block';
+
+    // Reveal the action buttons row
+    setImportActionsVisible(true);
+
     var stickyBtn = document.getElementById('importConfirmSticky');
     if (stickyBtn) {
         stickyBtn.disabled = false;
