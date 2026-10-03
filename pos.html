@@ -1021,11 +1021,14 @@ body.retail-mode .pos-item .item-stock.empty { background: rgba(239, 68, 68, 0.1
                     <span class="label"><i class="fas fa-tag"></i> <span id="discountLabel">Discount</span></span>
                     <span id="billDiscount">—</span>
                 </div>
-                <div class="row" style="justify-content: flex-start; padding-top: 6px;">
-                    <button class="bill-discount-btn" id="discountBtn" onclick="openDiscount()" disabled>
-                        <i class="fas fa-tag"></i> Add Discount
-                    </button>
-                </div>
+               <div class="row" id="promoRow" style="justify-content: flex-start; padding-top: 6px; gap: 8px; display: flex; align-items: center;">
+    <input type="text" id="promoInput" placeholder="Promo code"
+           style="flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; outline: none;"
+           onkeypress="if(event.key==='Enter'){event.preventDefault();applyPromoCode();}">
+    <button class="bill-discount-btn" id="promoApplyBtn" onclick="applyPromoCode()" disabled>
+        <i class="fas fa-check"></i> Apply
+    </button>
+</div>
                 <div class="row total">
                     <span class="label">Total</span>
                     <span class="value" id="billTotal">—</span>
@@ -1210,35 +1213,7 @@ body.retail-mode .pos-item .item-stock.empty { background: rgba(239, 68, 68, 0.1
     </div>
 </div>
 
-<!-- Discount -->
-<div class="pos-modal" id="discountModal">
-    <div class="pos-modal-box">
-        <div class="icon" style="background:rgba(139,92,246,0.15);color:var(--purple);">
-            <i class="fas fa-tag"></i>
-        </div>
-        <h2>Apply Discount</h2>
-        <div class="meta">Add a percentage or fixed-amount discount</div>
-        <div class="form-field">
-            <label>Type</label>
-            <select id="discountType">
-                <option value="percent">Percentage (%)</option>
-                <option value="fixed">Fixed amount</option>
-            </select>
-        </div>
-        <div class="form-field">
-            <label id="discountValueLabel">Value</label>
-            <input type="number" id="discountValue" placeholder="e.g. 10" min="0" step="0.01">
-        </div>
-        <div class="btns" style="grid-template-columns: 1fr 1fr;">
-            <button class="btn-print" onclick="closeDiscountModal()" style="background:var(--surface-secondary);color:var(--text);border:1px solid var(--border);">
-                Cancel
-            </button>
-            <button class="btn-next" onclick="applyDiscount()" style="background:var(--purple);">
-                Apply
-            </button>
-        </div>
-    </div>
-</div>
+
 
 <!-- Printer settings -->
 <div class="pos-modal" id="printerModal">
@@ -1342,7 +1317,7 @@ var CURRENT_SEARCH = '';
 var BILL = [];
 var HELD_BILLS = [];
 var CURRENT_CUSTOMER = { name: '', phone: '' };
-var CURRENT_DISCOUNT = null;
+var CURRENT_PROMO = null;   // { id, code, type, value, amount }
 var LAST_RECEIPT = null;
 var PRINTER_MODE = 'browser';
 var QZ_CONNECTED = false;
@@ -2056,13 +2031,24 @@ function renderBill() {
     var countEl = document.getElementById('billCount');
     var clearBtn = document.getElementById('billClear');
     var holdBtn = document.getElementById('billHoldBtn');
-    var discountBtn = document.getElementById('discountBtn');
+    var promoBtn = document.getElementById('promoApplyBtn');
+    var promoInput = document.getElementById('promoInput');
 
     var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
     countEl.textContent = totalQty;
     clearBtn.disabled = BILL.length === 0;
     holdBtn.disabled = BILL.length === 0;
-    if (discountBtn) discountBtn.disabled = BILL.length === 0;
+    if (promoBtn) promoBtn.disabled = BILL.length === 0 || !!CURRENT_PROMO;
+    if (promoInput) {
+        promoInput.disabled = BILL.length === 0 || !!CURRENT_PROMO;
+        if (CURRENT_PROMO) {
+            promoInput.value = CURRENT_PROMO.code;
+            promoInput.style.borderColor = 'var(--success)';
+        } else {
+            promoInput.value = '';
+            promoInput.style.borderColor = 'var(--border)';
+        }
+    }
 
     updateCustomerStrip();
 
@@ -2145,16 +2131,22 @@ function updateTotals() {
         taxRow.style.display = 'none';
     }
 
-    var discountAmount = 0;
+      var discountAmount = 0;
     var discountRow = document.getElementById('discountRow');
-    if (CURRENT_DISCOUNT) {
-        if (CURRENT_DISCOUNT.type === 'percent') {
-            discountAmount = subtotal * (CURRENT_DISCOUNT.value / 100);
+    if (CURRENT_PROMO) {
+        if (CURRENT_PROMO.type === 'percent') {
+            discountAmount = subtotal * (CURRENT_PROMO.value / 100);
             if (discountAmount > subtotal) discountAmount = subtotal;
-            document.getElementById('discountLabel').textContent = 'Discount (' + CURRENT_DISCOUNT.value + '%)';
-        } else {
-            discountAmount = Math.min(CURRENT_DISCOUNT.value, subtotal);
-            document.getElementById('discountLabel').textContent = 'Discount (' + formatMoney(CURRENT_DISCOUNT.value) + ')';
+            document.getElementById('discountLabel').textContent =
+                'Promo ' + CURRENT_PROMO.code + ' (−' + CURRENT_PROMO.value + '%)';
+        } else if (CURRENT_PROMO.type === 'fixed') {
+            discountAmount = Math.min(CURRENT_PROMO.value, subtotal);
+            document.getElementById('discountLabel').textContent =
+                'Promo ' + CURRENT_PROMO.code;
+        } else if (CURRENT_PROMO.type === 'free_delivery') {
+            discountAmount = 0;
+            document.getElementById('discountLabel').textContent =
+                'Promo ' + CURRENT_PROMO.code + ' (Free delivery)';
         }
         document.getElementById('billDiscount').textContent = '− ' + formatMoney(discountAmount);
         discountRow.style.display = 'flex';
@@ -2194,7 +2186,7 @@ function closeClearModal() { document.getElementById('clearModal').classList.rem
 function confirmClearBill() {
     BILL = [];
     CURRENT_CUSTOMER = { name: '', phone: '' };
-    CURRENT_DISCOUNT = null;
+    CURRENT_PROMO = null;
     closeClearModal();
     renderBill();
 }
@@ -2233,12 +2225,12 @@ function holdCurrentBill() {
     var totalQty = BILL.reduce(function(s, l) { return s + l.quantity; }, 0);
     var subtotal = BILL.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
 
-    HELD_BILLS.push({
+       HELD_BILLS.push({
         id: Date.now(),
         label: label,
         items: BILL.slice(),
         customer: Object.assign({}, CURRENT_CUSTOMER),
-        discount: CURRENT_DISCOUNT ? Object.assign({}, CURRENT_DISCOUNT) : null,
+        promo: CURRENT_PROMO ? Object.assign({}, CURRENT_PROMO) : null,
         totalQty: totalQty,
         subtotal: subtotal,
         heldAt: new Date().toISOString()
@@ -2248,7 +2240,7 @@ function holdCurrentBill() {
 
     BILL = [];
     CURRENT_CUSTOMER = { name: '', phone: '' };
-    CURRENT_DISCOUNT = null;
+    CURRENT_PROMO = null;
     renderBill();
     showToast('✅ Bill held', 'success');
 }
@@ -2290,10 +2282,10 @@ function resumeHeldBill(id) {
         }
         holdCurrentBill();
     }
-    var h = HELD_BILLS[idx];
+       var h = HELD_BILLS[idx];
     BILL = h.items.slice();
     CURRENT_CUSTOMER = Object.assign({ name: '', phone: '' }, h.customer || {});
-    CURRENT_DISCOUNT = h.discount ? Object.assign({}, h.discount) : null;
+    CURRENT_PROMO = h.promo ? Object.assign({}, h.promo) : null;
     HELD_BILLS.splice(idx, 1);
     saveHeldBills();
     updateHeldBillsBadge();
@@ -2326,37 +2318,84 @@ function saveCustomerInfo() {
     updateCustomerStrip();
     showToast('✅ Customer updated', 'success');
 }
+// ============================================================
+// PROMO CODE
+// ============================================================
+function applyPromoCode() {
+    if (BILL.length === 0) { showToast('Add items first', 'error'); return; }
+    if (CURRENT_PROMO) { showToast('Remove the current promo first', 'error'); return; }
 
-// ============================================================
-// DISCOUNT
-// ============================================================
-function openDiscount() {
-    if (BILL.length === 0) return;
-    if (CURRENT_DISCOUNT) {
-        if (confirm('Remove current discount?')) {
-            CURRENT_DISCOUNT = null;
-            renderBill();
-            showToast('Discount removed');
+    var input = document.getElementById('promoInput');
+    var code = (input.value || '').trim().toUpperCase();
+    if (!code) { showToast('Enter a promo code', 'error'); input.focus(); return; }
+
+    var subtotal = BILL.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
+
+    var btn = document.getElementById('promoApplyBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+    fetch(withRestaurant(API + '/pos/promo/validate'), {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + getToken(),
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            code: code,
+            subtotal: subtotal
+        })
+    })
+    .then(function(r) { return r.json().then(function(d) { return { ok: r.ok, data: d }; }); })
+    .then(function(result) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Apply';
+
+        if (!result.ok || !result.data.valid) {
+            showToast('❌ ' + (result.data.error || 'Invalid promo code'), 'error');
+            input.style.borderColor = 'var(--danger)';
+            setTimeout(function() { input.style.borderColor = 'var(--border)'; }, 1500);
+            return;
         }
-        return;
+
+        CURRENT_PROMO = {
+            id: result.data.id,
+            code: result.data.code,
+            type: result.data.type,
+            value: parseFloat(result.data.value) || 0,
+            amount: parseFloat(result.data.discount_amount) || 0
+        };
+        renderBill();
+        showToast('✅ Promo applied: ' + CURRENT_PROMO.code, 'success');
+    })
+    .catch(function(err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Apply';
+        console.error('Promo validate error:', err);
+        showToast('Network error validating promo', 'error');
+    });
+}
+
+function removePromoCode() {
+    CURRENT_PROMO = null;
+    var input = document.getElementById('promoInput');
+    if (input) {
+        input.value = '';
+        input.style.borderColor = 'var(--border)';
     }
-    document.getElementById('discountType').value = 'percent';
-    document.getElementById('discountValue').value = '';
-    document.getElementById('discountValueLabel').textContent = 'Value';
-    document.getElementById('discountModal').classList.add('open');
-    setTimeout(function() { document.getElementById('discountValue').focus(); }, 100);
-}
-function closeDiscountModal() { document.getElementById('discountModal').classList.remove('open'); }
-function applyDiscount() {
-    var type = document.getElementById('discountType').value;
-    var value = parseFloat(document.getElementById('discountValue').value);
-    if (isNaN(value) || value <= 0) { showToast('Enter a valid discount value', 'error'); return; }
-    if (type === 'percent' && value > 100) { showToast('Percentage cannot exceed 100', 'error'); return; }
-    CURRENT_DISCOUNT = { type: type, value: value };
-    closeDiscountModal();
     renderBill();
-    showToast('✅ Discount applied', 'success');
+    showToast('Promo removed');
 }
+
+// Double-click the promo input to remove an applied promo
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('promoInput');
+    if (input) {
+        input.addEventListener('dblclick', function() {
+            if (CURRENT_PROMO) removePromoCode();
+        });
+    }
+});
 
 // ============================================================
 // PAYMENT BUTTONS
@@ -2378,10 +2417,7 @@ function renderPaymentButtons() {
     var wrap = document.getElementById('billPayments');
     wrap.innerHTML = '';
     var methods = getPaymentMethods();
-    console.log('💳 Backend payment_methods →', methods);
     methods.forEach(function(m) {
-        var style = getPaymentStyle(m);
-        console.log('   →', JSON.stringify(m), '→ class:', style.cls, '| label:', style.label);
         var style = getPaymentStyle(m);
         var btn = document.createElement('button');
         btn.className = 'pay-btn ' + style.cls;
@@ -2515,10 +2551,15 @@ function payOrder(method) {
         else { taxAmount = subtotal * (taxRate / 100); total = subtotal + taxAmount; }
     }
 
-    var discountAmount = 0;
-    if (CURRENT_DISCOUNT) {
-        if (CURRENT_DISCOUNT.type === 'percent') discountAmount = subtotal * (CURRENT_DISCOUNT.value / 100);
-        else discountAmount = Math.min(CURRENT_DISCOUNT.value, subtotal);
+       var discountAmount = 0;
+    if (CURRENT_PROMO) {
+        if (CURRENT_PROMO.type === 'percent') {
+            discountAmount = subtotal * (CURRENT_PROMO.value / 100);
+            if (discountAmount > subtotal) discountAmount = subtotal;
+        } else if (CURRENT_PROMO.type === 'fixed') {
+            discountAmount = Math.min(CURRENT_PROMO.value, subtotal);
+        }
+        // free_delivery: no subtotal change (backend handles)
     }
 
     var grand = total - discountAmount;
@@ -2531,9 +2572,8 @@ function payOrder(method) {
         payment_method: method,
         customer_name: CURRENT_CUSTOMER.name || null,
         customer_phone: CURRENT_CUSTOMER.phone || null,
-        discount_type: CURRENT_DISCOUNT ? CURRENT_DISCOUNT.type : null,
-        discount_value: CURRENT_DISCOUNT ? CURRENT_DISCOUNT.value : null,
-        discount_amount: CURRENT_DISCOUNT ? roundToCurrency(discountAmount) : 0
+        promo_code: CURRENT_PROMO ? CURRENT_PROMO.code : null
+        // discount_amount is computed by the backend — do not send from client
     };
 
     var isCash = method.toLowerCase().indexOf('cash') !== -1;
@@ -2573,7 +2613,7 @@ function submitPosOrder(payload) {
         var taxRate = parseFloat(RESTAURANT.tax_rate) || 0;
         var subtotal = payload.items.reduce(function(s, l) { return s + (l.price * l.quantity); }, 0);
 
-        LAST_RECEIPT = {
+              LAST_RECEIPT = {
             orderId: result.data.orderId,
             items: payload.items.slice(),
             subtotal: subtotal,
@@ -2585,8 +2625,8 @@ function submitPosOrder(payload) {
             change_given: payload.change_given || null,
             customer_name: payload.customer_name || null,
             customer_phone: payload.customer_phone || null,
-            discount_code: payload.discount_type ? (payload.discount_type + ' ' + payload.discount_value) : null,
-            discount_amount: payload.discount_amount || 0,
+            discount_code: CURRENT_PROMO ? CURRENT_PROMO.code : null,
+            discount_amount: result.data.discount_amount || 0,
             cashier: ADMIN.username,
             restaurantName: RESTAURANT.name || 'Receipt',
             currency: RESTAURANT.currency,
@@ -2597,21 +2637,21 @@ function submitPosOrder(payload) {
         showPaidModal(payload.total, payload.payment_method);
         BILL = [];
         CURRENT_CUSTOMER = { name: '', phone: '' };
-        CURRENT_DISCOUNT = null;
+        CURRENT_PROMO = null;
         renderBill();
         updatePayButtonsState();
     })
     .catch(function(err) {
         console.error('POS order error:', err);
         if (err && err.message === 'Unauthorized') return; // already handled
-        try {
+             try {
             var queue = JSON.parse(localStorage.getItem('posOfflineQueue') || '[]');
             queue.push({ payload: payload, at: new Date().toISOString() });
             localStorage.setItem('posOfflineQueue', JSON.stringify(queue));
             showToast('⚠️ Offline — order saved locally, will sync', 'warn');
             BILL = [];
             CURRENT_CUSTOMER = { name: '', phone: '' };
-            CURRENT_DISCOUNT = null;
+            CURRENT_PROMO = null;
             renderBill();
         } catch (e) {
             showToast('❌ Network error — order not saved', 'error');
@@ -3230,18 +3270,17 @@ function confirmLogout() {
 // ============================================================
 // MODAL BACKDROP CLICKS
 // ============================================================
-['paidModal','logoutModal','clearModal','heldModal','customerModal','discountModal','printerModal','closeDayModal'].forEach(function(id) {
+['paidModal','logoutModal','clearModal','heldModal','customerModal','printerModal','closeDayModal'].forEach(function(id) {
     var el = document.getElementById(id);
     if (!el) return;
     el.addEventListener('click', function(e) {
         if (e.target === this) {
-            var fn = {
+                       var fn = {
                 paidModal: posCloseModal,
                 logoutModal: closeLogoutModal,
                 clearModal: closeClearModal,
                 heldModal: closeHeldModal,
                 customerModal: closeCustomerModal,
-                discountModal: closeDiscountModal,
                 printerModal: closePrinterModal,
                 closeDayModal: closeCloseDayModal
             }[id];
@@ -3283,13 +3322,12 @@ document.addEventListener('keydown', function(e) {
     if (e.key === 'F6') { e.preventDefault(); posCloseModal(); return; }
     if (e.key === 'F7') { e.preventDefault(); holdCurrentBill(); return; }
     if (e.key === 'F8') { e.preventDefault(); openHeldBills(); return; }
-    if (e.key === 'Escape') {
+      if (e.key === 'Escape') {
         posCloseModal();
         closeLogoutModal();
         closeClearModal();
         closeHeldModal();
         closeCustomerModal();
-        closeDiscountModal();
         closePrinterModal();
         closeCloseDayModal();
         closeBackupMenu();
