@@ -6,6 +6,7 @@
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qz-tray@2.2.4/qz-tray.js"></script>
     <style>
         :root {
             --bg: #f5f6f8;
@@ -815,6 +816,7 @@
                         <h2><i class="fas fa-receipt"></i> Orders <span id="orderCount" style="color:var(--text-muted);font-weight:400;">(0)</span></h2>
                         <div class="actions">
                             <button class="btn" onclick="loadOrders()"><i class="fas fa-sync"></i> Refresh</button>
+                            <button class="btn" onclick="printAllPending()"><i class="fas fa-print"></i> Print Pending</button>
                             <button class="btn" onclick="toggleExportMenu(event)"><i class="fas fa-download"></i> Export <i class="fas fa-caret-down" style="font-size:0.8em;"></i></button>
                             <button class="btn btn-danger" onclick="clearAllOrders()"><i class="fas fa-trash"></i> Clear</button>
                             <div id="exportMenu">
@@ -2287,30 +2289,32 @@ function renderOrders(orders) {
 
         // Use order.id for all actions so a background refresh can never
         // point an action at the wrong order.
-        var actionButtons = '';
-        if (order.status === 'New' || !order.status || order.status === 'new') {
-            actionButtons =
-                '<button class="btn btn-success" onclick="updateOrderStatus(' + order.id + ', \'Confirmed\')"><i class="fas fa-check"></i> Confirm</button>' +
-                '<button class="btn btn-danger" onclick="updateOrderStatus(' + order.id + ', \'Cancelled\')"><i class="fas fa-times"></i> Cancel</button>';
-        } else if (order.status === 'Confirmed') {
-            actionButtons =
-                '<button class="btn btn-primary" onclick="updateOrderStatus(' + order.id + ', \'Preparing\')"><i class="fas fa-fire"></i> Start Preparing</button>';
-        } else if (order.status === 'Preparing') {
-            actionButtons =
-                '<button class="btn" style="background:var(--purple);color:#fff;border-color:var(--purple);" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-motorcycle"></i> Assign Driver</button>';
-        } else if (order.status === 'On the Way') {
-            actionButtons =
-                '<button class="btn btn-success" onclick="updateOrderStatus(' + order.id + ', \'Delivered\')"><i class="fas fa-check"></i> Mark Delivered</button>' +
-                '<button class="btn btn-primary" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-sync"></i> Reassign Driver</button>';
-        } else if (order.status === 'Delivered') {
-            actionButtons =
-                '<span style="color: var(--success); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-check-circle"></i> Completed</span>' +
-                '<button class="btn btn-danger" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>';
-        } else if (order.status === 'Cancelled') {
-            actionButtons =
-                '<span style="color: var(--danger); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-times-circle"></i> Cancelled</span>' +
-                '<button class="btn btn-danger" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>';
-        }
+      var printBtn = '<button class="btn" onclick="printOrderReceipt(' + order.id + ')"><i class="fas fa-print"></i> Print</button>';
+
+var actionButtons = printBtn + ' ';   // always available
+if (order.status === 'New' || !order.status || order.status === 'new') {
+    actionButtons +=
+        '<button class="btn btn-success" onclick="updateOrderStatus(' + order.id + ', \'Confirmed\')"><i class="fas fa-check"></i> Confirm</button>' +
+        '<button class="btn btn-danger" onclick="updateOrderStatus(' + order.id + ', \'Cancelled\')"><i class="fas fa-times"></i> Cancel</button>';
+} else if (order.status === 'Confirmed') {
+    actionButtons +=
+        '<button class="btn btn-primary" onclick="updateOrderStatus(' + order.id + ', \'Preparing\')"><i class="fas fa-fire"></i> Start Preparing</button>';
+} else if (order.status === 'Preparing') {
+    actionButtons +=
+        '<button class="btn" style="background:var(--purple);color:#fff;border-color:var(--purple);" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-motorcycle"></i> Assign Driver</button>';
+} else if (order.status === 'On the Way') {
+    actionButtons +=
+        '<button class="btn btn-success" onclick="updateOrderStatus(' + order.id + ', \'Delivered\')"><i class="fas fa-check"></i> Mark Delivered</button>' +
+        '<button class="btn btn-primary" onclick="openAssignDriverModal(' + order.id + ')"><i class="fas fa-sync"></i> Reassign Driver</button>';
+} else if (order.status === 'Delivered') {
+    actionButtons +=
+        '<span style="color: var(--success); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-check-circle"></i> Completed</span>' +
+        '<button class="btn btn-danger" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>';
+} else if (order.status === 'Cancelled') {
+    actionButtons +=
+        '<span style="color: var(--danger); font-weight: 600; font-size: 0.9rem;"><i class="fas fa-times-circle"></i> Cancelled</span>' +
+        '<button class="btn btn-danger" onclick="deleteOrder(' + order.id + ')"><i class="fas fa-trash"></i></button>';
+}
 
         // ✅ SAFE: coerce items to an array, and support both item_name and name
         var items = order.items;
@@ -4083,6 +4087,281 @@ document.addEventListener('visibilitychange', function() {
         }
     }
 });
+// ============================================================
+// ORDER RECEIPT PRINTING (admin side)
+// ============================================================
+var ADMIN_QZ_CONNECTED = false;
+var ADMIN_QZ_AVAILABLE = false;
+
+function detectQzTrayAdmin() {
+    if (typeof qz === 'undefined' || !qz.websocket) {
+        ADMIN_QZ_AVAILABLE = false;
+        return;
+    }
+    ADMIN_QZ_AVAILABLE = true;
+    qz.websocket.connect({ retries: 0, delay: 0 })
+        .then(function() {
+            ADMIN_QZ_CONNECTED = true;
+            console.log('🖨️ QZ Tray connected (admin)');
+            qz.websocket.setClosedCallbacks(function() {
+                ADMIN_QZ_CONNECTED = false;
+                console.log('🖨️ QZ Tray disconnected');
+            });
+        })
+        .catch(function() {
+            ADMIN_QZ_CONNECTED = false;
+            console.log('🖨️ QZ Tray not available — will use browser print');
+        });
+}
+document.addEventListener('DOMContentLoaded', detectQzTrayAdmin);
+
+function findOrderForPrint(id) {
+    for (var i = 0; i < allOrders.length; i++) {
+        if (allOrders[i].id === id) return allOrders[i];
+    }
+    return null;
+}
+
+function printOrderReceipt(orderId) {
+    var order = findOrderForPrint(orderId);
+    if (!order) { showNotification('Order not found'); return; }
+
+    if (ADMIN_QZ_CONNECTED && typeof qz !== 'undefined') {
+        qzPrintOrder(order);
+    } else {
+        browserPrintOrder(order);
+    }
+}
+
+function qzPrintOrder(order) {
+    qz.printers.find()
+        .then(function(printers) {
+            var name = null;
+            // Prefer a printer containing 'thermal', 'receipt', 'pos', 'tm-', 'xp-'
+            if (Array.isArray(printers)) {
+                for (var i = 0; i < printers.length; i++) {
+                    var p = String(printers[i]).toLowerCase();
+                    if (p.indexOf('thermal') !== -1 || p.indexOf('receipt') !== -1 ||
+                        p.indexOf('tm-') !== -1 || p.indexOf('xp-') !== -1 || p.indexOf('pos') !== -1) {
+                        name = printers[i]; break;
+                    }
+                }
+                if (!name) name = printers[0];
+            }
+            if (!name) throw new Error('No printer found');
+            var config = qz.configs.create(name);
+            var data = buildOrderTicketEscPos(order);
+            return qz.print(config, [{ type: 'raw', format: 'plain', data: data }]);
+        })
+        .then(function() {
+            showNotification('✅ Receipt sent to printer');
+        })
+        .catch(function(err) {
+            console.error('QZ print failed:', err);
+            showNotification('⚠️ Printer failed — using browser print');
+            browserPrintOrder(order);
+        });
+}
+
+function buildOrderTicketEscPos(order) {
+    var W = 42;
+    var line = '\n';
+    var dashes = '------------------------------------------';
+
+    function pad(left, right) {
+        left = String(left); right = String(right);
+        var space = W - left.length - right.length;
+        if (space < 1) space = 1;
+        return left + new Array(space + 1).join(' ') + right;
+    }
+    function center(text) {
+        text = String(text);
+        var p = Math.floor((W - text.length) / 2);
+        if (p < 0) p = 0;
+        return new Array(p + 1).join(' ') + text;
+    }
+
+    var cur = order.restaurant_currency || RESTAURANT.currency || 'BD';
+    function money(n) {
+        n = parseFloat(n) || 0;
+        if (cur === 'UGX' || cur === 'TZS' || cur === 'RWF') return cur + ' ' + Math.round(n).toLocaleString('en-US');
+        if (cur === 'BD' || cur === 'KWD' || cur === 'OMR') return cur + ' ' + n.toFixed(3);
+        return cur + ' ' + n.toFixed(2);
+    }
+
+    var items = order.items;
+    if (typeof items === 'string') { try { items = JSON.parse(items); } catch (e) { items = []; } }
+    if (!Array.isArray(items)) items = [];
+
+    var out = '';
+    out += line;
+    out += center(RESTAURANT.name || 'Receipt') + line;
+    out += center('DELIVERY TICKET') + line;
+    out += center('Order #' + order.id) + line;
+    out += center(new Date(order.date || Date.now()).toLocaleString()) + line;
+    out += dashes + line;
+
+    out += 'CUSTOMER' + line;
+    out += (order.name || '—') + line;
+    if (order.phone) out += 'Tel: ' + order.phone + line;
+    if (order.address) {
+        // Simple word-wrap for the address
+        var words = String(order.address).split(/\s+/);
+        var current = '';
+        words.forEach(function(w) {
+            if ((current + ' ' + w).trim().length > W) {
+                out += current.trim() + line;
+                current = w;
+            } else {
+                current += ' ' + w;
+            }
+        });
+        if (current.trim()) out += current.trim() + line;
+    }
+    out += dashes + line;
+
+    out += 'ITEMS' + line;
+    items.forEach(function(it) {
+        var qty   = parseInt(it.quantity) || 0;
+        var price = parseFloat(it.price) || 0;
+        var name  = it.item_name || it.name || 'Item';
+        var lineTotal = qty * price;
+        // Wrap long item names onto their own line
+        var left = qty + 'x ' + name;
+        if (left.length > W - 12) {
+            out += qty + 'x ' + name + line;
+            out += pad('', money(lineTotal)) + line;
+        } else {
+            out += pad(left, money(lineTotal)) + line;
+        }
+    });
+
+    out += dashes + line;
+
+    // Subtotal = sum of items
+    var subtotal = items.reduce(function(s, it) {
+        return s + ((parseInt(it.quantity) || 0) * (parseFloat(it.price) || 0));
+    }, 0);
+    out += pad('Subtotal', money(subtotal)) + line;
+
+    // Delivery fee = order.total - subtotal (fallback to 0)
+    var deliveryFee = (parseFloat(order.total) || 0) - subtotal;
+    if (deliveryFee > 0.001) {
+        out += pad('Delivery', money(deliveryFee)) + line;
+    }
+
+    out += pad('TOTAL', money(order.total)) + line;
+    out += dashes + line;
+    out += pad('Payment', order.payment || 'Cash on Delivery') + line;
+    if (order.driver_name) out += pad('Driver', order.driver_name) + line;
+    out += pad('Status', order.status || 'New') + line;
+    out += line;
+    out += center('Thank you!') + line;
+    out += line + line + line + line;
+
+    return out;
+}
+
+function browserPrintOrder(order) {
+    var cur = order.restaurant_currency || RESTAURANT.currency || 'BD';
+    function money(n) {
+        n = parseFloat(n) || 0;
+        if (cur === 'UGX' || cur === 'TZS' || cur === 'RWF') return cur + ' ' + Math.round(n).toLocaleString('en-US');
+        if (cur === 'BD' || cur === 'KWD' || cur === 'OMR') return cur + ' ' + n.toFixed(3);
+        return cur + ' ' + n.toFixed(2);
+    }
+
+    var items = order.items;
+    if (typeof items === 'string') { try { items = JSON.parse(items); } catch (e) { items = []; } }
+    if (!Array.isArray(items)) items = [];
+
+    var rows = '';
+    var subtotal = 0;
+    items.forEach(function(it) {
+        var qty   = parseInt(it.quantity) || 0;
+        var price = parseFloat(it.price) || 0;
+        var name  = it.item_name || it.name || 'Item';
+        var lt = qty * price;
+        subtotal += lt;
+        rows +=
+            '<tr>' +
+                '<td style="padding:3px 0;">' + qty + '× ' + escapeHtml(name) + '</td>' +
+                '<td style="text-align:right;padding:3px 0;">' + money(lt) + '</td>' +
+            '</tr>';
+    });
+
+    var deliveryFee = (parseFloat(order.total) || 0) - subtotal;
+    var deliveryRow = deliveryFee > 0.001
+        ? '<tr><td style="padding:2px 0;color:#666;">Delivery</td><td style="text-align:right;padding:2px 0;color:#666;">' + money(deliveryFee) + '</td></tr>'
+        : '';
+
+    var driverRow = order.driver_name
+        ? '<tr><td style="padding:2px 0;color:#666;">Driver</td><td style="text-align:right;padding:2px 0;color:#666;">' + escapeHtml(order.driver_name) + '</td></tr>'
+        : '';
+
+    var html =
+        '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Order #' + order.id + '</title>' +
+        '<style>' +
+            'body { font-family: "Courier New", monospace; width: 300px; margin: 0 auto; padding: 10px; color: #000; }' +
+            'h2 { text-align: center; font-size: 1.15em; margin: 0 0 4px; }' +
+            '.sub { text-align: center; font-size: 0.8em; color: #666; margin-bottom: 10px; }' +
+            '.section-title { font-weight: bold; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin: 10px 0 4px; border-bottom: 1px solid #000; padding-bottom: 2px; }' +
+            'table { width: 100%; border-collapse: collapse; font-size: 0.9em; }' +
+            '.totals { border-top: 1px dashed #999; margin-top: 8px; padding-top: 6px; }' +
+            '.grand { font-weight: bold; font-size: 1.15em; border-top: 2px solid #000; padding-top: 6px; }' +
+            '.footer { text-align: center; font-size: 0.75em; margin-top: 16px; color: #666; }' +
+            '@media print { @page { margin: 0; } }' +
+        '</style></head><body>' +
+        '<h2>' + escapeHtml(RESTAURANT.name || 'Receipt') + '</h2>' +
+        '<div class="sub">DELIVERY TICKET<br>Order #' + order.id + '<br>' + new Date(order.date || Date.now()).toLocaleString() + '</div>' +
+        '<div class="section-title">Customer</div>' +
+        '<div style="font-size:0.9em;line-height:1.5;">' +
+            '<strong>' + escapeHtml(order.name || '—') + '</strong><br>' +
+            (order.phone ? 'Tel: ' + escapeHtml(order.phone) + '<br>' : '') +
+            (order.address ? escapeHtml(order.address) : '') +
+        '</div>' +
+        '<div class="section-title">Items</div>' +
+        '<table>' + rows + '</table>' +
+        '<table class="totals">' +
+            '<tr><td>Subtotal</td><td style="text-align:right;">' + money(subtotal) + '</td></tr>' +
+            deliveryRow +
+            '<tr class="grand"><td>TOTAL</td><td style="text-align:right;">' + money(order.total) + '</td></tr>' +
+            '<tr><td colspan="2" style="padding-top:6px;font-size:0.85em;color:#666;">Payment: ' + escapeHtml(order.payment || 'Cash on Delivery') + '</td></tr>' +
+            driverRow +
+            '<tr><td colspan="2" style="font-size:0.85em;color:#666;">Status: ' + escapeHtml(order.status || 'New') + '</td></tr>' +
+        '</table>' +
+        '<div class="footer">Thank you!</div>' +
+        '</body></html>';
+
+    var w = window.open('', '_blank', 'width=340,height=640');
+    if (!w) { showNotification('Pop-up blocked — allow pop-ups to print'); return; }
+    w.document.write(html);
+    w.document.close();
+    setTimeout(function() { w.focus(); w.print(); }, 300);
+}
+function printAllPending() {
+    var pending = allOrders.filter(function(o) {
+        return o.status === 'Confirmed' || o.status === 'Preparing';
+    });
+    if (pending.length === 0) {
+        showNotification('No pending orders to print');
+        return;
+    }
+    if (!confirm('Print ' + pending.length + ' pending order ticket' + (pending.length === 1 ? '' : 's') + '?')) return;
+
+    // Print them one after another with a small delay so QZ doesn't choke
+    var i = 0;
+    function next() {
+        if (i >= pending.length) {
+            showNotification('✅ Printed ' + pending.length + ' tickets');
+            return;
+        }
+        printOrderReceipt(pending[i].id);
+        i++;
+        setTimeout(next, 800);   // 800ms gap between jobs
+    }
+    next();
+}
 console.log('🚀 Admin dashboard ready');
 </script>
 </body>
